@@ -19,17 +19,17 @@
 
 ## Descripción
 
-### **FoodPass** - Aplicación para Gestión de Comidas en Empresas con Escaneo Facial
+### **FoodPass** - Aplicación para Gestión de Comidas en Organizaciónes con Escaneo Facial
 
-**FoodPass** es una innovadora aplicación diseñada para facilitar la selección y distribución de comidas en empresas mediante un sistema automatizado de escaneo facial. Desarrollada con el framework Expo, ofrece una experiencia intuitiva y segura para los empleados al momento de elegir y recibir su comida en el comedor de la empresa.
+**FoodPass** es una innovadora aplicación diseñada para facilitar la selección y distribución de comidas en organizaciónes mediante un sistema automatizado de escaneo facial. Desarrollada con el framework Expo, ofrece una experiencia intuitiva y segura para los miembros al momento de elegir y recibir su comida en el comedor de la organización.
 
 ## Objetivo
 
-El propósito principal de **FoodPass** es optimizar el proceso de gestión de comidas en empresas, ofreciendo una solución eficiente y moderna que garantice la selección adecuada de alimentos y la validación segura de la identidad de los empleados a través del escaneo facial. Además, busca mejorar la experiencia del usuario al proporcionar una alternativa cómoda y personalizada para el almuerzo en el lugar de trabajo.
+El propósito principal de **FoodPass** es optimizar el proceso de gestión de comidas en organizaciónes, ofreciendo una solución eficiente y moderna que garantice la selección adecuada de alimentos y la validación segura de la identidad de los miembros a través del escaneo facial. Además, busca mejorar la experiencia del usuario al proporcionar una alternativa cómoda y personalizada para el almuerzo en el lugar de trabajo.
 
 ## Uso
 
-Para utilizar **FoodPass**, los empleados simplemente deben acceder a la aplicación en la tablet del comedor, donde podrán seleccionar su comida preferida dentro de las habilitadas y con el descuento correspondiente acorde a su puesto. Al momento de retirarlas deberan validar su identidad mediante el escaneo facial. Una vez completado este proceso, el empleado del comedor entregará la comida correspondiente al usuario. Además, se planea desarrollar una página web complementaria que permita realizar pedidos sin necesidad de estar físicamente en el comedor.
+Para utilizar **FoodPass**, los miembros simplemente deben acceder a la aplicación en la tablet del comedor, donde podrán seleccionar su comida preferida dentro de las habilitadas y con el descuento correspondiente acorde a su puesto. Al momento de retirarlas deberan validar su identidad mediante el escaneo facial. Una vez completado este proceso, el empleado del comedor entregará la comida correspondiente al usuario. Además, se planea desarrollar una página web complementaria que permita realizar pedidos sin necesidad de estar físicamente en el comedor.
 
 ## Equipo de desarrollo
 
