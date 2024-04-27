@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, Button, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { Camera, CameraType } from 'expo-camera';
 import { useState, useRef } from 'react';
 
@@ -36,7 +36,7 @@ export default function App() {
   
   async function takePicture() {
     let options = {
-      quality: 0,
+      quality: 1,
       base64: true,
       exif: false
     };
@@ -56,7 +56,7 @@ export default function App() {
       {!photo ?
         <View style={styles.container}>
           <View style={styles.roundedContainer}>
-            <Camera style={styles.camera} type={type} ref={cameraRef} />
+            <Camera style={styles.camera} type={type} pictureSize='1600x1200' ref={cameraRef} />
           </View>
           <View style={styles.buttonContainer}>
               <TouchableOpacity style={styles.button} onPress={toggleCameraType}>
@@ -88,21 +88,24 @@ const styles = StyleSheet.create({
   },
   roundedContainer: {
     flex: 1,
+    position: 'relative',
     justifyContent: 'center',
     overflow: 'hidden',
     borderRadius: 30,
-    width: '80%',
-    marginHorizontal: '10%',
-    marginVertical: '25%',
+    marginTop: '10%',
+    marginHorizontal: '15%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: Dimensions.get('window').height *.9 - Dimensions.get('window').width*.7*4/3 - 50 - 35, //total pantalla -margen superior - altura camara - margen botones - alto texto botones
   },
   camera: {
-    flex: 1,
+    aspectRatio: 3/4,
+    height: '100%',
   },
   buttonContainer: {
-    display: 'block',
     flexDirection: 'row',
     backgroundColor: 'transparent',
-    margin: 64,
+    marginBottom: 50,
   },
   button: {
     flex: 1,
