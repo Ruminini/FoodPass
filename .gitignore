@@ -1,2 +1,5 @@
 # Android Studio
 .idea*
+
+# Node.js
+node_modules
