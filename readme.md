@@ -34,10 +34,10 @@ Para utilizar **FoodPass**, los miembros simplemente deben acceder a la aplicaci
 ## Equipo de desarrollo
 
 - Dan Luca Gutierrez
-- Federico Gomez
 - Fernando Mossier
 - Tobias Rumiz
 - Santiago Gomez
+- Federico Gomez
 
 ## Herramientas
 
@@ -49,7 +49,7 @@ Para utilizar **FoodPass**, los miembros simplemente deben acceder a la aplicaci
 
 ## Librerías y Dependencias
 - [Expo-Camera](https://docs.expo.dev/versions/latest/sdk/camera/)
-- [OpenCV](https://opencv.org/) o [face_recognition](https://github.com/ageitgey/face_recognition)
+- [Fast-Api](https://justadudewhohacks.github.io/face-api.js/docs/globals.html#createmtcnn)
 
 ## Instrucciones para levantar la aplicacion en Expo
 
@@ -70,6 +70,11 @@ Para utilizar **FoodPass**, los miembros simplemente deben acceder a la aplicaci
 3. Instalar dependencias
     ```sh
     npm install
+    ```
+
+4. Instalar Fast-Api
+    ```sh
+    npm i face-api.js
     ```
 
 4. Ejecutar la aplicacion
