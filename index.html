@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <script src="node_modules\face-api.js\dist\face-api.js"></script>
+
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+    
+            body {
+                text-align: center;
+                background: #f2f6f8;
+            }
+    
+            img {
+                position: absolute;
+                z-index: 1;
+            }
+    
+            #container {
+                display: inline-block;
+                width: 1280px;
+                height: 856px;
+                margin: 0 auto;
+                background: black;
+                position: relative;
+                border: 5px solid black;
+                border-radius: 10px;
+                box-shadow: 0 5px 50px #333
+            }
+    
+            #canvas {
+                position: relative;
+                z-index: 20;
+            }
+        </style>
+    </head>
+
+<body>
+    <div id="container">
+        <title>FoodPass | Reconocimiento Facial (Test)</title>
+        <img src="Backend\images\breaking_bad.jpg" id="image">
+        <canvas id="canvas" width="1280" height="856"></canvas> <!-- Tamaño de image -->
+    </div>
+
+    <script src="Backend\script.js" type="module"></script>
+</body>
+
+</html>
