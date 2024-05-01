@@ -41,10 +41,11 @@ Para utilizar **FoodPass**, los miembros simplemente deben acceder a la aplicaci
 
 ## Herramientas
 
-- Expo
+- Expo (Expo Go)
 - React Native
-- Python (para el desarrollo del backend)
-- HTML, CSS, JavaScript (para la página web complementaria)
+- HTML
+- CSS
+- JS
 
 ## Librerías y Dependencias
 - [Expo-Camera](https://docs.expo.dev/versions/latest/sdk/camera/)
