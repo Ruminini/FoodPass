@@ -25,7 +25,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'white',
         borderRadius: 25,
-        paddingRight: 25,
         elevation: 2,
         marginVertical: 15,
 		width: '100%',
@@ -39,6 +38,6 @@ const styles = StyleSheet.create({
         fontWeight: '400',
         color: 'black',
         textAlign: 'center',
-        minHeight: 50,
+        paddingHorizontal: 15,
     },
 });
