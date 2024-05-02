@@ -53,7 +53,7 @@ export default function FoodPicker() {
                 />
                 <BackButton style={{transform: [{rotate: '180deg'}]}} onPress={() => console.log('Volver')} />
             </View>
-            <MenuList>
+            <MenuList alignTop={true}>
                 {filters.type === 'comida' &&
                     <View style={{alignItems: 'center'}}>
                         <View style={styles.filterContainer}>
