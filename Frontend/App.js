@@ -26,7 +26,7 @@ export default function App() {
         setPage(<Register onPress={handleDefault}/>);
         break;
       case 'ConfigMenu':
-        setPage(<ConfigMenu/>);
+        setPage(<ConfigMenu onPress={handleDefault}/>);
         break;
     }
   };

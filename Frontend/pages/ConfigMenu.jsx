@@ -7,10 +7,10 @@ import Food from '../assets/svg/food.svg'
 import Register from '../assets/svg/register.svg'
 import Constants from 'expo-constants';
 
-export default function ConfigMenu() {
+export default function ConfigMenu({onPress}) {
     return (
         <View style={styles.container}>
-            <BackButton onPress={() => console.log('Volver')}/>
+            <BackButton onPress={() => onPress('cancel')}/>
             <MenuList >
                 <MenuButton
                     svg={<Food/>}
