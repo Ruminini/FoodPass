@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Button, TouchableOpacity, Image, Dimensions, StatusBar } from 'react-native';
-import { useState, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import FaceScan from './pages/FaceScan';
 import MainMenu from './pages/MainMenu';
 import ConfigMenu from './pages/ConfigMenu'
@@ -7,10 +7,42 @@ import FoodPicker from './pages/FoodPicker';
 import Register from './pages/Register';
 
 export default function App() {
-  
+  const [page, setPage] = useState(<View/>);
+  useEffect(() => setPage(<MainMenu onPress={handleMainMenuButton}/>), []);
+
+  const setMainMenu = () => {
+    setPage(<MainMenu onPress={handleMainMenuButton}/>);
+  };
+
+  const handleMainMenuButton = (option) => {
+    switch (option) {
+      case 'FoodPicker':
+        setPage(<FoodPicker onPress={handleDefault}/>);
+        break;
+      case 'FaceScan':
+        setPage(<FaceScan onPress={handleDefault}/>);
+        break;
+      case 'Register':
+        setPage(<Register onPress={handleDefault}/>);
+        break;
+      case 'ConfigMenu':
+        setPage(<ConfigMenu/>);
+        break;
+    }
+  };
+
+  const handleDefault = (values) => {
+    if (values == 'cancel') {
+      setMainMenu();
+      return
+    }
+    console.log(values);
+    setMainMenu();
+  }
+
   return (
       <View style={styles.container}>
-        <FaceScan />
+        {page}
       </View>
   );
 }

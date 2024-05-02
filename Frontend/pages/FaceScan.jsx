@@ -8,8 +8,9 @@ import {
 import { Camera, CameraType } from "expo-camera";
 import { useState, useRef } from "react";
 import MenuButton from "../components/MenuButton";
+import BackButton from "../components/BackButton";
 
-export default function FaceScan() {
+export default function FaceScan({onPress}) {
 	const [type, setType] = useState(CameraType.back);
 	const [permission, requestPermission] = Camera.useCameraPermissions();
 	const [photo, setPhoto] = useState(null);
@@ -57,6 +58,7 @@ export default function FaceScan() {
 
 	return (
 		<View style={styles.container}>
+			<BackButton onPress={() => onPress('cancel')}/>
 			{!photo ? (
 				<View style={styles.container}>
 					<View style={styles.roundedContainer}>

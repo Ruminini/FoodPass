@@ -13,7 +13,7 @@ import Celiac from '../assets/svg/celiac.svg'
 import SelectedMenuList from '../components/SelectedMenuList'
 import SelectedFoodItem from '../components/SelectedFoodItem';
 
-export default function FoodPicker() {
+export default function FoodPicker({onPress}) {
     const [filters, setFilters] = useState({vegan: false, vegetarian: false, celiac: false, type: 'comida'})
     const [selectedFoods, setSelectedFoods] = useState([])
     const foodList = foods.filter(food => matchesFilters(food, filters))
@@ -29,7 +29,7 @@ export default function FoodPicker() {
     return (
         <View style={styles.container}>
             <View style={styles.navContainer}>
-                <BackButton onPress={() => console.log('Volver')} />
+			    <BackButton onPress={() => onPress('cancel')}/>
                 <TabIcon
                     text='Comida'
                     svg={<Food fill={filters.type === 'comida' && 'white'}/>}
@@ -51,7 +51,7 @@ export default function FoodPicker() {
                     style={filters.type === 'postre' && {backgroundColor: 'black', borderRadius: 15}}
                     selected={filters.type === 'postre'}
                 />
-                <BackButton style={{transform: [{rotate: '180deg'}]}} onPress={() => console.log('Volver')} />
+                <BackButton style={{transform: [{rotate: '180deg'}]}} onPress={() => onPress(selectedFoods)} />
             </View>
             <MenuList alignTop={true}>
                 {filters.type === 'comida' &&
