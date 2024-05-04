@@ -3,7 +3,7 @@ const faceapi = require('face-api.js');
 const { loadImage } = require('canvas');
 
 // Define la ruta del modelo
-const MODEL_URL = '../Backend/models';
+const MODEL_URL = '/Backend/models';
 
 // Configura face-api.js para usar node-canvas
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
@@ -23,7 +23,7 @@ async function detectFaces(imagePath) {
 }
 
 // Ruta de la imagen
-const imagePath = '../Backend/images/breaking_bad.';
+const imagePath = '/Backend/images/breaking_bad.jpg';
 
 // Carga los modelos y detecta los rostros en la imagen
 export async function runFR() {
