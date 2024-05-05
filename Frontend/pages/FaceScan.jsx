@@ -6,15 +6,19 @@ import {
 	Image,
 } from "react-native";
 import { Camera, CameraType } from "expo-camera";
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import MenuButton from "../components/MenuButton";
 import BackButton from "../components/BackButton";
+import LandmarksSvg from "../components/LandmarksSvg";
 
 export default function FaceScan({onPress}) {
 	const [type, setType] = useState(CameraType.back);
 	const [permission, requestPermission] = Camera.useCameraPermissions();
 	const [photo, setPhoto] = useState(null);
+	const [size, setSize] = useState("320x240");
+	const [landmarks, setLandmarks] = useState(null);
 	const cameraRef = useRef(null);
+	useEffect(() => getPictureSizes, [type]);
 
 	if (!permission) {
 		// Camera permissions are still loading
@@ -33,10 +37,23 @@ export default function FaceScan({onPress}) {
 		);
 	}
 
+	async function getPictureSizes() {
+		if (!cameraRef || cameraRef.current == null) return;
+		cameraRef.current.getAvailablePictureSizesAsync('4:3')
+		.then(sizes => {
+			console.log('Available picture sizes:', sizes);
+			setSize(sizes[0]);
+		})
+		.catch(error => {
+			console.error('Error getting picture sizes:', error);
+		});
+	}
+
 	function toggleCameraType() {
-		setType((current) =>
+		setType((current) => 
 			current === CameraType.back ? CameraType.front : CameraType.back
 		);
+		getPictureSizes();
 	}
 
 	async function takePicture() {
@@ -47,8 +64,13 @@ export default function FaceScan({onPress}) {
 		};
 		if (cameraRef) {
 			try {
+				setLandmarks(null);
 				const newPhoto = await cameraRef.current.takePictureAsync(options);
-				console.log(newPhoto);
+				console.log(Object.keys(newPhoto));
+				recognizeFaces(newPhoto.base64).then((response) => {
+					setLandmarks(response);
+				})
+				
 				setPhoto(newPhoto.uri);
 			} catch (e) {
 				console.log(e);
@@ -65,7 +87,7 @@ export default function FaceScan({onPress}) {
 						<Camera
 							style={styles.camera}
 							type={type}
-							pictureSize="1600x1200"
+							pictureSize={size}//"1600x1200"
 							ref={cameraRef}
 						/>
 					</View>
@@ -84,11 +106,14 @@ export default function FaceScan({onPress}) {
 				</View>
 			) : (
 				<View style={styles.container}>
-					<Image source={{ uri: photo }} style={styles.roundedContainer} />
+					<View style={styles.roundedContainer}>
+					<Image source={{ uri: photo }} style={{ aspectRatio: 3 / 4, height: "100%", width: "100%"}} />
+					{landmarks && <View style={styles.landmarks} ><LandmarksSvg landmarks={landmarks} style={{flex: 1}}/></View>}
+					</View>
 					<View style={styles.buttonContainer}>
 						<MenuButton
 							text="Retake Picture"
-							onPress={() => setPhoto(null)}
+							onPress={() => {setPhoto(null); setLandmarks(null);}}
 							style={styles.button}
 						/>
 					</View>
@@ -104,6 +129,7 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		flexDirection: "column",
 		justifyContent: "space-around",
+		position: "relative",
 	},
 	roundedContainer: {
 		position: "relative",
@@ -126,4 +152,40 @@ const styles = StyleSheet.create({
 		width: "40%",
 		height: 100,
 	},
+	landmarks: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+	}
 });
+
+
+const API_URL = 'https://quality-cicada-wrongly.ngrok-free.app';
+const recognizeFaces = async (base64Image) => {
+    if (!base64Image) {
+		console.error('Error: Tried to recognize faces with no image');
+      return;
+    }
+
+    try {
+      const response = await fetch(API_URL+'/recognizeFaces', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ base64Image }),
+      });
+	  console.log(await response.body)
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('Image uploaded successfully:', responseData);
+		return responseData;
+      } else {
+        console.error('Failed to upload image:', response.status);
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
+  };
