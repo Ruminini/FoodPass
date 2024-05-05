@@ -72,17 +72,12 @@ Para utilizar **FoodPass**, los miembros simplemente deben acceder a la aplicaci
     npm install
     ```
 
-4. Instalar Fast-Api
-    ```sh
-    npm i face-api.js
-    ```
-
-4. Ejecutar la aplicacion
+3. Ejecutar la aplicacion
     ```sh
     npm start
     ```
 
-5. Acceder desde el celular/tablet
+4. Acceder desde el celular/tablet
     - Instalar Expo Go desde PlayStore
     - Escanear el código QR generado por consola en el paso 4 o introducir manualmente la URL obtenida.
 
