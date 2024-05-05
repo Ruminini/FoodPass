@@ -4,15 +4,14 @@ import BackButton from '../components/BackButton';
 import MenuButton from '../components/MenuButton';
 
 export default function Register({onPress}) {
-    const [email, onChangeEmail] = useState('');
     const [password, onChangePassword] = useState('');
     const [id, onChangeId] = useState('');
     const [invalid, setInvalid] = useState('');
 
     const validateAndRegister = () => {
-        // Valid Email
-        if (!email.match(/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/)) {
-            setInvalid('email')
+        // Id: 8 digits - 4 digits
+        if (!id.match(/^[0-9]{8}-[0-9]{4}$/)) {
+            setInvalid('id')
             return false;
         }
         // Password: >8, 1 uppercase, 1 lowercase, 1 number
@@ -20,25 +19,20 @@ export default function Register({onPress}) {
             setInvalid('password')
             return false;
         }
-        // Id: 8 digits - 4 digits
-        if (!id.match(/^[0-9]{8}-[0-9]{4}$/)) {
-            setInvalid('id')
-            return false;
-        }
-        onPress({email, password, id});
+        onPress({ id, password });
     }
 
     return (
         <View style={{ flex: 1 }}>
             <BackButton onPress={() => onPress('cancel')}/>
             <View style={styles.container}>
-                <Text style={[styles.title, invalid==='email' && { color: 'red' }]}>Correo Electronico</Text>
+                <Text style={[styles.title, invalid==='id' && { color: 'red' }]}>Legajo</Text>
                 <TextInput
                     style={styles.input}
-                    onChangeText={onChangeEmail}
-                    value={email}
-                    placeholder="email@ejemplo.com"
-                    keyboardType="email-address"
+                    onChangeText={onChangeId}
+                    value={id}
+                    placeholder="12345678-4321"
+                    keyboardType="numeric"
                 />
                 <Text style={[styles.title, invalid==='password' && { color: 'red' }]}>Contraseña</Text>
                 <TextInput
@@ -47,14 +41,6 @@ export default function Register({onPress}) {
                     value={password}
                     placeholder="••••••••••"
                     secureTextEntry={true}
-                />
-                <Text style={[styles.title, invalid==='id' && { color: 'red' }]}>Legajo</Text>
-                <TextInput
-                    style={styles.input}
-                    onChangeText={onChangeId}
-                    value={id}
-                    placeholder="12345678-4321"
-                    keyboardType="numeric"
                 />
                 <MenuButton text="Registrar" onPress={validateAndRegister} style={{height: 75}}/>
             </View>
