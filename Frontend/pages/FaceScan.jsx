@@ -10,8 +10,9 @@ import { useState, useEffect, useRef } from "react";
 import MenuButton from "../components/MenuButton";
 import BackButton from "../components/BackButton";
 import LandmarksSvg from "../components/LandmarksSvg";
+import people from '../data/people.json';
 
-export default function FaceScan({onPress}) {
+export default function FaceScan({ onPress }) {
 	const [type, setType] = useState(CameraType.back);
 	const [permission, requestPermission] = Camera.useCameraPermissions();
 	const [photo, setPhoto] = useState(null);
@@ -50,7 +51,7 @@ export default function FaceScan({onPress}) {
 	}
 
 	function toggleCameraType() {
-		setType((current) => 
+		setType((current) =>
 			current === CameraType.back ? CameraType.front : CameraType.back
 		);
 		getPictureSizes();
@@ -66,11 +67,11 @@ export default function FaceScan({onPress}) {
 			try {
 				setLandmarks(null);
 				const newPhoto = await cameraRef.current.takePictureAsync(options);
-				console.log(Object.keys(newPhoto));
 				recognizeFaces(newPhoto.base64).then((response) => {
 					setLandmarks(response);
+					matchFaces(response[0].descriptor);
 				})
-				
+
 				setPhoto(newPhoto.uri);
 			} catch (e) {
 				console.log(e);
@@ -80,7 +81,7 @@ export default function FaceScan({onPress}) {
 
 	return (
 		<View style={styles.container}>
-			<BackButton onPress={() => onPress('cancel')}/>
+			<BackButton onPress={() => onPress('cancel')} />
 			{!photo ? (
 				<View style={styles.container}>
 					<View style={styles.roundedContainer}>
@@ -107,13 +108,15 @@ export default function FaceScan({onPress}) {
 			) : (
 				<View style={styles.container}>
 					<View style={styles.roundedContainer}>
-					<Image source={{ uri: photo }} style={{ aspectRatio: 3 / 4, height: "100%", width: "100%"}} />
-					{landmarks && <View style={styles.landmarks} ><LandmarksSvg landmarks={landmarks} style={{flex: 1}}/></View>}
+						<Image source={{ uri: photo }} style={{ aspectRatio: 3 / 4, height: "100%", width: "100%" }} />
+						<View style={styles.landmarks} >
+							{landmarks && <LandmarksSvg landmarks={landmarks} style={{ flex: 1 }} />}
+						</View>
 					</View>
 					<View style={styles.buttonContainer}>
 						<MenuButton
 							text="Retake Picture"
-							onPress={() => {setPhoto(null); setLandmarks(null);}}
+							onPress={() => { setPhoto(null); setLandmarks(null); }}
 							style={styles.button}
 						/>
 					</View>
@@ -164,28 +167,67 @@ const styles = StyleSheet.create({
 
 const API_URL = 'https://quality-cicada-wrongly.ngrok-free.app';
 const recognizeFaces = async (base64Image) => {
-    if (!base64Image) {
+	if (!base64Image) {
 		console.error('Error: Tried to recognize faces with no image');
-      return;
-    }
+		return;
+	}
+	try {
+		const response = await fetch(API_URL + '/recognizeFaces', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ base64Image }),
+		});
+		if (response.ok) {
+			const responseData = await response.json();
+			console.log('Image uploaded successfully:', responseData);
+			return responseData;
+		} else {
+			console.error('Failed to upload image:', response.status);
+		}
+	} catch (error) {
+		console.error('Error uploading image:', error);
+	}
+};
 
-    try {
-      const response = await fetch(API_URL+'/recognizeFaces', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ base64Image }),
-      });
-	  console.log(await response.body)
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log('Image uploaded successfully:', responseData);
-		return responseData;
-      } else {
-        console.error('Failed to upload image:', response.status);
-      }
-    } catch (error) {
-      console.error('Error uploading image:', error);
-    }
-  };
+function euclideanDistance(vector1, vector2) {
+	if (vector1.length !== vector2.length) {
+		throw new Error('Vectors must be of the same length');
+	}
+	let sumOfSquares = 0;
+	for (let i = 0; i < vector1.length; i++) {
+		const difference = vector1[i] - vector2[i];
+		sumOfSquares += difference * difference;
+	}
+	return Math.sqrt(sumOfSquares);
+}
+
+function matchFaces(faceDescriptor) {
+	const faceDescriptorValues = Object.values(faceDescriptor);
+	let closestPerson = null;
+	let closestDistance = Infinity;
+	const startTime = performance.now();
+
+	// for (let i = 0; i < 1000; i++) { // For testing purposes
+	for (const otherPerson in people) {
+		if (people.hasOwnProperty(otherPerson)) {
+			const otherPersonDescriptors = people[otherPerson];
+			const otherPersonDescriptorValues = Object.values(otherPersonDescriptors);
+
+			// Calculate the Euclidean distance
+			const distance = euclideanDistance(faceDescriptorValues, otherPersonDescriptorValues);
+			if (distance <= closestDistance) {
+				closestPerson = otherPerson;
+				closestDistance = distance;
+			}
+			console.log(`Distance between the face and ${otherPerson}: ${distance}`);
+		}
+	}
+	// }
+
+	const endTime = performance.now();
+	const elapsedTime = endTime - startTime;
+
+	console.log(`Total time taken: ${elapsedTime} milliseconds`);
+}

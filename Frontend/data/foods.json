@@ -1,0 +1,226 @@
+[
+    {
+       "title":"Canelones a la criolla",
+       "description":"Canelones rellenos de carne picada y espinaca, bañados en salsa de tomate.",
+       "type":"comida"
+    },
+    {
+       "title":"Pastel de papas",
+       "description":"Capas de puré de papas, carne molida y huevo duro, gratinado al horno.",
+       "type":"comida",
+       "celiac":true
+    },
+    {
+       "title":"Matambre al roquefort",
+       "description":"Matambre relleno de roquefort y nueces, asado a la parrilla.",
+       "type":"comida"
+    },
+    {
+       "title":"Revuelto gramajo",
+       "description":"Revuelto de papas fritas, huevo, jamón y cebolla.",
+       "type":"comida",
+       "celiac":true
+    },
+    {
+       "title":"Puchero criollo",
+       "description":"Guiso tradicional con carne, chorizo, zapallo y maíz.",
+       "type":"comida",
+       "celiac":true
+    },
+    {
+       "title":"Tarta de choclo",
+       "description":"Tarta rellena de choclo, queso y pimiento morrón.",
+       "type":"comida",
+       "vegetarian":true
+    },
+    {
+       "title":"Bondiola al malbec",
+       "description":"Bondiola de cerdo cocida lentamente en salsa de malbec y cebolla.",
+       "type":"comida",
+       "celiac":true
+    },
+    {
+       "title":"Chivito a la parrilla",
+       "description":"Sandwich de carne de chivo asada, lechuga, tomate, panceta y huevo.",
+       "type":"comida"
+    },
+    {
+       "title":"Pollo al curry criollo",
+       "description":"Pollo marinado en especias criollas con curry y papas.",
+       "type":"comida"
+    },
+    {
+       "title":"Pizza de Vegetales Asados",
+       "description":"Una pizza con base de masa fina, cubierta con salsa de tomate, mozzarella, y vegetales asados como berenjena, pimientos y champiñones.",
+       "type":"comida",
+       "vegetarian":true
+    },
+    {
+       "title":"Empanadas de Espinaca y Queso",
+       "description":"Empanadas rellenas de espinaca cocida y queso cremoso.",
+       "type":"comida",
+       "vegetarian":true
+    },
+    {
+       "title":"Tarta de Zapallitos y Queso",
+       "description":"Tarta rellena de zapallitos rallados y queso, con una base de masa crocante.",
+       "type":"comida",
+       "vegetarian":true
+    },
+    {
+       "title":"Milanesa de Soja",
+       "description":"Milanesa vegetal hecha con proteína de soja marinada y empanizada, acompañada de ensalada fresca.",
+       "type":"comida",
+       "vegetarian":true
+    },
+    {
+       "title":"Risotto de Hongos",
+       "description":"Risotto cremoso cocinado con hongos, cebolla y caldo de verduras.",
+       "type":"comida",
+       "vegetarian":true
+    },
+    {
+       "title":"Arroz con pollo y vegetales",
+       "description":"Arroz salteado con trozos de pollo, zanahorias y arvejas.",
+       "type":"comida",
+       "celiac":true
+    },
+    {
+       "title":"Hamburguesa de Lentejas",
+       "description":"Hamburguesa vegana elaborada con lentejas cocidas, cebolla, ajo y especias, servida con pan integral y vegetales frescos.",
+       "type":"comida",
+       "vegetarian":true,
+       "vegan":true
+    },
+    {
+       "title":"Fideos de Calabacín con Pesto Vegano",
+       "description":"Fideos de calabacín crudos acompañados de pesto vegano hecho con albahaca, nueces, ajo y levadura nutricional.",
+       "type":"comida",
+       "vegetarian":true,
+       "vegan":true,
+       "celiac":true
+    },
+    {
+       "title":"Ensalada Vegana de Quinoa y Verduras",
+       "description":"Ensalada refrescante con quinoa cocida, tomate cherry, pepino, aguacate y aderezo de limón y aceite de oliva.",
+       "type":"comida",
+       "vegetarian":true,
+       "vegan":true,
+       "celiac":true
+    },
+    {
+       "title":"Burrito Vegano de Frijoles Negros",
+       "description":"Burrito relleno de frijoles negros refritos, arroz, aguacate, pico de gallo y salsa picante, envuelto en tortilla de maíz.",
+       "type":"comida",
+       "vegetarian":true,
+       "vegan":true
+    },
+    {
+       "title":"Curry de Verduras al Coco",
+       "description":"Curry vegano con verduras mixtas cocinadas en leche de coco y especias, servido con arroz basmati.",
+       "type":"comida",
+       "vegetarian":true,
+       "vegan":true,
+       "celiac":true
+    },
+    {
+       "title":"Mate frío con limón",
+       "description":"Mate frío con jugo de limón y hojas de menta.",
+       "type":"bebida"
+    },
+    {
+       "title":"Clara con limón",
+       "description":"Cerveza rubia con jugo de limón y hielo.",
+       "type":"bebida"
+    },
+    {
+       "title":"Vino dulce de uva",
+       "description":"Vino tinto suave y dulce con sabor a uva.",
+       "type":"bebida"
+    },
+    {
+       "title":"Fernet con pomelo",
+       "description":"Fernet con soda y rodajas de pomelo.",
+       "type":"bebida"
+    },
+    {
+       "title":"Licuado de frutilla",
+       "description":"Licuado cremoso de frutilla con leche y azúcar.",
+       "type":"bebida"
+    },
+    {
+       "title":"Jugo de naranja exprimido",
+       "description":"Jugo fresco de naranja recién exprimido.",
+       "type":"bebida"
+    },
+    {
+       "title":"Café con crema",
+       "description":"Café espresso con crema batida y cacao en polvo.",
+       "type":"bebida"
+    },
+    {
+       "title":"Sidra de manzana",
+       "description":"Sidra de manzana natural con burbujas refrescantes.",
+       "type":"bebida"
+    },
+    {
+       "title":"Trago de frutas tropicales",
+       "description":"Cóctel refrescante con ron, jugo de piña y coco rallado.",
+       "type":"bebida"
+    },
+    {
+       "title":"Limonada casera",
+       "description":"Limonada hecha con limones frescos y azúcar.",
+       "type":"bebida"
+    },
+    {
+       "title":"Alfajor de chocolate blanco",
+       "description":"Dulce de leche entre dos galletas bañadas en chocolate blanco.",
+       "type":"postre"
+    },
+    {
+       "title":"Flan de dulce de leche",
+       "description":"Flan tradicional argentino con abundante dulce de leche.",
+       "type":"postre"
+    },
+    {
+       "title":"Queso y dulce",
+       "description":"Queso cremoso acompañado de dulce de batata casero.",
+       "type":"postre"
+    },
+    {
+       "title":"Torta de ricota",
+       "description":"Torta suave de ricota con pasas de uva y cáscara de limón.",
+       "type":"postre"
+    },
+    {
+       "title":"Helado de dulce de leche granizado",
+       "description":"Helado cremoso de dulce de leche con trocitos de chocolate.",
+       "type":"postre"
+    },
+    {
+       "title":"Pastelitos de membrillo",
+       "description":"Pastelitos rellenos de membrillo y espolvoreados con azúcar impalpable.",
+       "type":"postre"
+    },
+    {
+       "title":"Panqueques de dulce de leche",
+       "description":"Panqueques rellenos con abundante dulce de leche y espolvoreados con azúcar.",
+       "type":"postre"
+    },
+    {
+       "title":"Bombón suizo",
+       "description":"Chocolate relleno con crema y licor, decorado con almendras.",
+       "type":"postre"
+    },
+    {
+       "title":"Mazamorra con arroz con leche",
+       "description":"Mazamorra tradicional acompañada de arroz con leche cremoso.",
+       "type":"postre"
+    },
+    {
+       "title":"Tiramisú criollo",
+       "description":"Postre de tiramisú con un toque de dulce de leche.",
+       "type":"postre"
+    }
+ ]
