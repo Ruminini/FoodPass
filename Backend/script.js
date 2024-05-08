@@ -3,12 +3,13 @@ const tf = require('@tensorflow/tfjs-node');
 const faceapi = require('@vladmandic/face-api');
 const { loadImage } = require('canvas');
 const fs = require('fs');
+require('dotenv').config()
+
+const MODEL_URL = process.env.MODEL_URL || './models';
+const PORT = process.env.PORT || 3000;
 
 // Configura face-api.js para usar node-canvas
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
-
-// Define la ruta del modelo
-const MODEL_URL = './models';
 
 // Carga los modelos
 async function loadModels() {
@@ -36,8 +37,6 @@ async function main() {
 async function runServer() {
     const express = require('express');
     const app = express();
-    const PORT = 3000;
-
     app.use(express.json({ limit: '10mb' }));
     app.post('/recognizeFaces', async (req, res) => {
         const { base64Image } = req.body;
@@ -53,9 +52,13 @@ async function runServer() {
         }
     });
 
+    app.get('/health', (req, res) => {
+        res.json({ status: 'up' });
+    });
+
     // Inicia el servidor
-    app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port: ${PORT}`);
     });
 }
 
