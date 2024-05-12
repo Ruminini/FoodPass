@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import Svg, { Circle, Rect } from 'react-native-svg';
 
-const LandmarksSvg = ({ landmarks }) => {
+export default function LandmarksSvg({ landmarks }) {
     if (!landmarks || landmarks.length === 0) {
         return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <Text style={{ textAlign: 'center', fontSize: 24, fontWeight: 'bold', backgroundColor: 'red', color: 'white', width: '100%' }}>No faces detected</Text>
@@ -12,8 +12,6 @@ const LandmarksSvg = ({ landmarks }) => {
 
     const dims = landmarks[0].detection._imageDims;
     console.log(dims);
-    console.log(Object.keys(landmarks));
-    console.log(Object.keys(landmarks[0]));
     let positions = []
     landmarks.forEach(face => positions.push(...face.landmarks._positions));
     let boxes = []
@@ -50,5 +48,3 @@ const LandmarksSvg = ({ landmarks }) => {
         </Svg>
   );
 };
-
-export default LandmarksSvg;

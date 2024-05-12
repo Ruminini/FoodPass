@@ -6,20 +6,21 @@ import {
 	Image,
 } from "react-native";
 import { Camera, CameraType } from "expo-camera";
+import * as ImageManipulator from "expo-image-manipulator";
 import { useState, useEffect, useRef } from "react";
 import MenuButton from "../components/MenuButton";
 import BackButton from "../components/BackButton";
 import LandmarksSvg from "../components/LandmarksSvg";
+import ScanAnimation from "../components/ScanAnimation";
 import people from '../data/people.json';
 
 export default function FaceScan({ onPress }) {
 	const [type, setType] = useState(CameraType.back);
 	const [permission, requestPermission] = Camera.useCameraPermissions();
 	const [photo, setPhoto] = useState(null);
-	const [size, setSize] = useState("320x240");
+	const [size, setSize] = useState("640x480");
 	const [landmarks, setLandmarks] = useState(null);
 	const cameraRef = useRef(null);
-	useEffect(() => getPictureSizes, [type]);
 
 	if (!permission) {
 		// Camera permissions are still loading
@@ -42,8 +43,9 @@ export default function FaceScan({ onPress }) {
 		if (!cameraRef || cameraRef.current == null) return;
 		cameraRef.current.getAvailablePictureSizesAsync('4:3')
 		.then(sizes => {
-			console.log('Available picture sizes:', sizes);
-			setSize(sizes[0]);
+			//make newSize the closest size <= 640x480
+			const newSize = sizes.filter(res => res.split('x')[0] <= 640).pop();
+			setSize(newSize);
 		})
 		.catch(error => {
 			console.error('Error getting picture sizes:', error);
@@ -57,21 +59,32 @@ export default function FaceScan({ onPress }) {
 		getPictureSizes();
 	}
 
+	async function resizeImage(img) {
+		if (img.height == 640) return img;
+		const resizedPhoto = await ImageManipulator.manipulateAsync(
+			img.uri,
+			[{ resize: { width: 480, height: 640 } }],
+			{ compress: 1, base64: true, compress: 0.5 }
+		);
+		console.log('resized',img.height,'to',resizedPhoto.height);
+		return resizedPhoto;
+	}
 	async function takePicture() {
 		let options = {
-			quality: 1,
+			quality: 0.5,
 			base64: true,
 			exif: false,
 		};
+		setLandmarks(null);
 		if (cameraRef) {
 			try {
-				setLandmarks(null);
-				const newPhoto = await cameraRef.current.takePictureAsync(options);
+				let newPhoto = await cameraRef.current.takePictureAsync(options).then(resizeImage);
 				recognizeFaces(newPhoto.base64).then((response) => {
 					setLandmarks(response);
-					matchFaces(response[0].descriptor);
-				})
-
+					if (response && response.length > 0) {
+						matchFaces(Object.values(response[0].descriptor));
+					}
+				});
 				setPhoto(newPhoto.uri);
 			} catch (e) {
 				console.log(e);
@@ -88,8 +101,9 @@ export default function FaceScan({ onPress }) {
 						<Camera
 							style={styles.camera}
 							type={type}
-							pictureSize={size}//"1600x1200"
+							pictureSize={size}
 							ref={cameraRef}
+							onCameraReady={getPictureSizes}
 						/>
 					</View>
 					<View style={styles.buttonContainer}>
@@ -112,6 +126,7 @@ export default function FaceScan({ onPress }) {
 						<View style={styles.landmarks} >
 							{landmarks && <LandmarksSvg landmarks={landmarks} style={{ flex: 1 }} />}
 						</View>
+						{!landmarks && <ScanAnimation />}
 					</View>
 					<View style={styles.buttonContainer}>
 						<MenuButton
@@ -165,23 +180,31 @@ const styles = StyleSheet.create({
 });
 
 
-const API_URL = 'https://quality-cicada-wrongly.ngrok-free.app';
+const API_URL = 'https://foodpass.onrender.com';
+// const API_URL = 'https://quality-cicada-wrongly.ngrok-free.app';
 const recognizeFaces = async (base64Image) => {
-	if (!base64Image) {
-		console.error('Error: Tried to recognize faces with no image');
-		return;
-	}
+	if (!base64Image) throw new error('Error: Tried to recognize faces with no image');
 	try {
+		// const health = await fetch(API_URL + '/health', {
+		// 	method: 'GET',
+		// 	headers: { 'Content-Type': 'application/json' }
+		// });
+		// if (!health.ok) {
+		// 	console.error('Failed to check health:', health.status);
+		// 	return;
+		// } else {
+		// 	console.log('Health check successful');
+		// }
+		let startTime = performance.now();
 		const response = await fetch(API_URL + '/recognizeFaces', {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
+			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ base64Image }),
 		});
+		console.log('Request time:',performance.now()-startTime, 'ms');
 		if (response.ok) {
 			const responseData = await response.json();
-			console.log('Image uploaded successfully:', responseData);
+			// console.log('Image uploaded successfully:', responseData);
 			return responseData;
 		} else {
 			console.error('Failed to upload image:', response.status);
@@ -203,31 +226,16 @@ function euclideanDistance(vector1, vector2) {
 	return Math.sqrt(sumOfSquares);
 }
 
-function matchFaces(faceDescriptor) {
-	const faceDescriptorValues = Object.values(faceDescriptor);
+function matchFaces(face) {
 	let closestPerson = null;
 	let closestDistance = Infinity;
-	const startTime = performance.now();
-
-	// for (let i = 0; i < 1000; i++) { // For testing purposes
 	for (const otherPerson in people) {
-		if (people.hasOwnProperty(otherPerson)) {
-			const otherPersonDescriptors = people[otherPerson];
-			const otherPersonDescriptorValues = Object.values(otherPersonDescriptors);
-
-			// Calculate the Euclidean distance
-			const distance = euclideanDistance(faceDescriptorValues, otherPersonDescriptorValues);
-			if (distance <= closestDistance) {
-				closestPerson = otherPerson;
-				closestDistance = distance;
-			}
-			console.log(`Distance between the face and ${otherPerson}: ${distance}`);
+		const otherFace = Object.values(people[otherPerson]);
+		const distance = euclideanDistance(face, otherFace);
+		if (distance < closestDistance) {
+			closestPerson = otherPerson;
+			closestDistance = distance;
 		}
 	}
-	// }
-
-	const endTime = performance.now();
-	const elapsedTime = endTime - startTime;
-
-	console.log(`Total time taken: ${elapsedTime} milliseconds`);
+	console.log(`Closest person: ${closestPerson}, distance: ${closestDistance}`);
 }
