@@ -1,25 +1,78 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
 import BackButton from '../components/BackButton';
 import MenuButton from '../components/MenuButton';
+import { validateId, validatePassword, registerPassword} from '../services/RegisterValidator';
 
 export default function Register({onPress}) {
     const [password, onChangePassword] = useState('');
     const [id, onChangeId] = useState('');
     const [invalid, setInvalid] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
-    const validateAndRegister = () => {
-        // Id: 8 digits - 4 digits
+    const validateAndRegister = async () => {
+        // Validación del formato del legajo
         if (!id.match(/^[0-9]{8}-[0-9]{4}$/)) {
+            setErrorMessage('')
             setInvalid('id')
             return false;
         }
-        // Password: >8, 1 uppercase, 1 lowercase, 1 number
+
+        // Validación del formato de la password
         if (!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)) {
+            setErrorMessage('')
             setInvalid('password')
             return false;
         }
+
+        // Validación del legajo en la base de datos
+        try {
+            const idIsValid = await validateId(id);
+            if (!idIsValid) {
+                setErrorMessage('No es un legajo válido.');
+                resetForm();
+                return false;
+            }
+        } catch (error) {
+            console.error('Error al validar el legajo:', error);
+            return false;
+        }
+
+        // Validación de la contraseña en la base de datos
+        try {
+            const passwordIsValid = await validatePassword(id, password);
+            if (!passwordIsValid) {
+                setErrorMessage('El usuario ya se encuentra registrado.');
+                resetForm();
+                return false;
+            }
+        } catch (error) {
+            console.error('Error al validar la contraseña:', error);
+            return false;
+        }
+
+        // Registrar contraseña del usuario en la base de datos
+        try {
+            const passwordRegistred = await registerPassword(id, password);
+            if (!passwordRegistred) {
+                setErrorMessage('Ocurrió un error inesperado, comuniquese con su empleador.');
+                console.log('Error al intentar registrar el usuario.')
+                return false;
+            } else {
+                console.log('Usuario registrado.')
+            }
+        } catch (error) {
+            console.error('Error al registrar el usuario:', error);
+            return false;
+        }
+
         onPress({ id, password });
+        }
+
+    const resetForm = () => {
+        onChangeId('');
+        onChangePassword('');
+        setInvalid('');
     }
 
     return (
@@ -42,6 +95,7 @@ export default function Register({onPress}) {
                     placeholder="••••••••••"
                     secureTextEntry={true}
                 />
+                {errorMessage !== '' && <Text style={styles.errorMessage}>{errorMessage}</Text>}
                 <MenuButton text="Registrar" onPress={validateAndRegister} style={{height: 75}}/>
             </View>
         </View>
@@ -76,5 +130,10 @@ const styles = StyleSheet.create({
         fontSize: 20,
         marginBottom: 20,
         elevation: 2,
+    },
+    errorMessage: {
+        color: 'red',
+        textAlign: 'center',
+        fontSize: 20,
     },
 });
