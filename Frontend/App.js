@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Button, TouchableOpacity, Image, Dimensions, StatusBar } from 'react-native';
 import { useState, useEffect } from 'react';
 import FaceScan from './pages/FaceScan';
+import OfflineLogin from './pages/OfflineLogin';
 import MainMenu from './pages/MainMenu';
 import ConfigMenu from './pages/ConfigMenu'
 import FoodPicker from './pages/FoodPicker';
@@ -12,6 +13,11 @@ export default function App() {
 
   const setMainMenu = () => {
     setPage(<MainMenu onPress={handleMainMenuButton}/>);
+  };
+
+  // Si no hay conexión muestra la página con el login offline
+  const setOfflineLogin = () => {
+    setPage(<OfflineLogin onPress={handleDefault}/>);
   };
 
   const handleMainMenuButton = (option) => {
@@ -35,6 +41,10 @@ export default function App() {
     if (values == 'cancel') {
       setMainMenu();
       return
+    }
+    if (values == 'noConnection') {
+      setOfflineLogin();
+      return;
     }
     console.log(values);
     setMainMenu();

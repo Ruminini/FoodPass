@@ -4,6 +4,7 @@ import {
 	View,
 	Button,
 	Image,
+	Alert,
 } from "react-native";
 import { Camera, CameraType } from "expo-camera";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -13,6 +14,7 @@ import BackButton from "../components/BackButton";
 import LandmarksSvg from "../components/LandmarksSvg";
 import ScanAnimation from "../components/ScanAnimation";
 import people from '../data/people.json';
+import NetInfo from '@react-native-community/netinfo';
 
 export default function FaceScan({ onPress }) {
 	const [type, setType] = useState(CameraType.back);
@@ -21,7 +23,23 @@ export default function FaceScan({ onPress }) {
 	const [size, setSize] = useState("640x480");
 	const [landmarks, setLandmarks] = useState(null);
 	const cameraRef = useRef(null);
-
+	const [showNoConnectionAlert, setShowNoConnectionAlert] = useState(false);
+	
+	//Comprueba si hay conexión al momento del log in y si no hay muestra una alerta para redirigirlo a la página de login sin conexión
+	useEffect(() => {
+		const unsubscribe = NetInfo.addEventListener(state => {
+		  if (!state.isConnected) {
+			setShowNoConnectionAlert(true);
+		  } else {
+			setShowNoConnectionAlert(false);
+		  }
+		});
+	
+		return () => {
+		  unsubscribe();
+		};
+	  }, []);
+	
 	if (!permission) {
 		// Camera permissions are still loading
 		return <View />;
@@ -38,7 +56,7 @@ export default function FaceScan({ onPress }) {
 			</View>
 		);
 	}
-
+	
 	async function getPictureSizes() {
 		if (!cameraRef || cameraRef.current == null) return;
 		cameraRef.current.getAvailablePictureSizesAsync('4:3')
@@ -92,9 +110,27 @@ export default function FaceScan({ onPress }) {
 		}
 	}
 
+	const handleLoadLoginOffline = () => {
+		onPress('noConnection');
+		setShowNoConnectionAlert(false); // Cerrar la alerta después de cargar el login offline
+	  };
+
+
 	return (
 		<View style={styles.container}>
 			<BackButton onPress={() => onPress('cancel')} />
+			{showNoConnectionAlert && (
+				Alert.alert(
+				'No hay conexión a internet',
+				'Pruebe con el login manual',
+				[
+					{
+					text: 'Cargar login offline',
+					onPress: handleLoadLoginOffline,
+					},
+				],
+				)
+			)}
 			{!photo ? (
 				<View style={styles.container}>
 					<View style={styles.roundedContainer}>
