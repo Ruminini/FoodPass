@@ -1,58 +1,69 @@
-import { StyleSheet, Text, View, Button, TouchableOpacity, Image, Dimensions, StatusBar } from 'react-native';
-import { useState, useEffect } from 'react';
-import FaceScan from './pages/FaceScan';
-import MainMenu from './pages/MainMenu';
-import ConfigMenu from './pages/ConfigMenu'
-import FoodPicker from './pages/FoodPicker';
-import Register from './pages/Register';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+  StatusBar,
+} from "react-native";
+import { useState, useEffect } from "react";
+import FaceScan from "./pages/FaceScan";
+import MainMenu from "./pages/MainMenu";
+import ConfigMenu from "./pages/ConfigMenu";
+import FoodPicker from "./pages/FoodPicker";
+import Register from "./pages/Register";
+import HomeScreen from "./pages/HomeScreen";
 
 export default function App() {
-  const [page, setPage] = useState(<View/>);
-  useEffect(() => setPage(<MainMenu onPress={handleMainMenuButton}/>), []);
+  const [page, setPage] = useState(<View />);
+  useEffect(() => setPage(<MainMenu onPress={handleMainMenuButton} />), []);
 
   const setMainMenu = () => {
-    setPage(<MainMenu onPress={handleMainMenuButton}/>);
+    setPage(<MainMenu onPress={handleMainMenuButton} />);
   };
 
   const handleMainMenuButton = (option) => {
     switch (option) {
-      case 'FoodPicker':
-        setPage(<FoodPicker onPress={handleDefault}/>);
+      case "FoodPicker":
+        setPage(<FoodPicker onPress={handleDefault} />);
         break;
-      case 'FaceScan':
-        setPage(<FaceScan onPress={handleDefault}/>);
+      case "FaceScan":
+        setPage(<FaceScan onPress={handleDefault} />);
         break;
-      case 'Register':
-        setPage(<Register onPress={handleDefault}/>);
+      case "Register":
+        setPage(<Register onPress={handleDefault} />);
         break;
-      case 'ConfigMenu':
-        setPage(<ConfigMenu onPress={handleDefault}/>);
+      case "ConfigMenu":
+        setPage(<ConfigMenu onPress={handleDefault} />);
         break;
     }
   };
 
   const handleDefault = (values) => {
-    if (values == 'cancel') {
+    if (values == "cancel") {
       setMainMenu();
-      return
+      return;
     }
     console.log(values);
     setMainMenu();
-  }
+  };
 
+  // return <View style={styles.container}>{HomeScreen}</View>;
   return (
-      <View style={styles.container}>
-        {page}
-      </View>
+    <View>
+      <HomeScreen />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-      flex: 1,
-      backgroundColor: '#EEE',
-      width: '100%',
-      position: 'relative',
-      paddingTop: StatusBar.currentHeight
-  }
+    flex: 1,
+    backgroundColor: "#EEE",
+    width: "100%",
+    position: "relative",
+    paddingTop: StatusBar.currentHeight,
+  },
 });
