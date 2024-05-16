@@ -2,7 +2,7 @@ import { StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
 import BackButton from '../components/BackButton';
 import MenuButton from '../components/MenuButton';
-import { validateId, validatePassword, registerPassword} from '../services/RegisterValidator';
+import { validateId, validatePassword, registerMember} from '../services/RegisterValidator';
 
 export default function Register({onPress}) {
     const [password, onChangePassword] = useState('');
@@ -11,6 +11,7 @@ export default function Register({onPress}) {
     const [errorMessage, setErrorMessage] = useState('');
 
     const validateAndRegister = async () => {
+
         // Validación del formato del legajo
         if (!id.match(/^[0-9]{8}-[0-9]{4}$/)) {
             setErrorMessage('')
@@ -18,7 +19,7 @@ export default function Register({onPress}) {
             return false;
         }
 
-        // Validación del formato de la password
+        // Validación del formato de la contraseña
         if (!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)) {
             setErrorMessage('')
             setInvalid('password')
@@ -51,10 +52,10 @@ export default function Register({onPress}) {
             return false;
         }
 
-        // Registrar contraseña del usuario en la base de datos
+        // Registrar mienbro en la base de datos
         try {
-            const passwordRegistred = await registerPassword(id, password);
-            if (!passwordRegistred) {
+            const memberRegistred = await registerMember(id, password);
+            if (!memberRegistred) {
                 setErrorMessage('Ocurrió un error inesperado, comuniquese con su empleador.');
                 console.log('Error al intentar registrar el usuario.')
                 return false;
