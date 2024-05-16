@@ -1,4 +1,6 @@
 import bcrypt from 'bcryptjs';
+//const bcrypt = require('bcryptjs');
+
 import * as SQLite from 'expo-sqlite';
 
 const db = SQLite.openDatabase('FoodPass.db');
