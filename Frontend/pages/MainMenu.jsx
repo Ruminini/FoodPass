@@ -5,6 +5,7 @@ import MenuList from '../components/MenuList'
 import Food from '../assets/svg/food.svg'
 import Face from '../assets/svg/face-scan.svg'
 import Register from '../assets/svg/register.svg'
+import Options from '../assets/svg/options.svg'
 import SettingsButton from '../components/SettingsButton'
 
 export default function MainMenu({onPress}) {
@@ -14,16 +15,20 @@ export default function MainMenu({onPress}) {
             <MenuList>
                 <MenuButton
                     svg={<Food/>}
-                    text='Elegir Menú'
+                    text='Realizar un pedido'
                     onPress={() => onPress('FoodPicker')} />
                 <MenuButton
                     svg={<Face/>}
-                    text='Validar Usuario'
+                    text='Iniciar sesión'
                     onPress={() => onPress('FaceScan')} />
                 <MenuButton
                     svg={<Register/>}
-                    text='Registrar Usuario'
+                    text='Registro'
                     onPress={() => onPress('Register')} />
+                <MenuButton
+                    svg={<Options/>}
+                    text='Opciones'
+                    onPress={() => onPress('Options')} />
             </MenuList>
         </View>
     )

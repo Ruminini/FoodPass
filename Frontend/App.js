@@ -6,6 +6,7 @@ import MainMenu from './pages/MainMenu';
 import ConfigMenu from './pages/ConfigMenu'
 import FoodPicker from './pages/FoodPicker';
 import Register from './pages/Register';
+import Options from './pages/Options';
 
 export default function App() {
   const [page, setPage] = useState(<View/>);
@@ -30,6 +31,9 @@ export default function App() {
         break;
       case 'Register':
         setPage(<Register onPress={handleDefault}/>);
+        break;
+      case 'Options':
+        setPage(<Options onPress={handleDefault}/>);
         break;
       case 'ConfigMenu':
         setPage(<ConfigMenu onPress={handleDefault}/>);
