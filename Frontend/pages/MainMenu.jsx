@@ -15,11 +15,11 @@ export default function MainMenu({onPress}) {
             <MenuList>
                 <MenuButton
                     svg={<Food/>}
-                    text='Realizar un pedido'
+                    text='Realizar pedido'
                     onPress={() => onPress('FoodPicker')} />
                 <MenuButton
                     svg={<Face/>}
-                    text='Iniciar sesión'
+                    text='Retirar pedido'
                     onPress={() => onPress('FaceScan')} />
                 <MenuButton
                     svg={<Register/>}
