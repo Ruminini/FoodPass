@@ -44,18 +44,6 @@ export default function Register({onPress}) {
             console.error('Error al validar la contraseña:', error);
             return false;
         }
-        // Creación y Validación del Log
-        // try {
-        //     const logSuccesfullyCreated = await createLoginLog(id);
-        //     if (!logSuccesfullyCreated) {
-        //         setErrorMessage('El log no pudo ser creado correctamente.');
-        //         resetForm();
-        //         return false;
-        //     }
-        // } catch (error) {
-        //     console.error('Error al crear el log:', error);
-        //     return false;
-        // }
         //onPress({ id, password }); Devuelve el flujo a App.js
         setErrorMessage('Te has logueado correctamente!');
         //Lógica de login. Redirigir al usuario
