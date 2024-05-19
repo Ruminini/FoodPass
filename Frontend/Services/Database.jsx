@@ -1,27 +1,27 @@
-// import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system";
 import * as SQLite from "expo-sqlite";
 
 //Este archivo contiene la lógica para crear y administrar la base de datos FoodPass.db en SQLite.
 
 const db = SQLite.openDatabase("FoodPass.db");
-// const dbPath = `${FileSystem.documentDirectory}SQLite/FoodPass.db`;
-// console.log("Database Path:", dbPath);
+const dbPath = `${FileSystem.documentDirectory}SQLite/FoodPass.db`;
+console.log("Database Path:", dbPath);
 
 export const initializeDatabase = () => {
   db.transaction((tx) => {
-    {
-      //Se habilita el uso de claves foráneas en SQLite
-      tx.executeSql(
-        "PRAGMA foreign_keys = ON;",
-        [],
-        (_, { rows: { _array } }) => {
-          console.log(`Enable foreign keys result: ${JSON.stringify(_array)}`);
-        },
-        ({}, error) => {
-          console.log(`Enable foreign keys error: ${error}`);
-        }
-      );
-    }
+    // {
+    //   //Se habilita el uso de claves foráneas en SQLite
+    //   tx.executeSql(
+    //     "PRAGMA foreign_keys = ON;",
+    //     [],
+    //     (_, { rows: { _array } }) => {
+    //       console.log(`Enable foreign keys result: ${JSON.stringify(_array)}`);
+    //     },
+    //     ({}, error) => {
+    //       console.log(`Enable foreign keys error: ${error}`);
+    //     }
+    //   );
+    // }
     {
       //Creacion de la tabla de parametría type_user
       tx.executeSql(
@@ -44,7 +44,7 @@ export const initializeDatabase = () => {
       //Se insertan datos de parametría en la tabla type_user (Usuario Admin)
       tx.executeSql(
         `INSERT OR IGNORE INTO type_user (name, create_date, last_update, state) VALUES ('Admin', ?, ?, 'A')`,
-        [new Date().toDateString(), new Date().toDateString()],
+        [new Date().toString(), new Date().toString()],
         (tx, results) => {
           console.log("Insert en type_user correctamente", results);
         },
@@ -57,13 +57,13 @@ export const initializeDatabase = () => {
       //Se insertan datos de parametría en la tabla type_user (Usuario General o "miembro". El que va a comprar la comprar la comida)
       tx.executeSql(
         `INSERT OR IGNORE INTO type_user (name, create_date, last_update, state) VALUES ('general', ?, ?, 'A')`,
-        [new Date().toDateString(), new Date().toDateString()],
+        [new Date().toString(), new Date().toString()],
         (tx, results) => {
           console.log("Insert en type_user correctamente", results);
         },
         (tx, error) => {
           console.error(
-            new Date().toDateString(),
+            new Date().toString(),
             "Error al insertar datos en tabla type_user:",
             error
           );
@@ -93,13 +93,13 @@ export const initializeDatabase = () => {
       //Se insertan datos en valid_member. El usuario 34985578-2024 quedaría blanqueado y podría registrarse en la aplicacion.
       tx.executeSql(
         `INSERT OR IGNORE INTO valid_member (code, name, last_name, create_date, last_update, state) VALUES ('34985578-2024', 'Fernando', 'Mossier', ?, ?, 'A')`,
-        [new Date().toDateString(), new Date().toDateString()],
+        [new Date().toString(), new Date().toString()],
         (tx, results) => {
           console.log("Insert en valid_member correctamente", results);
         },
         (tx, error) => {
           console.error(
-            new Date().toDateString(),
+            new Date().toString(),
             "Error al insertar datos comida principal en tabla valid_member",
             error
           );
@@ -114,8 +114,11 @@ export const initializeDatabase = () => {
           type_code INTEGER NOT NULL,
           hashed_pass TEXT NOT NULL, 
           salt TEXT NOT NULL, 
-          state TEXT DEFAULT 'A',
-          FOREIGN KEY(type_code) REFERENCES type_user(code));`,
+          create_date TEXT NOT NULL,
+          last_update TEXT NOT NULL,
+          state TEXT DEFAULT 'A'
+          --FOREIGN KEY(type_code) REFERENCES type_user(code)
+        );`,
         [],
         (tx, results) => {
           console.log("Tabla user creada correctamente", results);
@@ -133,8 +136,9 @@ export const initializeDatabase = () => {
           user_id TEXT NOT NULL,
           descriptor TEXT NOT NULL,
           create_date TEXT NOT NULL, 
-          state TEXT DEFAULT 'A',
-          FOREIGN KEY(user_id) REFERENCES user(member_code));`,
+          state TEXT DEFAULT 'A'
+          --FOREIGN KEY(user_id) REFERENCES user(member_code)
+        );`,
         [],
         (tx, results) => {
           console.log("Tabla face creada correctamente", results);
@@ -150,8 +154,9 @@ export const initializeDatabase = () => {
         `CREATE TABLE IF NOT EXISTS logs_login (
           id INTEGER PRIMARY KEY AUTOINCREMENT, 
           user_id TEXT NOT NULL,
-          create_date TEXT NOT NULL, 
-          FOREIGN KEY(user_id) REFERENCES user(member_code));`,
+          create_date TEXT NOT NULL
+          --FOREIGN KEY(user_id) REFERENCES user(member_code)
+        );`,
         [],
         (tx, results) => {
           console.log("Tabla logs_login creada correctamente", results);
@@ -184,13 +189,13 @@ export const initializeDatabase = () => {
       //Se insertan datos de parametría en la tabla type_food. (Plato principal)
       tx.executeSql(
         `INSERT OR IGNORE INTO type_food (name, description, create_date, last_update, state) VALUES ('Plato Principal', 'Plato Principal', ?, ?, 'A')`,
-        [new Date().toDateString(), new Date().toDateString()],
+        [new Date().toString(), new Date().toString()],
         (tx, results) => {
           console.log("Insert en type_food correctamente", results);
         },
         (tx, error) => {
           console.error(
-            new Date().toDateString(),
+            new Date().toString(),
             "Error al insertar datos comida principal en tabla type_food:",
             error
           );
@@ -201,13 +206,13 @@ export const initializeDatabase = () => {
       //Se insertan datos de parametría en la tabla type_food. (Bebida)
       tx.executeSql(
         `INSERT OR IGNORE INTO type_food (name, description, create_date, last_update, state) VALUES ('Bebida', 'Bebida', ?, ?, 'A')`,
-        [new Date().toDateString(), new Date().toDateString()],
+        [new Date().toString(), new Date().toString()],
         (tx, results) => {
           console.log("Insert en type_food correctamente", results);
         },
         (tx, error) => {
           console.error(
-            new Date().toDateString(),
+            new Date().toString(),
             "Error al insertar datos de bebida en tabla type_food:",
             error
           );
@@ -218,13 +223,13 @@ export const initializeDatabase = () => {
       //Se insertan datos de parametría en la tabla type_food. (Postre)
       tx.executeSql(
         `INSERT OR IGNORE INTO type_food (name, description, create_date, last_update, state) VALUES ('Postre', 'Postre', ?, ?, 'A')`,
-        [new Date().toDateString(), new Date().toDateString()],
+        [new Date().toString(), new Date().toString()],
         (tx, results) => {
           console.log("Insert en type_food correctamente", results);
         },
         (tx, error) => {
           console.error(
-            new Date().toDateString(),
+            new Date().toString(),
             "Error al insertar datos de postre en tabla type_food:",
             error
           );
@@ -257,13 +262,13 @@ export const initializeDatabase = () => {
       //Se insertan datos de parametría en la tabla type_food_restriction. (Vegetariano)
       tx.executeSql(
         `INSERT OR IGNORE INTO type_food_restriction (name, description, create_date, last_update, state) VALUES ('Vegetariano', 'Alimento apto para dieta vegetariana', ?, ?, 'A')`,
-        [new Date().toDateString(), new Date().toDateString()],
+        [new Date().toString(), new Date().toString()],
         (tx, results) => {
           console.log("Insert en type_food_restriction correctamente", results);
         },
         (tx, error) => {
           console.error(
-            new Date().toDateString(),
+            new Date().toString(),
             "Error al insertar datos de vegetariano en tabla type_food_restriction",
             error
           );
@@ -274,13 +279,13 @@ export const initializeDatabase = () => {
       //Se insertan datos de parametría en la tabla type_food_restriction. (Vegano)
       tx.executeSql(
         `INSERT OR IGNORE INTO type_food_restriction (name, description, create_date, last_update, state) VALUES ('Vegano', 'Alimento apto para dieta vegana', ?, ?, 'A')`,
-        [new Date().toDateString(), new Date().toDateString()],
+        [new Date().toString(), new Date().toString()],
         (tx, results) => {
           console.log("Insert en type_food_restriction correctamente", results);
         },
         (tx, error) => {
           console.error(
-            new Date().toDateString(),
+            new Date().toString(),
             "Error al insertar datos de vegano en tabla type_food_restriction",
             error
           );
@@ -291,13 +296,13 @@ export const initializeDatabase = () => {
       //Se insertan datos de parametría en la tabla type_food_restriction. (Celiaco)
       tx.executeSql(
         `INSERT OR IGNORE INTO type_food_restriction (name, description, create_date, last_update, state) VALUES ('Celiaco', 'Alimento apto para dieta sin TACC', ?, ?, 'A')`,
-        [new Date().toDateString(), new Date().toDateString()],
+        [new Date().toString(), new Date().toString()],
         (tx, results) => {
           console.log("Insert en type_food_restriction correctamente", results);
         },
         (tx, error) => {
           console.error(
-            new Date().toDateString(),
+            new Date().toString(),
             "Error al insertar datos de celiaco en tabla type_food_restriction",
             error
           );
@@ -326,13 +331,13 @@ export const initializeDatabase = () => {
       //Se insertan datos de parametría en la tabla order_state. (Pendiente)
       tx.executeSql(
         `INSERT OR IGNORE INTO order_state (description, create_date, last_update, state) VALUES ('Pendiente', ?, ?, 'A')`,
-        [new Date().toDateString(), new Date().toDateString()],
+        [new Date().toString(), new Date().toString()],
         (tx, results) => {
           console.log("Insert en order_state correctamente", results);
         },
         (tx, error) => {
           console.error(
-            new Date().toDateString(),
+            new Date().toString(),
             "Error al insertar datos de Pendiente en tabla order_state",
             error
           );
@@ -343,13 +348,13 @@ export const initializeDatabase = () => {
       //Se insertan datos de parametría en la tabla order_state. (Retirado)
       tx.executeSql(
         `INSERT OR IGNORE INTO order_state (description, create_date, last_update, state) VALUES ('Retirado', ?, ?, 'A')`,
-        [new Date().toDateString(), new Date().toDateString()],
+        [new Date().toString(), new Date().toString()],
         (tx, results) => {
           console.log("Insert en order_state correctamente", results);
         },
         (tx, error) => {
           console.error(
-            new Date().toDateString(),
+            new Date().toString(),
             "Error al insertar datos de Retirado en tabla order_state",
             error
           );
@@ -360,13 +365,13 @@ export const initializeDatabase = () => {
       //Se insertan datos de parametría en la tabla order_state. (Cancelado)
       tx.executeSql(
         `INSERT OR IGNORE INTO order_state (description, create_date, last_update, state) VALUES ('Cancelado', ?, ?, 'A')`,
-        [new Date().toDateString(), new Date().toDateString()],
+        [new Date().toString(), new Date().toString()],
         (tx, results) => {
           console.log("Insert en order_state correctamente", results);
         },
         (tx, error) => {
           console.error(
-            new Date().toDateString(),
+            new Date().toString(),
             "Error al insertar datos de Cancelado en tabla order_state",
             error
           );
@@ -397,10 +402,11 @@ export const initializeDatabase = () => {
           create_date TEXT NOT NULL,
           order_state_code INTEGER NOT NULL,
           menu_id INTEGER NOT NULL,
-          FOREIGN KEY(user_id) REFERENCES user(member_code),
-          FOREIGN KEY(order_state_code) REFERENCES order_state(code),
-          FOREIGN KEY(menu_id) REFERENCES menu(id),
-          PRIMARY KEY (user_id, create_date));`,
+          --FOREIGN KEY(user_id) REFERENCES user(member_code),
+          --FOREIGN KEY(order_state_code) REFERENCES order_state(code),
+          --FOREIGN KEY(menu_id) REFERENCES menu(id),
+          PRIMARY KEY (user_id, create_date)
+        );`,
         [],
         (tx, results) => {
           console.log("Tabla order creada correctamente", results);
@@ -422,8 +428,9 @@ export const initializeDatabase = () => {
           stock INTEGER DEFAULT 1000000,
           create_date TEXT NOT NULL, 
           last_update TEXT NOT NULL, 
-          state TEXT DEFAULT 'A',
-          FOREIGN KEY(type_code) REFERENCES type_food(code));`,
+          state TEXT DEFAULT 'A'
+          --FOREIGN KEY(type_code) REFERENCES type_food(code)
+        );`,
         [],
         (tx, results) => {
           console.log("Tabla food creada correctamente", results);
@@ -443,9 +450,10 @@ export const initializeDatabase = () => {
           create_date TEXT NOT NULL, 
           last_update TEXT NOT NULL, 
           state TEXT DEFAULT 'A',
-          FOREIGN KEY(id_food) REFERENCES food(id)
-          FOREIGN KEY(id_menu) REFERENCES menu(id)
-          PRIMARY KEY (id_menu, id_food));`,
+          --FOREIGN KEY(id_food) REFERENCES food(id)
+          --FOREIGN KEY(id_menu) REFERENCES menu(id)
+          PRIMARY KEY (id_menu, id_food)
+        );`,
         [],
         (tx, results) => {
           console.log("Tabla relation_food_menu creada correctamente", results);
@@ -464,9 +472,10 @@ export const initializeDatabase = () => {
           create_date TEXT NOT NULL, 
           last_update TEXT NOT NULL, 
           state TEXT DEFAULT 'A',
-          FOREIGN KEY(id_food) REFERENCES food(id)
-          FOREIGN KEY(code_restriction) REFERENCES type_food_restriction(code)
-          PRIMARY KEY (id_food, code_restriction));`,
+          --FOREIGN KEY(id_food) REFERENCES food(id)
+          --FOREIGN KEY(code_restriction) REFERENCES type_food_restriction(code)
+          PRIMARY KEY (id_food, code_restriction)
+        );`,
         [],
         (tx, results) => {
           console.log(
@@ -481,6 +490,9 @@ export const initializeDatabase = () => {
           );
         }
       );
+    }
+    {
+      //insertUser(tx, "34985578-2024", "hashpasswordtest_salt", "salt");
     }
 
     //Chequear inserts
@@ -519,7 +531,7 @@ export const initializeDatabase = () => {
 export const insertUser = (member_code, hashed_pass, salt) => {
   db.transaction((tx) => {
     tx.executeSql(
-      "INSERT INTO usuario (member_code, type_user, hashed_pass, salt, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO user (member_code, type_code, hashed_pass, salt, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [
         member_code,
         2,
