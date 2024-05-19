@@ -12,8 +12,9 @@ import { useState, useEffect, useRef } from "react";
 import MenuButton from "../components/MenuButton";
 import BackButton from "../components/BackButton";
 import ScanAnimation from "../components/ScanAnimation";
-import {getFacesValidator} from '../services/OnlineLoginValidator';
+import {getFacesValidator, userStateValidator} from '../services/LoginValidator';
 import NetInfo from '@react-native-community/netinfo';
+//import {createLoginLog} from '../services/LogCreator'
 
 export default function Login({ onPress }) {
 	const [type, setType] = useState(CameraType.back);
@@ -105,16 +106,35 @@ export default function Login({ onPress }) {
 				const response = await recognizeFaces(newPhoto.base64);
                 // Si hay alguna cara en la imagen entonces realiza la comparación con la base de datos
 				if (response && response.length > 0) {
-					const closestFace = await matchFaces(Object.values(response[0].descriptor));
-					setLoading(false);
-					Alert.alert(
-						'Comprobación exitosa',
-						[{ 
-                            text: 'OK',
-                            // Se envia al usuario a la página para retirar el pedido
-                            onPress: () => onPress({ userId: "closestFace.id", page: 'orderPickUp' }),
-                         }],
-					);
+					const closestFaceId = await matchFaces(Object.values(response[0].descriptor));
+					try {
+						const userState = await userStateValidator(closestFaceId);
+						//Si el usuario está activo le manda una alerta de onfirmación, sino una alerta de rechazo
+						if(userState){
+							setLoading(false);
+							Alert.alert(
+								'Comprobación exitosa',
+								[{ 
+									text: 'OK',
+									// Se envia al usuario a la página para retirar el pedido
+									onPress: () => onPress({ userId: "closestFaceId", page: 'orderPickUp' }),
+								}],
+							);
+						} else {
+							Alert.alert(
+								'Usuario de baja',
+								'Vuelva a registrarse',
+								[{ 
+									text: 'OK',
+								 }],
+							);
+						} 
+					} catch (error) {
+						console.log(e);
+						setLoading(false);
+						Alert.alert('Error', 'Ocurrió un error al reconocer el estado del usuario.', [{ text: 'OK' }]);
+					}
+					
 				} else {
                     Alert.alert(
 						'Comprobación fallida',
@@ -256,18 +276,18 @@ const recognizeFaces = async (base64Image) => {
 export async function matchFaces(descriptor_from_login) {
 	try {
 		const faces = await getFacesValidator();
-		let closestFace = null;
+		let closestFaceId = null;
 		let closestDistance = Infinity;
 		faces.forEach(face => {
 			const descriptor_from_db = JSON.parse(face.descriptor);
 			const distance = euclideanDistance(descriptor_from_login, descriptor_from_db);
 			if (distance < closestDistance) {
-				closestFace = face;
+				closestFaceId = face.id;
 				closestDistance = distance;
 			}
 		});
-		console.log(`Persona más cercana: ${closestFace}, distancia: ${closestDistance}`);
-		return closestFace;
+		console.log(`Id de persona más cercana: ${closestFaceId}, distancia: ${closestDistance}`);
+		return closestFaceId;
 	} catch (error) {
 		console.error('Error al encontrar el descriptor más cercano:', error);
 		throw error;
