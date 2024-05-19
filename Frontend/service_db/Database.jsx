@@ -551,6 +551,24 @@ export const insertUser = (member_code, hashed_pass, salt) => {
   });
 };
 
+export const getValidMember = (member_code) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM user WHERE code = ?",
+        [member_code],
+        (tx, results) => {
+          const members = results.rows._array;
+          resolve(members);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
 export const getUsers = () => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {

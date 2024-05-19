@@ -1,14 +1,20 @@
 import { useState, useEffect } from "react";
-import { initializeDatabase, insertUser, getUsers } from "../dbTemp/Database";
+import {
+  initializeDatabase,
+  insertUser,
+  getUsers,
+  getValidMember,
+} from "../service_db/Database";
 
 //Este hook proporciona funciones para interactuar con la base de datos desde otros componentes.
 
 const useDatabase = () => {
   const [users, setUsers] = useState([]);
+  const [members, setMembers] = useState([]);
 
-  useEffect(() => {
-    initializeDatabase();
-  }, []);
+  // useEffect(() => {
+  //   initializeDatabase();
+  // }, []);
 
   //Insertar usuario NO ADMIN
   const addUser = async (member_code, hashed_pass, salt) => {
@@ -22,7 +28,15 @@ const useDatabase = () => {
     setUsers(usersData);
   };
 
-  return { users, addUser, fetchUsers };
+  const fetchMember = (member_code) => {
+    const membersData = getValidMember(member_code);
+    membersData.then((algo) => {
+      console.log("OTRO ACAAA", algo);
+    });
+    setMembers(membersData);
+  };
+
+  return { users, members, addUser, fetchUsers, fetchMember };
 };
 
 export default useDatabase;

@@ -1,17 +1,35 @@
-import { StyleSheet, View, StatusBar } from 'react-native';
-import { useState, useEffect } from 'react';
-import FaceScan from './pages/FaceScan';
-import OfflineLogin from './pages/OfflineLogin';
-import MainMenu from './pages/MainMenu';
-import ConfigMenu from './pages/ConfigMenu'
-import FoodPicker from './pages/FoodPicker';
-import Register from './pages/Register';
-import Options from './pages/Options';
+import { StyleSheet, View, StatusBar } from "react-native";
+import { useState, useEffect } from "react";
+import FaceScan from "./pages/FaceScan";
+import OfflineLogin from "./pages/OfflineLogin";
+import MainMenu from "./pages/MainMenu";
+import ConfigMenu from "./pages/ConfigMenu";
+import FoodPicker from "./pages/FoodPicker";
+import Register from "./pages/Register";
+import Options from "./pages/Options";
+import { initializeDatabase, getValidMember } from "./service_db/Database";
+// import useDatabase from "./hooks/useDatabase"; // Import the hook
 
 export default function App() {
   const [page, setPage] = useState(<View />);
   useEffect(() => setPage(<MainMenu onPress={handleMainMenuButton} />), []);
   useEffect(() => initializeDatabase(), []);
+  // const { fetchMember } = useDatabase();
+
+  // const handleFetchMember = (memberCode) => {
+  //   const memberData = fetchMember(memberCode);
+  //   console.log("ACA", memberData); // Use the member data here
+  // };
+
+  // useEffect(() => {
+  //   handleFetchMember("34985578-2024");
+  // }, []);
+
+  useEffect(() => {
+    getValidMember("34985578-2024").then((res) =>
+      console.log("acacacacacacacaca", res)
+    );
+  }, []);
 
   const setMainMenu = () => {
     setPage(<MainMenu onPress={handleMainMenuButton} />);
@@ -33,11 +51,11 @@ export default function App() {
       case "Register":
         setPage(<Register onPress={handleDefault} />);
         break;
-      case 'Options':
-        setPage(<Options onPress={handleDefault}/>);
+      case "Options":
+        setPage(<Options onPress={handleDefault} />);
         break;
-      case 'ConfigMenu':
-        setPage(<ConfigMenu onPress={handleDefault}/>);
+      case "ConfigMenu":
+        setPage(<ConfigMenu onPress={handleDefault} />);
         break;
     }
   };
