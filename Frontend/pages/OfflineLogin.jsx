@@ -12,7 +12,7 @@ export default function Register({onPress}) {
     const [errorMessage, setErrorMessage] = useState('');
 
     const validateAndLogIn = async () => {
-
+        
         // Validación del formato del legajo
         if (!id.match(/^[0-9]{8}-[0-9]{4}$/)) {
             setErrorMessage('')
@@ -44,7 +44,7 @@ export default function Register({onPress}) {
             console.error('Error al validar la contraseña:', error);
             return false;
         }
-        //onPress({ id, password }); Devuelve el flujo a App.js
+        onPress({ user_id: id, page: 'retireOrder' }),
         setErrorMessage('Te has logueado correctamente!');
         //Lógica de login. Redirigir al usuario
         console.log('Usuario logueado')
