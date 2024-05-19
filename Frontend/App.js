@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button, TouchableOpacity, Image, Dimensions, StatusBar } from 'react-native';
+import { StyleSheet, View, StatusBar } from 'react-native';
 import { useState, useEffect } from 'react';
 import FaceScan from './pages/FaceScan';
 import OfflineLogin from './pages/OfflineLogin';
@@ -42,13 +42,6 @@ export default function App() {
     }
   };
 
-  const handleRegister = (values) => {
-    if (values == "cancel") {
-      setMainMenu();
-      return;
-    }
-    console.log(values);
-  };
   const handleDefault = (values) => {
     if (values == "cancel") {
       setMainMenu();
