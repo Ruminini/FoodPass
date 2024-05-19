@@ -1,4 +1,4 @@
-import * as FileSystem from "expo-file-system";
+// import * as FileSystem from "expo-file-system";
 import * as SQLite from "expo-sqlite";
 
 //Este archivo contiene la lógica para crear y administrar la base de datos FoodPass.db en SQLite.
@@ -516,35 +516,43 @@ export const initializeDatabase = () => {
   });
 };
 
-// export const insertUser = (nombre, apellido) => {
-//   db.transaction((tx) => {
-//     tx.executeSql(
-//       "INSERT INTO usuario (nombre, apellido) VALUES (?, ?)",
-//       [nombre, apellido],
-//       (tx, results) => {
-//         console.log("Usuario insertado correctamente");
-//       },
-//       (tx, error) => {
-//         console.error("Error al insertar usuario:", error);
-//       }
-//     );
-//   });
-// };
+export const insertUser = (member_code, hashed_pass, salt) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "INSERT INTO usuario (member_code, type_user, hashed_pass, salt, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [
+        member_code,
+        2,
+        hashed_pass,
+        salt,
+        new Date().toString(),
+        new Date().toString(),
+        "A",
+      ],
+      (tx, results) => {
+        console.log("Usuario insertado correctamente", results);
+      },
+      (tx, error) => {
+        console.error("Error al insertar usuario:", error);
+      }
+    );
+  });
+};
 
-// export const getUsers = () => {
-//   return new Promise((resolve, reject) => {
-//     db.transaction((tx) => {
-//       tx.executeSql(
-//         "SELECT * FROM usuario",
-//         [],
-//         (tx, results) => {
-//           const users = results.rows._array;
-//           resolve(users);
-//         },
-//         (tx, error) => {
-//           reject(error);
-//         }
-//       );
-//     });
-//   });
-// };
+export const getUsers = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM user",
+        [],
+        (tx, results) => {
+          const users = results.rows._array;
+          resolve(users);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};

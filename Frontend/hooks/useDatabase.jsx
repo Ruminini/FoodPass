@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { initializeDatabase, insertUser, getUsers } from "../Services/Database";
+import { initializeDatabase, insertUser, getUsers } from "../services/Database";
 
 //Este hook proporciona funciones para interactuar con la base de datos desde otros componentes.
 
@@ -10,8 +10,9 @@ const useDatabase = () => {
     initializeDatabase();
   }, []);
 
-  const addUser = async (nombre, apellido) => {
-    await insertUser(nombre, apellido);
+  //Insertar usuario NO ADMIN
+  const addUser = async (member_code, hashed_pass, salt) => {
+    await insertUser(member_code, hashed_pass, salt);
     const updatedUsers = await getUsers();
     setUsers(updatedUsers);
   };

@@ -15,7 +15,7 @@ import ConfigMenu from "./pages/ConfigMenu";
 import FoodPicker from "./pages/FoodPicker";
 import Register from "./pages/Register";
 import HomeScreen from "./pages/HomeScreen";
-import { initializeDatabase } from "./Services/Database";
+import { initializeDatabase } from "./services/Database";
 
 export default function App() {
   const [page, setPage] = useState(<View />);
@@ -43,6 +43,13 @@ export default function App() {
     }
   };
 
+  const handleRegister = (values) => {
+    if (values == "cancel") {
+      setMainMenu();
+      return;
+    }
+    console.log(values);
+  };
   const handleDefault = (values) => {
     if (values == "cancel") {
       setMainMenu();
