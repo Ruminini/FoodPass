@@ -121,7 +121,6 @@ export default function Login({ onPress }) {
                         'Registrese primero o pruebe a retomar la foto con su cara',
 						[{ 
                             text: 'OK',
-							onPress: () => onPress({ userId: "closestFace.id", page: 'orderPickUp' }),
                          }],
 					);
                 }
