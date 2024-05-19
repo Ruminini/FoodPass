@@ -7,6 +7,7 @@ import ConfigMenu from './pages/ConfigMenu'
 import FoodPicker from './pages/FoodPicker';
 import Register from './pages/Register';
 import Options from './pages/Options';
+import { initializeDatabase } from './service_db/Database';
 
 export default function App() {
   const [page, setPage] = useState(<View />);
