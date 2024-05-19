@@ -15,10 +15,12 @@ import ConfigMenu from "./pages/ConfigMenu";
 import FoodPicker from "./pages/FoodPicker";
 import Register from "./pages/Register";
 import HomeScreen from "./pages/HomeScreen";
+import { initializeDatabase } from "./Services/Database";
 
 export default function App() {
   const [page, setPage] = useState(<View />);
   useEffect(() => setPage(<MainMenu onPress={handleMainMenuButton} />), []);
+  useEffect(() => initializeDatabase(), []);
 
   const setMainMenu = () => {
     setPage(<MainMenu onPress={handleMainMenuButton} />);
@@ -50,12 +52,7 @@ export default function App() {
     setMainMenu();
   };
 
-  // return <View style={styles.container}>{HomeScreen}</View>;
-  return (
-    <View>
-      <HomeScreen />
-    </View>
-  );
+  return <View style={styles.container}>{page}</View>;
 }
 
 const styles = StyleSheet.create({
