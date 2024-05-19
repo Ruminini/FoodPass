@@ -7,13 +7,16 @@ import ConfigMenu from "./pages/ConfigMenu";
 import FoodPicker from "./pages/FoodPicker";
 import Register from "./pages/Register";
 import Options from "./pages/Options";
-import { initializeDatabase, getValidMember } from "./service_db/Database";
+import { initializeDatabase, getValidMember, getUsers } from "./service_db/Database";
 // import useDatabase from "./hooks/useDatabase"; // Import the hook
 
 export default function App() {
   const [page, setPage] = useState(<View />);
   useEffect(() => setPage(<MainMenu onPress={handleMainMenuButton} />), []);
-  useEffect(() => initializeDatabase(), []);
+  useEffect(() => {
+    initializeDatabase()
+    console.log("Database initialized");
+  }, []);
   // const { fetchMember } = useDatabase();
 
   // const handleFetchMember = (memberCode) => {
@@ -25,10 +28,19 @@ export default function App() {
   //   handleFetchMember("34985578-2024");
   // }, []);
 
+
   useEffect(() => {
-    getValidMember("34985578-2024").then((res) =>
-      console.log("acacacacacacacaca", res)
-    );
+    const fetchUsers = async () => {
+      try {
+        console.log('Fetching users...');
+        const users = await getUsers();
+        console.log("USERS", users);
+      } catch (error) {
+        console.error('Failed to fetch users', error);
+      }
+    };
+
+    fetchUsers();
   }, []);
 
   const setMainMenu = () => {
