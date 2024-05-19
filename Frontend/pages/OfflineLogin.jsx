@@ -2,17 +2,17 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-nativ
 import React, { useState } from 'react'
 import BackButton from '../components/BackButton';
 import MenuButton from '../components/MenuButton';
-import { validateId, validatePassword} from '../services/OfflineLoginValidator';
+import { validateId, validatePassword, userStateValidator} from '../services/LoginValidator';
 //import {createLoginLog} from '../services/LogCreator'
 
-export default function Register({onPress}) {
+export default function OfflineLogin({onPress}) {
     const [password, onChangePassword] = useState('');
     const [id, onChangeId] = useState('');
     const [invalid, setInvalid] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
     const validateAndLogIn = async () => {
-
+        
         // Validación del formato del legajo
         if (!id.match(/^[0-9]{8}-[0-9]{4}$/)) {
             setErrorMessage('')
@@ -44,10 +44,22 @@ export default function Register({onPress}) {
             console.error('Error al validar la contraseña:', error);
             return false;
         }
-        //onPress({ id, password }); Devuelve el flujo a App.js
-        setErrorMessage('Te has logueado correctamente!');
-        //Lógica de login. Redirigir al usuario
-        console.log('Usuario logueado')
+
+        //Validación del estado del usuario
+        try {
+            const userState = await userStateValidator(id);
+            
+            if(!userState){
+                setErrorMessage('El usuario está dado de baja. Vuelva a registrarse');
+                resetForm();
+                return false;
+            }
+        } catch (error) {
+            console.error('Error al validar el estado del usuario:', error);
+            return false;
+        }
+        onPress({ user_id: id, page: 'orderPickUp' }),
+        console.log('Usuario logueado')       
     }
 
     return (

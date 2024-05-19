@@ -2,12 +2,14 @@ import { StyleSheet, View, StatusBar } from 'react-native';
 import { useState, useEffect } from 'react';
 import FaceScan from './pages/FaceScan';
 import OfflineLogin from './pages/OfflineLogin';
+import Login from './pages/Login';
 import MainMenu from './pages/MainMenu';
 import ConfigMenu from './pages/ConfigMenu'
 import FoodPicker from './pages/FoodPicker';
 import Register from './pages/Register';
 import Options from './pages/Options';
 import { initializeDatabase } from './service_db/Database';
+import OrderPickUp from './pages/OrderPickUp';
 
 export default function App() {
   const [page, setPage] = useState(<View />);
@@ -28,8 +30,8 @@ export default function App() {
       case "FoodPicker":
         setPage(<FoodPicker onPress={handleDefault} />);
         break;
-      case "FaceScan":
-        setPage(<FaceScan onPress={handleDefault} />);
+      case 'FaceScan':
+        setPage(<Login onPress={handleDefault}/>);
         break;
       case "Register":
         setPage(<Register onPress={handleDefault} />);
@@ -43,17 +45,18 @@ export default function App() {
     }
   };
 
-  const handleDefault = (values) => {
-    if (values == "cancel") {
-      setMainMenu();
-      return;
+  const handleDefault = ({ faceId, page }) => { // Modifica handleDefault para recibir faceId y page
+    switch (page) {
+      case 'noConnection':
+        setOfflineLogin();
+        break;
+      case 'orderPickUp':
+        setPage(<OrderPickUp faceId={faceId} onPress={handleDefault} />); // Renderiza la página Result con faceId como prop
+        break;
+      default:
+        setMainMenu();
+        break;
     }
-    if (values == "noConnection") {
-      setOfflineLogin();
-      return;
-    }
-    console.log(values);
-    setMainMenu();
   };
 
   return <View style={styles.container}>{page}</View>;
