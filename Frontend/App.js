@@ -1,21 +1,12 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Button,
-  TouchableOpacity,
-  Image,
-  Dimensions,
-  StatusBar,
-} from "react-native";
-import { useState, useEffect } from "react";
-import FaceScan from "./pages/FaceScan";
-import MainMenu from "./pages/MainMenu";
-import ConfigMenu from "./pages/ConfigMenu";
-import FoodPicker from "./pages/FoodPicker";
-import Register from "./pages/Register";
-import HomeScreen from "./pages/HomeScreen";
-import { initializeDatabase } from "./dbTemp/Database";
+import { StyleSheet, Text, View, Button, TouchableOpacity, Image, Dimensions, StatusBar } from 'react-native';
+import { useState, useEffect } from 'react';
+import FaceScan from './pages/FaceScan';
+import OfflineLogin from './pages/OfflineLogin';
+import MainMenu from './pages/MainMenu';
+import ConfigMenu from './pages/ConfigMenu'
+import FoodPicker from './pages/FoodPicker';
+import Register from './pages/Register';
+import Options from './pages/Options';
 
 export default function App() {
   const [page, setPage] = useState(<View />);
@@ -42,8 +33,11 @@ export default function App() {
       case "Register":
         setPage(<Register onPress={handleDefault} />);
         break;
-      case "ConfigMenu":
-        setPage(<ConfigMenu onPress={handleDefault} />);
+      case 'Options':
+        setPage(<Options onPress={handleDefault}/>);
+        break;
+      case 'ConfigMenu':
+        setPage(<ConfigMenu onPress={handleDefault}/>);
         break;
     }
   };
