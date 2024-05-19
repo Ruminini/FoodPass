@@ -15,7 +15,7 @@ import ConfigMenu from "./pages/ConfigMenu";
 import FoodPicker from "./pages/FoodPicker";
 import Register from "./pages/Register";
 import HomeScreen from "./pages/HomeScreen";
-import { initializeDatabase } from "./services/Database";
+import { initializeDatabase } from "./dbTemp/Database";
 
 export default function App() {
   const [page, setPage] = useState(<View />);

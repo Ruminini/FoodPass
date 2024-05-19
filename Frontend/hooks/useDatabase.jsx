@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { initializeDatabase, insertUser, getUsers } from "../services/Database";
+import { initializeDatabase, insertUser, getUsers } from "../dbTemp/Database";
 
 //Este hook proporciona funciones para interactuar con la base de datos desde otros componentes.
 
