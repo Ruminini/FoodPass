@@ -37,4 +37,4 @@ yarn-error.*
 #icons
 public/icons/
 
-%ProgramData*
+%ProgramData%*
