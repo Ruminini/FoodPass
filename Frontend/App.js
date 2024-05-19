@@ -7,7 +7,7 @@ import MainMenu from './pages/MainMenu';
 import ConfigMenu from './pages/ConfigMenu'
 import FoodPicker from './pages/FoodPicker';
 import Register from './pages/Register';
-import OrderRetire from './pages/OrderPickUp';
+import OrderPickUp from './pages/OrderPickUp';
 
 export default function App() {
   const [page, setPage] = useState(<View/>);
@@ -44,8 +44,8 @@ export default function App() {
       case 'noConnection':
         setOfflineLogin();
         break;
-      case 'orderRetire':
-        setPage(<OrderRetire faceId={faceId} onPress={handleDefault} />); // Renderiza la página Result con faceId como prop
+      case 'orderPickUp':
+        setPage(<OrderPickUp faceId={faceId} onPress={handleDefault} />); // Renderiza la página Result con faceId como prop
         break;
       default:
         setMainMenu();

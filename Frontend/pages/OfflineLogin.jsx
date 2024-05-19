@@ -44,7 +44,7 @@ export default function Register({onPress}) {
             console.error('Error al validar la contraseña:', error);
             return false;
         }
-        onPress({ user_id: id, page: 'retireOrder' }),
+        onPress({ user_id: id, page: 'orderPickUp' }),
         setErrorMessage('Te has logueado correctamente!');
         //Lógica de login. Redirigir al usuario
         console.log('Usuario logueado')

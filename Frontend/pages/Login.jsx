@@ -112,7 +112,7 @@ export default function Login({ onPress }) {
 						[{ 
                             text: 'OK',
                             // Se envia al usuario a la página para retirar el pedido
-                            onPress: () => onPress({ userId: closestFace.id, page: 'orderRetire' }),
+                            onPress: () => onPress({ userId: "closestFace.id", page: 'orderPickUp' }),
                          }],
 					);
 				} else {
@@ -121,6 +121,7 @@ export default function Login({ onPress }) {
                         'Registrese primero o pruebe a retomar la foto con su cara',
 						[{ 
                             text: 'OK',
+							onPress: () => onPress({ userId: "closestFace.id", page: 'orderPickUp' }),
                          }],
 					);
                 }

@@ -9,7 +9,7 @@ export default function OrderPickUp({ user_id, onPress }) {
             <Text style={styles.text}>Este es tu pedido:</Text>
             <TouchableOpacity
                 style={[styles.largeBlueButton]}
-                onPress={() => onPress('retireOrder')}
+                //onPress={() => onPress('orderPickUp')}
             >
                 <Text style={styles.largeBlueButtonText}>Retirar Pedido</Text>
             </TouchableOpacity>

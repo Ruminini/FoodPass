@@ -5,8 +5,8 @@
 // const db = SQLite.openDatabase('FoodPass.db');
 // //cerrar base de datos?
 
-export async function validateId(id) {
-    return true;
+// export async function validateId(id) {
+//     return true;
 //     // Devolver una promesa que realiza la consulta a la base de datos
 //     return new Promise((resolve, reject) => {
 //         db.transaction(tx => {
@@ -24,10 +24,10 @@ export async function validateId(id) {
 //             );
 //         });
 //     });
-}
+// }
 
- export async function validatePassword(id, user_password) {
-    return true;
+//  export async function validatePassword(id, user_password) {
+//     return true;
 //     try {
 //         // Obtiene el salt para hashearlo con el password nuevo
 //         const salt = takeSalt(id);
@@ -59,10 +59,10 @@ export async function validateId(id) {
 //         console.error('Error al generar el hash de la contraseña:', error);
 //         return Promise.reject(error);
 //     }
-}
+// }
 
- export function takeSalt(id){
-    return true;
+//  export function takeSalt(id){
+//     return true;
 //     db.transaction(tx => {
 //         tx.executeSql('SELECT * FROM user WHERE id = ?'), 
 //         [id],
@@ -76,4 +76,4 @@ export async function validateId(id) {
 //             reject(error);
 //         }
 //     })
- }
+//  }
