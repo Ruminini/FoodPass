@@ -7,6 +7,7 @@ import ConfigMenu from "./pages/ConfigMenu";
 import FoodPicker from "./pages/FoodPicker";
 import Register from "./pages/Register";
 import Options from "./pages/Options";
+<<<<<<< HEAD
 import {
   initializeDatabase,
   getValidMemberById,
@@ -17,15 +18,27 @@ import {
   insertValidMember,
   insertFaceData,
 } from "./service_db/Database";
+=======
+import { initializeDatabase, getValidMember, getUsers } from "./service_db/Database";
+>>>>>>> fe7593d1eab8afe6117d560687b2ff54bc317e17
 // import useDatabase from "./hooks/useDatabase"; // Import the hook
 
 export default function App() {
   const [page, setPage] = useState(<View />);
   useEffect(() => setPage(<MainMenu onPress={handleMainMenuButton} />), []);
+<<<<<<< HEAD
   useEffect(() => initializeDatabase(), []);
+=======
+  useEffect(() => {
+    initializeDatabase()
+    console.log("Database initialized");
+  }, []);
+  // const { fetchMember } = useDatabase();
+>>>>>>> fe7593d1eab8afe6117d560687b2ff54bc317e17
 
   //#region EJEMPLOS DE USO DE LAS FUNCIONES PARA ADMINISTAR LA BASE DE DATOS
 
+<<<<<<< HEAD
   //Ejemplo insertando un usuario
   useEffect(() => {
     insertUser("34985578-2024", "passwordHasheado_testSalt", "testSalt");
@@ -36,6 +49,21 @@ export default function App() {
     getUserById("34985578-2024").then((res) =>
       console.log("Usuario por id:", res)
     );
+=======
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        console.log('Fetching users...');
+        const users = await getUsers();
+        console.log("USERS", users);
+      } catch (error) {
+        console.error('Failed to fetch users', error);
+      }
+    };
+
+    fetchUsers();
+>>>>>>> fe7593d1eab8afe6117d560687b2ff54bc317e17
   }, []);
 
   //Ejemplo obteniendo lista de usuarios

@@ -7,6 +7,27 @@ const db = SQLite.openDatabase("FoodPass.db");
 const dbPath = `${FileSystem.documentDirectory}SQLite/FoodPass.db`;
 console.log("Database Path:", dbPath);
 
+// Function to drop the database
+async function dropDatabase() {
+  if (db) {
+    db._db.close(); // Use with caution as this is a private method
+  }
+  try {
+    await FileSystem.deleteAsync(dbPath);
+    console.log('Database deleted successfully');
+  } catch (error) {
+    console.error('Error deleting the database', error);
+  }
+}
+
+
+// setTimeout(
+//   () => {
+//     console.log("Database Path:", dbPath);
+//     dropDatabase()
+//   }
+//   , 5000);
+
 export const initializeDatabase = () => {
   db.transaction((tx) => {
     // {
@@ -508,6 +529,13 @@ export const initializeDatabase = () => {
         }
       );
     }
+<<<<<<< HEAD
+=======
+    {
+      insertUser(tx, "34985578-2024", "hashpasswordtest_salt", "salt");
+    }
+
+>>>>>>> fe7593d1eab8afe6117d560687b2ff54bc317e17
     //Chequear inserts
     {
       tx.executeSql(`SELECT * FROM type_user;`, [], (_, { rows }) => {
@@ -570,7 +598,11 @@ export const getValidMemberById = (member_code) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
+<<<<<<< HEAD
         "SELECT * FROM valid_member WHERE code = ?",
+=======
+        "SELECT * FROM user WHERE type_code = ?",
+>>>>>>> fe7593d1eab8afe6117d560687b2ff54bc317e17
         [member_code],
         (tx, results) => {
           const members = results.rows._array;
