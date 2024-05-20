@@ -105,7 +105,6 @@ export default function Options({ onPress }) {
 
     return (
         <View style={{ flex: 1 }}>
-            <BackButton onPress={() => onPress('cancel')} />
             <View style={styles.container}>
                 <Text style={[styles.title, invalid === 'id' && { color: 'red' }]}>Legajo</Text>
                 <TextInput
@@ -143,6 +142,7 @@ export default function Options({ onPress }) {
                     style={[styles.menuButton, styles.deleteButton]}
                 />
             </View>
+            <BackButton onPress={() => onPress('cancel')} />
         </View>
     );
 }
@@ -192,7 +192,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#E53935',
         height: 50,
         alignSelf: 'center',
-        marginTop: 300,
         width: 250,
+        position: 'absolute',
+        bottom: 20,
     },
 });

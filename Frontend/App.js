@@ -2,7 +2,6 @@ import { StyleSheet, View, StatusBar } from 'react-native';
 import { useState, useEffect } from 'react';
 import FaceScan from './pages/FaceScan';
 import OfflineLogin from './pages/OfflineLogin';
-import Login from './pages/Login';
 import MainMenu from './pages/MainMenu';
 import ConfigMenu from './pages/ConfigMenu'
 import FoodPicker from './pages/FoodPicker';

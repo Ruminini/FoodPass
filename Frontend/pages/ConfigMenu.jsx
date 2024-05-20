@@ -9,7 +9,6 @@ import Register from '../assets/svg/register.svg'
 export default function ConfigMenu({onPress}) {
     return (
         <View style={styles.container}>
-            <BackButton onPress={() => onPress('cancel')}/>
             <MenuList >
                 <MenuButton
                     svg={<Food/>}
@@ -20,6 +19,7 @@ export default function ConfigMenu({onPress}) {
                     text='Gestionar Usuarios'
                     onPress={() => console.log('Gestionar Usuario')} />
             </MenuList>
+            <BackButton onPress={() => onPress('cancel')}/>
         </View>
     )
 }

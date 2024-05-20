@@ -98,7 +98,6 @@ export default function Register({ onPress }) {
         <View style={{ flex: 1 }}>
             {!showFaceScan ? ( // Mostrar el formulario normal mientras no se active FaceScan
                 <>
-                    <BackButton onPress={() => onPress('cancel')} />
                     <View style={styles.container}>
                         <Text style={[styles.title, invalid === 'id' && { color: 'red' }]}>Legajo</Text>
                         <TextInput
@@ -121,6 +120,7 @@ export default function Register({ onPress }) {
                         <MenuButton text="Registrar" onPress={validateAndRegister} style={{ height: 75, width: 300, alignSelf: 'center'}} />
                         
                     </View>
+                    <BackButton onPress={() => onPress('cancel')} />
                 </>
             ) : (
                 <FaceScan onPress={() => setShowFaceScan(false)} onDescriptorsTaken={setDescriptors} onPhotoTaken={setPhotoTaken} /> // Mostrar FaceScan cuando se active
