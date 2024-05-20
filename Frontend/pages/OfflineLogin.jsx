@@ -1,6 +1,5 @@
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react'
-import BackButton from '../components/BackButton';
 import MenuButton from '../components/MenuButton';
 import { validateId, validatePassword} from '../services/OfflineLoginValidator';
 //import {createLoginLog} from '../services/LogCreator'
@@ -52,7 +51,6 @@ export default function Register({onPress}) {
 
     return (
         <View style={{ flex: 1 }}>
-            <BackButton onPress={() => onPress('cancel')}/>
             <View style={styles.container}>
                 <Text style={[styles.title, invalid==='id' && { color: 'red' }]}>Legajo</Text>
                 <TextInput

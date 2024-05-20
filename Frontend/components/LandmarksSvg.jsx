@@ -9,16 +9,14 @@ export default function LandmarksSvg({ landmarks }) {
         </View>;
     }
 
-
     const dims = landmarks[0].detection._imageDims;
-    console.log(dims);
     let positions = []
     landmarks.forEach(face => positions.push(...face.landmarks._positions));
     let boxes = []
     landmarks.forEach(face => boxes.push(face.detection._box));
 
     return (
-        <Svg height='100%' width='100%' viewBox={`0 0 ${dims._width} ${dims._height}`}>
+        <Svg height='100%' width='100%' viewBox={`0 0 ${dims._width} ${dims._height}`} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>
         {positions.map(({ _x, _y }, index) => {
             return (
                 <Circle

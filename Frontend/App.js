@@ -6,6 +6,8 @@ import MainMenu from './pages/MainMenu';
 import ConfigMenu from './pages/ConfigMenu'
 import FoodPicker from './pages/FoodPicker';
 import Register from './pages/Register';
+import Toast from 'react-native-toast-message';
+import Login from './pages/Login';
 
 export default function App() {
   const [page, setPage] = useState(<View/>);
@@ -26,7 +28,7 @@ export default function App() {
         setPage(<FoodPicker onPress={handleDefault}/>);
         break;
       case 'FaceScan':
-        setPage(<FaceScan onPress={handleDefault}/>);
+        setPage(<Login onPress={handleDefault}/>);
         break;
       case 'Register':
         setPage(<Register onPress={handleDefault}/>);
@@ -53,6 +55,7 @@ export default function App() {
   return (
       <View style={styles.container}>
         {page}
+        <Toast visibilityTime={7500}/>
       </View>
   );
 }

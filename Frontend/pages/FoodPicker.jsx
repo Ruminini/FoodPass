@@ -30,7 +30,9 @@ export default function FoodPicker({onPress}) {
     return (
         <View style={styles.container}>
             <View style={styles.navContainer}>
-			    <BackButton onPress={() => onPress('cancel')}/>
+			    <View style={{ height: '100%', overflow: 'hidden', aspectRatio: 1}}>
+                    <BackButton onPress={() => onPress('cancel')}/>
+                </View>
                 <TabIcon
                     text='Comida'
                     svg={<Food fill={filters.type === 'comida' && 'white'}/>}
@@ -52,7 +54,9 @@ export default function FoodPicker({onPress}) {
                     style={filters.type === 'postre' && {backgroundColor: 'black', borderRadius: 15}}
                     selected={filters.type === 'postre'}
                 />
-                <BackButton style={{transform: [{rotate: '180deg'}]}} onPress={() => onPress(selectedFoods)} />
+                <View style={{ height: '100%', overflow: 'hidden', aspectRatio: 1}}>
+                    <BackButton style={{transform: [{rotate: '180deg'}]}} onPress={() => onPress(selectedFoods)} />
+                </View>
             </View>
             <MenuList alignTop={true}>
                 {filters.type === 'comida' &&
