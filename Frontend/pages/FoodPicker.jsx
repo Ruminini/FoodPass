@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, { useState, useEffect } from "react";
+import { StyleSheet, View } from 'react-native'
+import React, { useState } from "react";
 import MenuList from '../components/MenuList'
 import FoodItem from '../components/FoodItem'
 import TabIcon from '../components/TabIcon'

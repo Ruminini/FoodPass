@@ -1,17 +1,11 @@
-import {
-	StyleSheet,
-	Text,
-	View,
-	Button,
-	Image,
-	Alert,
-} from "react-native";
-import { Camera, CameraType } from "expo-camera";
-import * as ImageManipulator from "expo-image-manipulator";
-import { useState, useEffect, useRef } from "react";
-import MenuButton from "../components/MenuButton";
-import LandmarksSvg from "../components/LandmarksSvg";
-import ScanAnimation from "../components/ScanAnimation";
+import React, { useState, useEffect, useRef } from 'react';
+import { StyleSheet, Text, View, Button, Image, Alert } from 'react-native';
+import { Camera, CameraType } from 'expo-camera';
+import * as ImageManipulator from 'expo-image-manipulator';
+import MenuButton from '../components/MenuButton';
+import BackButton from '../components/BackButton';
+import LandmarksSvg from '../components/LandmarksSvg';
+import ScanAnimation from '../components/ScanAnimation';
 import people from '../data/people.json';
 import Toast from "react-native-toast-message";
 
@@ -31,6 +25,7 @@ export default function FaceScan({ onPress }) {
 				setLandmarks(response);
 				closest = matchFaces(Object.values(response[0].descriptor));
 			}
+			// Aca, cuando ande, habria q usar const userState = await userStateValidator(closestFaceId);
 			if (!closest || closest.distance > 0.65) {
 				Toast.show({
 					type: 'error',
@@ -61,37 +56,32 @@ export default function FaceScan({ onPress }) {
 		return <View />;
 	}
 
-	if (!permission.granted) {
-		// Camera permissions are not granted yet
-		return (
-			<View style={styles.container}>
-				<Text style={{ textAlign: "center" }}>
-					We need your permission to show the camera
-				</Text>
-				<Button onPress={requestPermission} title="grant permission" />
-			</View>
-		);
-	}
-	
-	async function getPictureSizes() {
-		if (!cameraRef || cameraRef.current == null) return;
-		cameraRef.current.getAvailablePictureSizesAsync('4:3')
-		.then(sizes => {
-			//make newSize the closest size <= 640x480
-			const newSize = sizes.filter(res => res.split('x')[0] <= 640).pop();
-			setSize(newSize);
-		})
-		.catch(error => {
-			console.error('Error getting picture sizes:', error);
-		});
-	}
+    if (!permission.granted) {
+        return (
+            <View style={styles.container}>
+                <Text style={{ textAlign: 'center' }}>We need your permission to show the camera</Text>
+                <Button onPress={requestPermission} title="Grant Permission" />
+            </View>
+        );
+    }
 
-	function toggleCameraType() {
-		setType((current) =>
-			current === CameraType.back ? CameraType.front : CameraType.back
-		);
-		getPictureSizes();
-	}
+    async function getPictureSizes() {
+        if (!cameraRef.current) return;
+        cameraRef.current
+            .getAvailablePictureSizesAsync('4:3')
+            .then((sizes) => {
+                const newSize = sizes.filter((res) => res.split('x')[0] <= 640).pop();
+                setSize(newSize);
+            })
+            .catch((error) => {
+                console.error('Error getting picture sizes:', error);
+            });
+    }
+
+    function toggleCameraType() {
+        setType((current) => (current === CameraType.back ? CameraType.front : CameraType.back));
+        getPictureSizes();
+    }
 
 	async function resizeImage(img) {
 		if (img.height == 640) return img;
@@ -202,7 +192,6 @@ const styles = StyleSheet.create({
 	}
 });
 
-
 const API_URL = 'https://foodpass.onrender.com';
 // const API_URL = 'https://quality-cicada-wrongly.ngrok-free.app';
 const recognizeFaces = async (base64Image) => {
@@ -235,20 +224,21 @@ const recognizeFaces = async (base64Image) => {
 };
 
 function euclideanDistance(vector1, vector2) {
-	if (vector1.length !== vector2.length) {
-		throw new Error('Vectors must be of the same length');
-	}
-	let sumOfSquares = 0;
-	for (let i = 0; i < vector1.length; i++) {
-		const difference = vector1[i] - vector2[i];
-		sumOfSquares += difference * difference;
-	}
-	return Math.sqrt(sumOfSquares);
+    if (vector1.length !== vector2.length) {
+        throw new Error('Vectors must be of the same length');
+    }
+    let sumOfSquares = 0;
+    for (let i = 0; i < vector1.length; i++) {
+        const difference = vector1[i] - vector2[i];
+        sumOfSquares += difference * difference;
+    }
+    return Math.sqrt(sumOfSquares);
 }
 
 function matchFaces(face) {
 	let closestPerson = null;
 	let closestDistance = Infinity;
+	// En vez de people, habria que usar const faces = await getFacesValidator();
 	for (const otherPerson in people) {
 		const otherFace = Object.values(people[otherPerson]);
 		const distance = euclideanDistance(face, otherFace);

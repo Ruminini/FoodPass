@@ -1,10 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { View } from 'react-native'
 import React from 'react'
 import MenuButton from '../components/MenuButton'
 import MenuList from '../components/MenuList'
 import Food from '../assets/svg/food.svg'
 import Face from '../assets/svg/face-scan.svg'
 import Register from '../assets/svg/register.svg'
+import Options from '../assets/svg/options.svg'
 import SettingsButton from '../components/SettingsButton'
 
 export default function MainMenu({onPress}) {
@@ -14,16 +15,20 @@ export default function MainMenu({onPress}) {
             <MenuList>
                 <MenuButton
                     svg={<Food/>}
-                    text='Elegir Menú'
+                    text='Realizar pedido'
                     onPress={() => onPress('FoodPicker')} />
                 <MenuButton
                     svg={<Face/>}
-                    text='Validar Usuario'
+                    text='Retirar pedido'
                     onPress={() => onPress('FaceScan')} />
                 <MenuButton
                     svg={<Register/>}
-                    text='Registrar Usuario'
+                    text='Registro'
                     onPress={() => onPress('Register')} />
+                <MenuButton
+                    svg={<Options/>}
+                    text='Opciones'
+                    onPress={() => onPress('Options')} />
             </MenuList>
         </View>
     )

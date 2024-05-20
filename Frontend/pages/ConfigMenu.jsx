@@ -1,11 +1,10 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import React from 'react'
 import MenuButton from '../components/MenuButton'
 import MenuList from '../components/MenuList'
 import BackButton from '../components/BackButton'
 import Food from '../assets/svg/food.svg'
 import Register from '../assets/svg/register.svg'
-import Constants from 'expo-constants';
 
 export default function ConfigMenu({onPress}) {
     return (
