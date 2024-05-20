@@ -13,10 +13,11 @@ import Celiac from '../assets/svg/celiac.svg'
 import SelectedMenuList from '../components/SelectedMenuList'
 import SelectedFoodItem from '../components/SelectedFoodItem';
 import foods from '../data/foods.json'
+import Toast from 'react-native-toast-message';
 
-export default function FoodPicker({onPress}) {
+export default function FoodPicker({data, goTo}) {
     const [filters, setFilters] = useState({vegan: false, vegetarian: false, celiac: false, type: 'comida'})
-    const [selectedFoods, setSelectedFoods] = useState([])
+    const [selectedFoods, setSelectedFoods] = useState(data.foods || [])
     const foodList = foods.filter(food => matchesFilters(food, filters))
     const totalPrice = selectedFoods.reduce((acc, food) => acc + food.price, 0)
     // useEffect(() => console.log(selectedFoods.map(food => food.title)), [selectedFoods]);
@@ -31,7 +32,7 @@ export default function FoodPicker({onPress}) {
         <View style={styles.container}>
             <View style={styles.navContainer}>
 			    <View style={{ height: '100%', overflow: 'hidden', aspectRatio: 1}}>
-                    <BackButton onPress={() => onPress('cancel')}/>
+                    <BackButton onPress={() => goTo('MainMenu')}/>
                 </View>
                 <TabIcon
                     text='Comida'
@@ -55,7 +56,22 @@ export default function FoodPicker({onPress}) {
                     selected={filters.type === 'postre'}
                 />
                 <View style={{ height: '100%', overflow: 'hidden', aspectRatio: 1}}>
-                    <BackButton style={{transform: [{rotate: '180deg'}]}} onPress={() => onPress(selectedFoods)} />
+                    <BackButton
+                        style={{transform: [{rotate: '180deg'}]}}
+                        
+                        // En vez de login, antes podria mostrarse una pestaña de confirmacion con los detalles del pedido
+                        onPress={() => goTo(
+                            'Login',
+                            {foods: selectedFoods},
+                            () => goTo('FoodPicker',{foods:selectedFoods}),
+                            (id) => {
+                                Toast.show({ type: 'success', text1: 'Pedido Realizado',text2: 'Gracias por tu pedido', id })
+                                console.log('Gracias por pedir',id)
+                                // TODO: Guardar pedido en db
+                                console.log('Tu pedido:',selectedFoods)
+                                goTo('MainMenu')
+                            })}
+                    />
                 </View>
             </View>
             <MenuList alignTop={true}>

@@ -14,6 +14,7 @@ const styles = StyleSheet.create({
     button: {
         marginHorizontal: 10,
         marginVertical: 5,
-        alignSelf: 'flex-end',
+        position: 'absolute',
+        right: 0
     }
 })

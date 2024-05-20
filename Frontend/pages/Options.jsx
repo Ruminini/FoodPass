@@ -4,7 +4,7 @@ import BackButton from '../components/BackButton';
 import MenuButton from '../components/MenuButton';
 import { updatePasswordMember, desactiveMember } from '../services/MemberOptions';
 
-export default function Options({ onPress }) {
+export default function Options({ goTo }) {
     const [id, setId] = useState('');
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -46,7 +46,7 @@ export default function Options({ onPress }) {
             return false;
         }
 
-        onPress({ id, oldPassword, newPassword });
+        goTo({ id, oldPassword, newPassword });
     };
 
     const confirmDeleteMember = () => {
@@ -92,8 +92,7 @@ export default function Options({ onPress }) {
             console.error(error);
             return false;
         }
-
-        onPress({ id, oldPassword });
+        // TODO : Dar de baja al miembro
     };
 
     const resetForm = () => {
@@ -142,7 +141,7 @@ export default function Options({ onPress }) {
                     style={[styles.menuButton, styles.deleteButton]}
                 />
             </View>
-            <BackButton onPress={() => onPress('cancel')} />
+            <BackButton onPress={() => goTo('MainMenu')} />
         </View>
     );
 }

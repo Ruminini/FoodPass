@@ -1,7 +1,7 @@
 import { StyleSheet, View, StatusBar } from 'react-native';
 import { useState, useEffect } from 'react';
-import FaceScan from './pages/FaceScan';
-import OfflineLogin from './pages/OfflineLogin';
+import FaceScan from './components/FaceScan';
+import OfflineLogin from './components/OfflineLogin';
 import MainMenu from './pages/MainMenu';
 import ConfigMenu from './pages/ConfigMenu'
 import FoodPicker from './pages/FoodPicker';
@@ -14,48 +14,31 @@ import OrderPickUp from './pages/OrderPickUp';
 
 export default function App() {
   const [page, setPage] = useState(<View />);
-  useEffect(() => setPage(<MainMenu onPress={handleMainMenuButton} />), []);
-  useEffect(() => initializeDatabase(), []);
+  useEffect(() => setPage(<MainMenu goTo={goTo} />), []);
+  useEffect(() => initializeDatabase(), [])
 
-  const setMainMenu = () => {
-    setPage(<MainMenu onPress={handleMainMenuButton} />);
-  };
-
-  // Si no hay conexión muestra la página con el login offline
-  const setOfflineLogin = () => {
-    setPage(<OfflineLogin onPress={handleDefault} />);
-  };
-
-  const handleMainMenuButton = (option) => {
+  const goTo = (option='MainMenu', data={}, before=() => {}, after=() => {}) => {
     switch (option) {
       case "FoodPicker":
-        setPage(<FoodPicker onPress={handleDefault} />);
+        setPage(<FoodPicker data={data} goTo={goTo} />);
         break;
-      case 'FaceScan':
-        setPage(<Login onPress={handleDefault}/>);
+      case 'Login':
+        setPage(<Login data={data} before={before} after={after} goTo={goTo}/>);
         break;
       case "Register":
-        setPage(<Register onPress={handleDefault} />);
+        setPage(<Register data={data} goTo={goTo} />);
         break;
       case 'Options':
-        setPage(<Options onPress={handleDefault}/>);
+        setPage(<Options goTo={goTo}/>);
         break;
       case 'ConfigMenu':
-        setPage(<ConfigMenu onPress={handleDefault}/>);
+        setPage(<ConfigMenu goTo={goTo}/>);
         break;
-    }
-  };
-
-  const handleDefault = ({ faceId, page }) => { // Modifica handleDefault para recibir faceId y page
-    switch (page) {
-      case 'noConnection':
-        setOfflineLogin();
+      case 'OrderPickUp':
+        setPage(<OrderPickUp data={data} goTo={goTo} />);
         break;
-      case 'orderPickUp':
-        setPage(<OrderPickUp faceId={faceId} onPress={handleDefault} />); // Renderiza la página Result con faceId como prop
-        break;
-      default:
-        setMainMenu();
+      case 'MainMenu':
+        setPage(<MainMenu goTo={goTo} />);
         break;
     }
   };

@@ -6,7 +6,7 @@ import BackButton from '../components/BackButton'
 import Food from '../assets/svg/food.svg'
 import Register from '../assets/svg/register.svg'
 
-export default function ConfigMenu({onPress}) {
+export default function ConfigMenu({goTo}) {
     return (
         <View style={styles.container}>
             <MenuList >
@@ -19,7 +19,7 @@ export default function ConfigMenu({onPress}) {
                     text='Gestionar Usuarios'
                     onPress={() => console.log('Gestionar Usuario')} />
             </MenuList>
-            <BackButton onPress={() => onPress('cancel')}/>
+            <BackButton onPress={() => goTo('MainMenu')}/>
         </View>
     )
 }

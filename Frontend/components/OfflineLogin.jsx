@@ -1,10 +1,10 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
-import MenuButton from '../components/MenuButton';
+import MenuButton from './MenuButton';
 import { validateId, validatePassword, userStateValidator} from '../services/LoginValidator';
 //import {createLoginLog} from '../services/LogCreator'
 
-export default function OfflineLogin({onPress}) {
+export default function OfflineLogin({ after }) {
     const [password, onChangePassword] = useState('');
     const [id, onChangeId] = useState('');
     const [invalid, setInvalid] = useState('');
@@ -57,7 +57,7 @@ export default function OfflineLogin({onPress}) {
             console.error('Error al validar el estado del usuario:', error);
             return false;
         }
-        onPress({ user_id: id, page: 'orderPickUp' }),
+        after({ legajo: id}),
         console.log('Usuario logueado')       
     }
 

@@ -8,28 +8,35 @@ import Register from '../assets/svg/register.svg'
 import Options from '../assets/svg/options.svg'
 import SettingsButton from '../components/SettingsButton'
 
-export default function MainMenu({onPress}) {
+export default function MainMenu({goTo}) {
     return (
         <View style={{flex: 1}}>
-            <SettingsButton onPress={() => onPress('ConfigMenu')}/>
             <MenuList>
                 <MenuButton
                     svg={<Food/>}
                     text='Realizar pedido'
-                    onPress={() => onPress('FoodPicker')} />
+                    onPress={() => goTo('FoodPicker')} />
                 <MenuButton
                     svg={<Face/>}
                     text='Retirar pedido'
-                    onPress={() => onPress('FaceScan')} />
+                    onPress={() => goTo(
+                        'Login',
+                        '',
+                        () => {goTo('MainMenu')},
+                        (id) => {
+                            console.log('pedido recibido',id);
+                            goTo('OrderPickUp', {legajo: id})
+                        })} />
                 <MenuButton
                     svg={<Register/>}
                     text='Registro'
-                    onPress={() => onPress('Register')} />
+                    onPress={() => goTo('Register')} />
                 <MenuButton
                     svg={<Options/>}
                     text='Opciones'
-                    onPress={() => onPress('Options')} />
+                    onPress={() => goTo('Options')} />
             </MenuList>
+            <SettingsButton onPress={() => goTo('ConfigMenu')}/>
         </View>
     )
 }

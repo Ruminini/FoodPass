@@ -2,30 +2,30 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, Alert } from 'react-native';
 import BackButton from '../components/BackButton';
 import MenuButton from '../components/MenuButton';
-import FaceScan from './FaceScan';
+import FaceScan from '../components/FaceScan';
 import { validateIdMember, insertMember } from '../services/MemberRegister';
 import insertFaceDescriptors from '../services/FaceDescriptorsRegister';
+import Toast from 'react-native-toast-message';
 
-export default function Register({ onPress }) {
-    const [password, onChangePassword] = useState('');
-    const [id, onChangeId] = useState('');
+export default function Register({ goTo, data }) {
+    const [password, onChangePassword] = useState(data.password || '');
+    const [id, onChangeId] = useState(data.id || '');
     const [invalid, setInvalid] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const [showFaceScan, setShowFaceScan] = useState(false);
     const [photoTaken, setPhotoTaken] = useState(false);
-    const [descriptors, setDescriptors] = useState(null);
+    const [descriptors, setDescriptors] = useState(data.descriptors || null);
 
     const validateAndRegister = async () => {
         // Validación del formato del legajo
         if (!id.match(/^[0-9]{8}-[0-9]{4}$/)) {
-            setErrorMessage('');
+            Toast.show({ type: 'info', text1: 'El legajo debe tener el formato 00000000-0000' });
             setInvalid('id');
             return false;
         }
 
         // Validación del formato de la contraseña
         if (!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)) {
-            setErrorMessage('');
+            Toast.show({ type: 'info', text1: 'La contraseña debe tener almenos 8 caracteres, una mayúscula, una minúscula y un número.' });
             setInvalid('password');
             return false;
         }
@@ -34,7 +34,7 @@ export default function Register({ onPress }) {
         try {
             const idIsValid = await validateIdMember(id);
             if (!idIsValid) {
-                setErrorMessage('No es un legajo válido.');
+                Toast.show({ type: 'Error', text1: 'El legajo no es valido.' });
                 resetForm();
                 return false;
             }
@@ -44,14 +44,8 @@ export default function Register({ onPress }) {
         }
 
         // Validación de la foto tomada
-        if (!photoTaken) {
+        if (!descriptors) {
             Alert.alert('Error', 'Por favor, primero tome una foto.');
-            return false;
-        }
-
-        // Validación de la foto tomada y los descriptores
-        if (photoTaken && descriptors === null) {
-            setErrorMessage('No se pudieron obtener datos del rostro. Intente nuevamente.');
             return false;
         }
 
@@ -59,7 +53,7 @@ export default function Register({ onPress }) {
         try {
             const memberInserted = await insertMember(id, password);
             if (!memberInserted) {
-                setErrorMessage('Ocurrió un error inesperado, comuníquese con su empleador.');
+                Toast.show({ type: 'Error', text1: 'Ocurrió un error inesperado, comuníquese con su empleador.'});
                 console.log('Error al intentar registrar el miembro.');
                 return false;
             } else {
@@ -74,7 +68,7 @@ export default function Register({ onPress }) {
         try {
             const faceDescriptorsInserted = await insertFaceDescriptorsMember(id, descriptors);
             if (!faceDescriptorsInserted) {
-                setErrorMessage('Ocurrió un error inesperado, comuníquese con su empleador.');
+                Toast.show({ type: 'Error', text1: 'Ocurrió un error inesperado, comuníquese con su empleador.'});
                 console.log('Error al intentar registrar descritores.');
                 return false;
             } else {
@@ -84,8 +78,8 @@ export default function Register({ onPress }) {
             console.error( error);
             return false;
         }
-
-        onPress({ id, password, descriptors });
+        Toast.show({ type: 'success', text1: 'Registro exitoso!' });
+        goTo('MainMenu');
     };
 
     const resetForm = () => {
@@ -96,35 +90,37 @@ export default function Register({ onPress }) {
 
     return (
         <View style={{ flex: 1 }}>
-            {!showFaceScan ? ( // Mostrar el formulario normal mientras no se active FaceScan
-                <>
-                    <View style={styles.container}>
-                        <Text style={[styles.title, invalid === 'id' && { color: 'red' }]}>Legajo</Text>
-                        <TextInput
-                            style={styles.input}
-                            onChangeText={onChangeId}
-                            value={id}
-                            placeholder="12345678-4321"
-                            keyboardType="numeric"
-                        />
-                        <Text style={[styles.title, invalid === 'password' && { color: 'red' }]}>Contraseña</Text>
-                        <TextInput
-                            style={styles.input}
-                            onChangeText={onChangePassword}
-                            value={password}
-                            placeholder="••••••••••"
-                            secureTextEntry={true}
-                        />
-                        {errorMessage !== '' && <Text style={styles.errorMessage}>{errorMessage}</Text>}
-                        <MenuButton text="Tomar foto" onPress={() => setShowFaceScan(true)} style={{ height: 75, width: 300, alignSelf: 'center'}} />
-                        <MenuButton text="Registrar" onPress={validateAndRegister} style={{ height: 75, width: 300, alignSelf: 'center'}} />
-                        
-                    </View>
-                    <BackButton onPress={() => onPress('cancel')} />
-                </>
-            ) : (
-                <FaceScan onPress={() => setShowFaceScan(false)} onDescriptorsTaken={setDescriptors} onPhotoTaken={setPhotoTaken} /> // Mostrar FaceScan cuando se active
-            )}
+            <View style={styles.container}>
+                <Text style={[styles.title, invalid === 'id' && { color: 'red' }]}>Legajo</Text>
+                <TextInput
+                    style={styles.input}
+                    onChangeText={onChangeId}
+                    value={id}
+                    placeholder="12345678-4321"
+                    keyboardType="numeric"
+                />
+                <Text style={[styles.title, invalid === 'password' && { color: 'red' }]}>Contraseña</Text>
+                <TextInput
+                    style={styles.input}
+                    onChangeText={onChangePassword}
+                    value={password}
+                    placeholder="••••••••••"
+                    secureTextEntry={true}
+                />
+                {errorMessage !== '' && <Text style={styles.errorMessage}>{errorMessage}</Text>}
+                <MenuButton
+                    text="Tomar foto"
+                    onPress={() => goTo(
+                        'Login',
+                        {onlyDescriptors: true},
+                        () => goTo('Register', {id,password,descriptors}),
+                        (desc) => goTo('Register', {id,password,desc})
+                    )}
+                    style={{ height: 75, width: 300, alignSelf: 'center'}} />
+                <MenuButton text="Registrar" onPress={validateAndRegister} style={{ height: 75, width: 300, alignSelf: 'center'}} />
+                
+            </View>
+            <BackButton onPress={() => goTo('MainMenu')} />
         </View>
     );
 }

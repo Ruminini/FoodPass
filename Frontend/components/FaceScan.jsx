@@ -2,14 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View, Button, Image, Alert } from 'react-native';
 import { Camera, CameraType } from 'expo-camera';
 import * as ImageManipulator from 'expo-image-manipulator';
-import MenuButton from '../components/MenuButton';
-import BackButton from '../components/BackButton';
-import LandmarksSvg from '../components/LandmarksSvg';
-import ScanAnimation from '../components/ScanAnimation';
+import MenuButton from './MenuButton';
+import LandmarksSvg from './LandmarksSvg';
+import ScanAnimation from './ScanAnimation';
 import people from '../data/people.json';
 import Toast from "react-native-toast-message";
 
-export default function FaceScan({ onPress }) {
+export default function FaceScan({ data, after }) {
 	const [type, setType] = useState(CameraType.back);
 	const [permission, requestPermission] = Camera.useCameraPermissions();
 	const [photo, setPhoto] = useState(null);
@@ -23,7 +22,9 @@ export default function FaceScan({ onPress }) {
 			let closest = null;
 			if (response && response.length > 0) {
 				setLandmarks(response);
-				closest = matchFaces(Object.values(response[0].descriptor));
+				const descriptors = Object.values(response[0].descriptor);
+				if (data.onlyDescriptors) after(descriptors);
+				closest = matchFaces(descriptors);
 			}
 			// Aca, cuando ande, habria q usar const userState = await userStateValidator(closestFaceId);
 			if (!closest || closest.distance > 0.65) {
@@ -39,7 +40,7 @@ export default function FaceScan({ onPress }) {
 					text1: `Hola ${closest.person}!`,
 					text2: `Distancia: ${closest.distance}`
 				})
-				onPress('cancel');
+				after(closest.person);
 			} else {
 				Toast.show({
 					type: 'info',
