@@ -90,7 +90,7 @@ export const initializeDatabase = () => {
       );
     }
     {
-      //Se insertan datos en valid_member. El usuario 34985578-2024 quedaría blanqueado y podría registrarse en la aplicacion.
+      //Se insertan datos de ejemplo en valid_member. El usuario 34985578-2024 quedaría blanqueado y podría registrarse en la aplicacion.
       tx.executeSql(
         `INSERT OR IGNORE INTO valid_member (code, name, last_name, create_date, last_update, state) VALUES ('34985578-2024', 'Fernando', 'Mossier', ?, ?, 'A')`,
         [new Date().toString(), new Date().toString()],
@@ -107,10 +107,27 @@ export const initializeDatabase = () => {
       );
     }
     {
+      //Se insertan datos de ejemplo en valid_member. El usuario 12345678-4321 quedaría blanqueado y podría registrarse en la aplicacion.
+      tx.executeSql(
+        `INSERT OR IGNORE INTO valid_member (code, name, last_name, create_date, last_update, state) VALUES ('12345678-4321', 'Ejemplo', 'Olpmeje', ?, ?, 'A')`,
+        [new Date().toString(), new Date().toString()],
+        (tx, results) => {
+          console.log("Insert en valid_member correctamente", results);
+        },
+        (tx, error) => {
+          console.error(
+            new Date().toString(),
+            "Error al insertar datos comida principal en tabla valid_member",
+            error
+          );
+        }
+      );
+    }
+    {
       // Creación de la tabla user. Contiene información del usuario, ya sea admin o miembro
       tx.executeSql(
-        `CREATE TABLE IF NOT EXISTS user (
-          member_code TEXT PRIMARY KEY NOT NULL, 
+        ` CREATE TABLE IF NOT EXISTS user (
+          member_code TEXT PRIMARY KEY, 
           type_code INTEGER NOT NULL,
           hashed_pass TEXT NOT NULL, 
           salt TEXT NOT NULL, 
@@ -121,7 +138,7 @@ export const initializeDatabase = () => {
         );`,
         [],
         (tx, results) => {
-          console.log("Tabla user creada correctamente", results);
+          console.log("USERRRR", "Tabla user creada correctamente", results);
         },
         (tx, error) => {
           console.error("Error al crear la tabla user:", error);
@@ -134,7 +151,7 @@ export const initializeDatabase = () => {
         `CREATE TABLE IF NOT EXISTS face (
           id INTEGER PRIMARY KEY AUTOINCREMENT, 
           user_id TEXT NOT NULL,
-          descriptor TEXT NOT NULL,
+          descriptor TEXT NOT NULL UNIQUE,
           create_date TEXT NOT NULL, 
           state TEXT DEFAULT 'A'
           --FOREIGN KEY(user_id) REFERENCES user(member_code)
@@ -491,10 +508,6 @@ export const initializeDatabase = () => {
         }
       );
     }
-    {
-      //insertUser(tx, "34985578-2024", "hashpasswordtest_salt", "salt");
-    }
-
     //Chequear inserts
     {
       tx.executeSql(`SELECT * FROM type_user;`, [], (_, { rows }) => {
@@ -528,6 +541,7 @@ export const initializeDatabase = () => {
   });
 };
 
+//Insertar usuario en tabla user. Se utilizará para nuevos registros.
 export const insertUser = (member_code, hashed_pass, salt) => {
   db.transaction((tx) => {
     tx.executeSql(
@@ -551,11 +565,12 @@ export const insertUser = (member_code, hashed_pass, salt) => {
   });
 };
 
-export const getValidMember = (member_code) => {
+//Pasando el legajo del usuario por parametro (member_code), la función retorna un array de los registros que existan en la tabla valid_member.
+export const getValidMemberById = (member_code) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "SELECT * FROM user WHERE code = ?",
+        "SELECT * FROM valid_member WHERE code = ?",
         [member_code],
         (tx, results) => {
           const members = results.rows._array;
@@ -569,12 +584,137 @@ export const getValidMember = (member_code) => {
   });
 };
 
+//Obtener listado de usuarios blanqueados (valid members)
+export const getValidMembers = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM valid_member",
+        [],
+        (tx, results) => {
+          const members = results.rows._array;
+          resolve(members);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+//Función para insertar miembro en la tabla valid_member (blanquear usuario)
+export const insertValidMember = (code, name, last_name) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "INSERT INTO valid_member (code, name, last_name, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?)",
+      [
+        code,
+        name,
+        last_name,
+        new Date().toString(),
+        new Date().toString(),
+        "A",
+      ],
+      (tx, results) => {
+        console.log("Miembro blanqueado correctamente", results);
+      },
+      (tx, error) => {
+        console.error("Error al blanquear miembro:", error);
+      }
+    );
+  });
+};
+
+//Obtener usuario de la tabla user por id
+export const getUserById = (member_code) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM user where member_code = ?",
+        [member_code],
+        (tx, results) => {
+          const user = results.rows._array;
+          resolve(user);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+//Obtener listado de todos los usuarios de la tabla user
 export const getUsers = () => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
         "SELECT * FROM user",
         [],
+        (tx, results) => {
+          const users = results.rows._array;
+          resolve(users);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+//Insertar descriptores para un usuario en la tabla face
+export const insertFaceData = (user_id, descriptor) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "INSERT INTO face (user_id, descriptor, create_date, state) VALUES (?, ?, ?, ?)",
+      [user_id, descriptor, new Date().toString(), "A"],
+      (tx, results) => {
+        console.log(
+          "Descriptor del usuario ",
+          user_id,
+          " insertado correctamente ",
+          results
+        );
+      },
+      (tx, error) => {
+        console.error(
+          "Error al insertar el descriptor del usuario ",
+          user_id,
+          error
+        );
+      }
+    );
+  });
+};
+
+//Obtener un listado de todos los descriptores de la tabla face
+export const getAllDescriptors = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM face",
+        [],
+        (tx, results) => {
+          const users = results.rows._array;
+          resolve(users);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+//Obtener todos los descriptores de un usuario por id de usuario
+export const getDescriptorsById = (user_id) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM face WHERE user_id = ?",
+        [user_id],
         (tx, results) => {
           const users = results.rows._array;
           resolve(users);
