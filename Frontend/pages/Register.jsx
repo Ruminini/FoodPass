@@ -2,30 +2,32 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, Alert } from 'react-native';
 import BackButton from '../components/BackButton';
 import MenuButton from '../components/MenuButton';
-import FaceScan from '../components/FaceScan';
 import { validateIdMember, insertMember } from '../services/MemberRegister';
-import insertFaceDescriptors from '../services/FaceDescriptorsRegister';
+import insertFaceDescriptorsMember from '../services/FaceDescriptorsRegister';
 import Toast from 'react-native-toast-message';
 
 export default function Register({ goTo, data }) {
     const [password, onChangePassword] = useState(data.password || '');
     const [id, onChangeId] = useState(data.id || '');
     const [invalid, setInvalid] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
-    const [photoTaken, setPhotoTaken] = useState(false);
-    const [descriptors, setDescriptors] = useState(data.descriptors || null);
+    const errorMessage = useState('');
+    const descriptors = useState(data.descriptors || null);
 
     const validateAndRegister = async () => {
         // Validación del formato del legajo
         if (!id.match(/^[0-9]{8}-[0-9]{4}$/)) {
-            Toast.show({ type: 'info', text1: 'El legajo debe tener el formato 00000000-0000' });
+            Toast.show({ type: 'info', 
+            text1: 'Formato de legajo incorrecto.',
+            text2: 'Debe ser 8 dígitos - (guión) 4 dígitos.'});
             setInvalid('id');
             return false;
         }
 
         // Validación del formato de la contraseña
         if (!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)) {
-            Toast.show({ type: 'info', text1: 'La contraseña debe tener almenos 8 caracteres, una mayúscula, una minúscula y un número.' });
+            Toast.show({ type: 'info', 
+            text1: 'Formato de contraseña incorrecto.',
+            text2: 'Debe tener al menos 8 caracteres (minusculas, mayusculas y números).'});
             setInvalid('password');
             return false;
         }
@@ -45,7 +47,7 @@ export default function Register({ goTo, data }) {
 
         // Validación de la foto tomada
         if (!descriptors) {
-            Alert.alert('Error', 'Por favor, primero tome una foto.');
+            Alert.alert('Error', 'Primero tome una foto por favor.');
             return false;
         }
 

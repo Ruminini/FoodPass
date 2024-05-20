@@ -1,6 +1,6 @@
-//import * as SQLite from 'expo-sqlite';
+import * as SQLite from 'expo-sqlite';
 
-//const db = SQLite.openDatabase('FoodPass.db');
+const db = SQLite.openDatabase('FoodPass.db');
 
 /**
  * Inserta o actualiza un registro en la tabla de caras (faces) de la base de datos.
