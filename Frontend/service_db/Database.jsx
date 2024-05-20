@@ -3,31 +3,10 @@ import * as SQLite from "expo-sqlite";
 
 //Este archivo contiene la lógica para crear y administrar la base de datos FoodPass.db en SQLite.
 
-const db = SQLite.openDatabase("FoodPass.db");
-const dbPath = `${FileSystem.documentDirectory}SQLite/FoodPass.db`;
-console.log("Database Path:", dbPath);
-
-// Function to drop the database
-async function dropDatabase() {
-  if (db) {
-    db._db.close(); // Use with caution as this is a private method
-  }
-  try {
-    await FileSystem.deleteAsync(dbPath);
-    console.log("Database deleted successfully");
-  } catch (error) {
-    console.error("Error deleting the database", error);
-  }
-}
-
-// setTimeout(
-//   () => {
-//     console.log("Database Path:", dbPath);
-//     dropDatabase()
-//   }
-//   , 5000);
+let db;
 
 export const initializeDatabase = () => {
+  db = SQLite.openDatabase("FoodPass.db");
   db.transaction((tx) => {
     // {
     //   //Se habilita el uso de claves foráneas en SQLite
@@ -565,7 +544,7 @@ export const initializeDatabase = () => {
 export const insertUser = (member_code, hashed_pass, salt) => {
   db.transaction((tx) => {
     tx.executeSql(
-      "INSERT INTO user (member_code, type_code, hashed_pass, salt, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      "INSERT OR IGNORE INTO user (member_code, type_code, hashed_pass, salt, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [
         member_code,
         2,
@@ -627,7 +606,7 @@ export const getValidMembers = () => {
 export const insertValidMember = (code, name, last_name) => {
   db.transaction((tx) => {
     tx.executeSql(
-      "INSERT INTO valid_member (code, name, last_name, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?)",
+      "INSERT OR IGNORE INTO valid_member (code, name, last_name, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?)",
       [
         code,
         name,
@@ -688,7 +667,7 @@ export const getUsers = () => {
 export const insertFaceData = (user_id, descriptor) => {
   db.transaction((tx) => {
     tx.executeSql(
-      "INSERT INTO face (user_id, descriptor, create_date, state) VALUES (?, ?, ?, ?)",
+      "INSERT OR IGNORE INTO face (user_id, descriptor, create_date, state) VALUES (?, ?, ?, ?)",
       [user_id, descriptor, new Date().toString(), "A"],
       (tx, results) => {
         console.log(
