@@ -92,7 +92,6 @@ export default function Options({ goTo }) {
             console.error(error);
             return false;
         }
-        // TODO : Dar de baja al miembro
     };
 
     const resetForm = () => {

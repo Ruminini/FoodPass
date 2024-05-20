@@ -1,13 +1,13 @@
-//import bcrypt from 'bcryptjs';
-//import * as SQLite from 'expo-sqlite';
+import bcrypt from 'bcryptjs';
+import * as SQLite from 'expo-sqlite';
 
-//const db = SQLite.openDatabase('FoodPass.db');
+const db = SQLite.openDatabase('FoodPass.db');
 
 /**
  * Valida el formato y la existencia de un legajo en la base de datos.
  * @param {string} id - El código del legajo a validar.
  * @returns {Promise<boolean>} - Una promesa que indica si el legajo es válido y existe en la base de datos.
- *    Resuelve a true si el formato del legajo es válido y existe en la tabla de miembros válidos (valid_members),
+ *    Resuelve a true si el formato del legajo es válido y existe en la tabla de miembros válidos (valid_member),
  *    de lo contrario, resuelve a false.
  *    Rechaza la promesa si ocurre algún error durante la ejecución de la consulta a la base de datos.
  */
@@ -22,7 +22,7 @@ export function validateIdMember(id) {
     return new Promise((resolve, reject) => {
         db.transaction(tx => {
             tx.executeSql(
-                'SELECT * FROM valid_members WHERE code_text = ?',
+                'SELECT * FROM valid_member WHERE code = ?',
                 [id],
                 (_, { rows }) => {
                     // Si hay alguna fila devuelta, significa que el legajo existe
