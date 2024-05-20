@@ -1,8 +1,8 @@
-import { StyleSheet, Text, TextInput, View } from 'react-native';
 import React, { useState } from 'react';
+import { StyleSheet, Text, TextInput, View, Alert } from 'react-native';
 import BackButton from '../components/BackButton';
 import MenuButton from '../components/MenuButton';
-import { insertNewPassword } from '../services/UpdatePassword';
+import { updatePasswordMember, desactiveMember } from '../services/MemberOptions';
 
 export default function Options({ onPress }) {
     const [id, setId] = useState('');
@@ -11,8 +11,7 @@ export default function Options({ onPress }) {
     const [invalid, setInvalid] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
-    const validateAndChangePassword = async () => {
-
+    const validateAndUpdatePassword = async () => {
         // Validación del formato del legajo
         if (!id.match(/^[0-9]{8}-[0-9]{4}$/)) {
             setErrorMessage('');
@@ -36,18 +35,65 @@ export default function Options({ onPress }) {
 
         // Actualizar nueva contraseña en la base de datos
         try {
-            const passwordUpdated = await insertNewPassword(id, oldPassword, newPassword);
+            const passwordUpdated = await updatePasswordMember(id, oldPassword, newPassword);
             if (!passwordUpdated) {
                 setErrorMessage('Legajo y/o contraseña incorrecto/s.');
                 resetForm();
                 return false;
             }
         } catch (error) {
-            console.error('Error al actualizar la contraseña:', error);
+            console.error(error);
             return false;
         }
 
         onPress({ id, oldPassword, newPassword });
+    };
+
+    const confirmDeleteMember = () => {
+        // Validación del formato del legajo
+        if (!id.match(/^[0-9]{8}-[0-9]{4}$/)) {
+            setErrorMessage('');
+            setInvalid('id');
+            return false;
+        }
+
+        // Validación del formato de la contraseña actual
+        if (!oldPassword.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)) {
+            setErrorMessage('');
+            setInvalid('oldPassword');
+            return false;
+        }
+
+        Alert.alert(
+            "Confirmación",
+            "¿Estás seguro que deseas darte de baja?",
+            [
+                {
+                    text: "No",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                { text: "Sí", onPress: deleteMember }
+            ],
+            { cancelable: false }
+        );
+    };
+
+    const deleteMember = async () => {
+        // Dar de baja a un miembro del sistema
+        try {
+            const desactive = await desactiveMember(id, oldPassword);
+            if (!desactive) {
+                setErrorMessage('No se pudo dar de baja al miembro.');
+                resetForm();
+                return false;
+            }
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+
+        onPress({ id, oldPassword });
     };
 
     const resetForm = () => {
@@ -69,7 +115,7 @@ export default function Options({ onPress }) {
                     placeholder="12345678-4321"
                     keyboardType="numeric"
                 />
-                <Text style={[styles.title, invalid === 'oldPassword' && { color: 'red' }]}>Contraseña vieja</Text>
+                <Text style={[styles.title, invalid === 'oldPassword' && { color: 'red' }]}>Contraseña actual</Text>
                 <TextInput
                     style={styles.input}
                     onChangeText={setOldPassword}
@@ -88,12 +134,12 @@ export default function Options({ onPress }) {
                 {errorMessage !== '' && <Text style={styles.errorMessage}>{errorMessage}</Text>}
                 <MenuButton 
                     text="Cambiar contraseña" 
-                    onPress={validateAndChangePassword} 
+                    onPress={validateAndUpdatePassword} 
                     style={styles.menuButton}
                 />
                 <MenuButton 
                     text="Darse de baja" 
-                    onPress={() => onPress('deleteAccount')} 
+                    onPress={confirmDeleteMember} 
                     style={[styles.menuButton, styles.deleteButton]}
                 />
             </View>

@@ -3,8 +3,8 @@ import { StyleSheet, Text, TextInput, View, Alert } from 'react-native';
 import BackButton from '../components/BackButton';
 import MenuButton from '../components/MenuButton';
 import FaceScan from './FaceScan';
-import { validateId, validatePassword, registerMember } from '../services/RegisterValidator';
-import insertFaceDescriptors from '../services/RegisterDescriptors';
+import { validateIdMember, insertMember } from '../services/MemberRegister';
+import insertFaceDescriptors from '../services/FaceDescriptorsRegister';
 
 export default function Register({ onPress }) {
     const [password, onChangePassword] = useState('');
@@ -16,7 +16,6 @@ export default function Register({ onPress }) {
     const [descriptors, setDescriptors] = useState(null);
 
     const validateAndRegister = async () => {
-
         // Validación del formato del legajo
         if (!id.match(/^[0-9]{8}-[0-9]{4}$/)) {
             setErrorMessage('');
@@ -33,27 +32,14 @@ export default function Register({ onPress }) {
 
         // Validación del legajo en la base de datos
         try {
-            const idIsValid = await validateId(id);
+            const idIsValid = await validateIdMember(id);
             if (!idIsValid) {
                 setErrorMessage('No es un legajo válido.');
                 resetForm();
                 return false;
             }
         } catch (error) {
-            console.error('Error al validar el legajo:', error);
-            return false;
-        }
-
-        // Validación de la contraseña en la base de datos
-        try {
-            const passwordIsValid = await validatePassword(id, password);
-            if (!passwordIsValid) {
-                setErrorMessage('El usuario ya se encuentra registrado.');
-                resetForm();
-                return false;
-            }
-        } catch (error) {
-            console.error('Error al validar la contraseña:', error);
+            console.error(error);
             return false;
         }
 
@@ -71,31 +57,31 @@ export default function Register({ onPress }) {
 
         // Registrar miembro en la base de datos
         try {
-            const memberRegistered = await registerMember(id, password);
-            if (!memberRegistered) {
+            const memberInserted = await insertMember(id, password);
+            if (!memberInserted) {
                 setErrorMessage('Ocurrió un error inesperado, comuníquese con su empleador.');
-                console.log('Error al intentar registrar el usuario.');
+                console.log('Error al intentar registrar el miembro.');
                 return false;
             } else {
-                console.log('Usuario registrado.');
+                console.log('Miembro registrado.');
             }
         } catch (error) {
-            console.error('Error al registrar el usuario:', error);
+            console.error(error);
             return false;
         }
 
         // Registrar descriptores del rostro en la base de datos
         try {
-            const faceRegistred = await insertFaceDescriptors(id, descriptors);
-            if (!faceRegistred) {
+            const faceDescriptorsInserted = await insertFaceDescriptorsMember(id, descriptors);
+            if (!faceDescriptorsInserted) {
                 setErrorMessage('Ocurrió un error inesperado, comuníquese con su empleador.');
-                console.log('Error al intentar almacenar descritores del usuario.');
+                console.log('Error al intentar registrar descritores.');
                 return false;
             } else {
-                console.log('Descriptores del usuario almacenados.');
+                console.log('Descriptores registrados.');
             }
         } catch (error) {
-            console.error('Error al almacenar descriptores del usuario:', error);
+            console.error( error);
             return false;
         }
 
