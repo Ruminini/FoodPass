@@ -3,7 +3,7 @@ import { StyleSheet, Text, TextInput, View, Alert } from 'react-native';
 import BackButton from '../components/BackButton';
 import MenuButton from '../components/MenuButton';
 import { validateIdMember, insertMember } from '../services/MemberRegister';
-import insertFaceDescriptorsMember from '../services/FaceDescriptorsRegister';
+import { insertFaceDescriptorsMember } from '../services/FaceDescriptorsRegister';
 import Toast from 'react-native-toast-message';
 
 export default function Register({ goTo, data }) {
@@ -11,23 +11,27 @@ export default function Register({ goTo, data }) {
     const [id, onChangeId] = useState(data.id || '');
     const [invalid, setInvalid] = useState('');
     const errorMessage = useState('');
-    const descriptors = useState(data.descriptors || null);
+    const [descriptors, setDescriptors] = useState(null);
 
     const validateAndRegister = async () => {
         // Validación del formato del legajo
         if (!id.match(/^[0-9]{8}-[0-9]{4}$/)) {
-            Toast.show({ type: 'info', 
-            text1: 'Formato de legajo incorrecto.',
-            text2: 'Debe ser 8 dígitos - (guión) 4 dígitos.'});
+            Toast.show({ 
+                type: 'info', 
+                text1: 'Formato de legajo incorrecto.',
+                text2: 'Formato correcto: 8 dígitos - (guión) 4 dígitos.'
+            });
             setInvalid('id');
             return false;
         }
 
         // Validación del formato de la contraseña
         if (!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)) {
-            Toast.show({ type: 'info', 
-            text1: 'Formato de contraseña incorrecto.',
-            text2: 'Debe tener al menos 8 caracteres (minusculas, mayusculas y números).'});
+            Toast.show({ 
+                type: 'info', 
+                text1: 'Formato de contraseña incorrecto.',
+                text2: 'Formato correcto: 8+ caracteres (min/mayús + números).'
+            });
             setInvalid('password');
             return false;
         }
@@ -36,7 +40,10 @@ export default function Register({ goTo, data }) {
         try {
             const idIsValid = await validateIdMember(id);
             if (!idIsValid) {
-                Toast.show({ type: 'Error', text1: 'El legajo no es valido.' });
+                Toast.show({ 
+                    type: 'error', 
+                    text1: 'El legajo no es válido.' 
+                });
                 resetForm();
                 return false;
             }
@@ -44,18 +51,24 @@ export default function Register({ goTo, data }) {
             console.error(error);
             return false;
         }
-
-        // Validación de la foto tomada
+        
+        // Validación de la foto tomada y los descriptores
         if (!descriptors) {
-            Alert.alert('Error', 'Primero tome una foto por favor.');
+            Alert.alert('Error', 'Debe tomar una foto primero.');
+            return false;
+        } else if (descriptors.length === 0) {
+            Alert.alert('Error', 'No se pudieron detectar los descriptores faciales. Por favor, tome una foto nuevamente.');
             return false;
         }
-
+        
         // Registrar miembro en la base de datos
         try {
             const memberInserted = await insertMember(id, password);
             if (!memberInserted) {
-                Toast.show({ type: 'Error', text1: 'Ocurrió un error inesperado, comuníquese con su empleador.'});
+                Toast.show({ 
+                    type: 'error',
+                    text1: 'Ocurrió un error inesperado.'
+                });
                 console.log('Error al intentar registrar el miembro.');
                 return false;
             } else {
@@ -70,8 +83,11 @@ export default function Register({ goTo, data }) {
         try {
             const faceDescriptorsInserted = await insertFaceDescriptorsMember(id, descriptors);
             if (!faceDescriptorsInserted) {
-                Toast.show({ type: 'Error', text1: 'Ocurrió un error inesperado, comuníquese con su empleador.'});
-                console.log('Error al intentar registrar descritores.');
+                Toast.show({ 
+                    type: 'error', 
+                    text1: 'Ocurrió un error inesperado.'
+                });
+                console.log('Error al intentar registrar descriptores.');
                 return false;
             } else {
                 console.log('Descriptores registrados.');
@@ -80,7 +96,10 @@ export default function Register({ goTo, data }) {
             console.error( error);
             return false;
         }
-        Toast.show({ type: 'success', text1: 'Registro exitoso!' });
+        Toast.show({ 
+            type: 'success', 
+            text1: '¡Registro exitoso!' 
+        });
         goTo('MainMenu');
     };
 
@@ -116,7 +135,10 @@ export default function Register({ goTo, data }) {
                         'Login',
                         {onlyDescriptors: true},
                         () => goTo('Register', {id,password,descriptors}),
-                        (desc) => goTo('Register', {id,password,desc})
+                        (desc) => {
+                            setDescriptors(desc);
+                            goTo('Register', {id,password,desc});
+                        }
                     )}
                     style={{ height: 75, width: 300, alignSelf: 'center'}} />
                 <MenuButton text="Registrar" onPress={validateAndRegister} style={{ height: 75, width: 300, alignSelf: 'center'}} />

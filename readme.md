@@ -1,7 +1,7 @@
 <!-- README --->
 
 <div align="center">
-    <img src="./Frontend/public/images/FoodPass-Logo.png" height="250">
+    <img src="./public/images/FoodPass-Logo.png" height="250">
 </div>
 <div align="center">
    <a href="https://https://github.com/Ruminini/FoodPass">

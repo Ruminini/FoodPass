@@ -70,7 +70,7 @@ export default function Options({ goTo }) {
             [
                 {
                     text: "No",
-                    onPress: () => console.log("Cancel Pressed"),
+                    onPress: () => console.log("Operación cancelada."),
                     style: "cancel"
                 },
                 { text: "Sí", onPress: deleteMember }
@@ -107,7 +107,10 @@ export default function Options({ goTo }) {
                 <Text style={[styles.title, invalid === 'id' && { color: 'red' }]}>Legajo</Text>
                 <TextInput
                     style={styles.input}
-                    onChangeText={setId}
+                    onChangeText={(text) => {
+                        setId(text);
+                        if (errorMessage) setErrorMessage('');
+                    }}
                     value={id}
                     placeholder="12345678-4321"
                     keyboardType="numeric"
@@ -115,7 +118,10 @@ export default function Options({ goTo }) {
                 <Text style={[styles.title, invalid === 'oldPassword' && { color: 'red' }]}>Contraseña actual</Text>
                 <TextInput
                     style={styles.input}
-                    onChangeText={setOldPassword}
+                    onChangeText={(text) => {
+                        setOldPassword(text);
+                        if (errorMessage) setErrorMessage('');
+                    }}
                     value={oldPassword}
                     placeholder="••••••••••"
                     secureTextEntry={true}
@@ -123,7 +129,10 @@ export default function Options({ goTo }) {
                 <Text style={[styles.title, invalid === 'newPassword' && { color: 'red' }]}>Contraseña nueva</Text>
                 <TextInput
                     style={styles.input}
-                    onChangeText={setNewPassword}
+                    onChangeText={(text) => {
+                        setNewPassword(text);
+                        if (errorMessage) setErrorMessage('');
+                    }}
                     value={newPassword}
                     placeholder="••••••••••"
                     secureTextEntry={true}

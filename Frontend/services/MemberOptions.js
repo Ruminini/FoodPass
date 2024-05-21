@@ -1,7 +1,8 @@
-//import bcrypt from 'bcryptjs';
-//import * as SQLite from 'expo-sqlite';
+import { generateSalt, basicHash, compareHash } from '../utils/Hash';
 
-//const db = SQLite.openDatabase('FoodPass.db');
+import * as SQLite from 'expo-sqlite';
+
+const db = SQLite.openDatabase('FoodPass.db');
 
 /**
  * Actualiza la contraseña de un usuario si la contraseña actual es correcta.
@@ -17,12 +18,11 @@ export function updatePasswordMember(id, oldPassword, newPassword) {
     return new Promise((resolve, reject) => {
         db.transaction(tx => {
             tx.executeSql(
-                'SELECT state, hashed_pass, salt FROM user WHERE member_code = ?',
+                'SELECT member_code, state, hashed_pass, salt FROM user WHERE member_code = ?',
                 [id],
                 async (_, { rows }) => {
                     if (rows.length === 0) {
-                        // Si no se encuentra el usuario, resolver con false
-                        resolve(false);
+                        resolve(false); // Si no se encuentra el usuario, resolver con false
                         return;
                     }
 
@@ -32,36 +32,30 @@ export function updatePasswordMember(id, oldPassword, newPassword) {
                     const oldHashedPass = user.hashed_pass;
 
                     if (userState === 'I') {
-                        // Si el estado es 'I', el usuario está desactivado, resolver con false
-                        resolve(false);
+                        resolve(false); // Si el estado es 'I', el usuario está desactivado, resolver con false
                         return;
                     }
 
-                    // Verificar si la contraseña antigua es correcta
-                    const isOldPasswordValid = bcrypt.compareSync(oldPassword + oldSalt, oldHashedPass);
+                    // Verificar si la contraseña antigua es correcta utilizando compareHash
+                    const isOldPasswordValid = compareHash(oldPassword, oldSalt, oldHashedPass);
 
                     if (!isOldPasswordValid) {
-                        // Si la contraseña antigua no es válida, resolver con false
-                        resolve(false);
-                        return;
-                    }   
-
-                    const newHashedPass = bcrypt.hashSync(newPassword + oldSalt, 10);
-
-                    // Verificar si la nueva contraseña es igual a la anterior
-                    if (oldHashedPass === newHashedPass) {
-                        // Si la nueva contraseña es igual a la anterior, resolver con false
-                        resolve(false);
+                        resolve(false); // Si la contraseña antigua no es válida, resolver con false
                         return;
                     }
+
+                    // Generar una nueva salt
+                    const newSalt = generateSalt();
+
+                    // Generar el hash de la nueva contraseña con la nueva salt
+                    const newHashedPass = basicHash(newPassword, newSalt);
 
                     // Actualizar la contraseña en la base de datos
                     tx.executeSql(
-                        'UPDATE user SET hashed_pass = ? WHERE member_code = ?',
-                        [newHashedPass, id],
+                        'UPDATE user SET hashed_pass = ?, salt = ? WHERE member_code = ?',
+                        [newHashedPass, newSalt, id],
                         () => {
-                            // Si la actualización es exitosa, resolver con true
-                            resolve(true);
+                            resolve(true); // Si la actualización es exitosa, resolver con true
                         },
                         (_, error) => {
                             console.error('Error al ejecutar la actualización:', error);
@@ -77,6 +71,7 @@ export function updatePasswordMember(id, oldPassword, newPassword) {
         });
     });
 }
+
 
 /**
  * Desactiva un miembro en la tabla user si el legajo y la contraseña coinciden.
@@ -110,8 +105,8 @@ export function desactiveMember(id, password) {
                         return;
                     }
 
-                    // Verificar si la contraseña ingresada es correcta
-                    const isPasswordValid = bcrypt.compareSync(password + storedSalt, storedHashedPass);
+                    // Verificar si la contraseña antigua es correcta utilizando compareHash
+                    const isPasswordValid = compareHash(password, storedSalt, storedHashedPass)
 
                     if (!isPasswordValid) {
                         // Si la contraseña ingresada no es válida, resolver con false

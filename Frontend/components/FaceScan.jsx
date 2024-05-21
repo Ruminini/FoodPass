@@ -30,8 +30,8 @@ export default function FaceScan({ data, after }) {
 			if (!closest || closest.distance > 0.65) {
 				Toast.show({
 					type: 'error',
-					text1: 'No he podido identificarte',
-					text2: 'Vuelve a intentarlo o, si no lo haz hecho, registrate!'
+					text1: 'No he podido identificarte.',
+					text2: 'Vuelve a intentarlo, si no lo haz hecho, registrate.'
 				})
 				setPhoto(null)
 			} else if (closest.distance < 0.55) {

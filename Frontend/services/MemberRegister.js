@@ -1,4 +1,5 @@
-import bcrypt from 'bcryptjs';
+import { generateSalt, basicHash } from '../utils/Hash';
+
 import * as SQLite from 'expo-sqlite';
 
 const db = SQLite.openDatabase('FoodPass.db');
@@ -37,44 +38,55 @@ export function validateIdMember(id) {
     });
 }
 
-/**
- * Registrar o activar un miembro en la base de datos con la contraseña hasheada y otros datos necesarios.
- * @param {string} id - El código del miembro a registrar o activar.
- * @param {string} password - La contraseña del miembro a registrar o activar.
- * @returns {Promise<boolean>} - Una promesa que indica si la operación fue exitosa.
- *    Resuelve a true si el miembro se registró o activó correctamente en la base de datos, de lo contrario, resuelve a false.
- *    Rechaza la promesa si ocurre algún error durante el proceso.
- */
 export async function insertMember(id, password) {
     // Validar el formato de la contraseña
     if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(password)) {
         return Promise.resolve(false); // El formato de la contraseña es inválido
     }
 
-    // Número de rondas para el salt
-    const saltRounds = 10;
-
     try {
-        // Generar el salt y hashear la contraseña
-        const salt = await bcrypt.genSalt(saltRounds);
-        const hashed_pass = await bcrypt.hash(password, salt);
-        const state = 'A';
+        // Generar el salt de manera segura usando el método importado generateSalt
+        const salt = generateSalt();
 
-        // Devolver una promesa que verifica e inserta/actualiza al miembro en la base de datos
+        // Generar el hash de la contraseña con el salt usando el método importado basicHash
+        const hashed_pass = basicHash(password, salt);
+
+        // Realizar la inserción o actualización en la base de datos
         return new Promise((resolve, reject) => {
             db.transaction(tx => {
-                // Verificar si el usuario ya existe en la base de datos
                 tx.executeSql(
                     'SELECT * FROM user WHERE member_code = ?',
                     [id],
                     (_, { rows }) => {
                         if (rows.length === 0) {
-                            // El usuario no está registrado, realizar el insert
                             tx.executeSql(
-                                'INSERT INTO user (member_code, hashed_pass, salt, state) VALUES (?, ?, ?, ?)',
-                                [id, hashed_pass, salt, state],
+                                "INSERT OR IGNORE INTO user (member_code, type_code, hashed_pass, salt, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                                [
+                                    id,
+                                    2,
+                                    hashed_pass,
+                                    salt,
+                                    new Date().toString(),
+                                    new Date().toString(),
+                                    "A",
+                                ],
                                 () => {
-                                    resolve(true); // El miembro se registró con éxito
+                                    // Verificar si el usuario se ha registrado correctamente
+                                    tx.executeSql(
+                                        'SELECT * FROM user WHERE member_code = ?',
+                                        [id],
+                                        (_, { rows }) => {
+                                            if (rows.length > 0) {
+                                                resolve(true); // El miembro se registró con éxito
+                                            } else {
+                                                resolve(false); // El registro falló
+                                            }
+                                        },
+                                        (_, error) => {
+                                            console.error('Error al verificar el registro del miembro:', error);
+                                            reject(error);
+                                        }
+                                    );
                                 },
                                 (_, error) => {
                                     console.error('Error al registrar el miembro:', error);
@@ -82,24 +94,30 @@ export async function insertMember(id, password) {
                                 }
                             );
                         } else {
-                            // El usuario está registrado
+                            // El usuario ya existe
                             const user = rows.item(0);
-                            if (user.state === 'A') {
-                                // El usuario ya está activo
-                                resolve(false);
-                            } else if (user.state === 'I') {
-                                // El estado es 'I', actualizar a 'A'
+                            if (user.state === 'I') {
+                                // Actualizar el estado a 'A' y la contraseña
                                 tx.executeSql(
-                                    'UPDATE user SET hashed_pass = ?, salt = ?, state = ? WHERE member_code = ?',
-                                    [hashed_pass, salt, state, id],
+                                    'UPDATE user SET hashed_pass = ?, salt = ?, create_date = ?, last_update = ?, state = ? WHERE member_code = ?',
+                                    [
+                                        hashed_pass, 
+                                        salt,
+                                        new Date().toString(),
+                                        new Date().toString(),
+                                        "A",
+                                        id,
+                                    ],
                                     () => {
-                                        resolve(true); // El miembro se activó correctamente
+                                        resolve(true); // El estado se actualizó y la contraseña se cambió con éxito
                                     },
                                     (_, error) => {
-                                        console.error('Error al actualizar el miembro:', error);
+                                        console.error('Error al actualizar el estado y la contraseña:', error);
                                         reject(error);
                                     }
                                 );
+                            } else {
+                                resolve(false); // El usuario ya está activo, no es necesario actualizar
                             }
                         }
                     },
