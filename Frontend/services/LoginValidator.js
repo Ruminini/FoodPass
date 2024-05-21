@@ -1,73 +1,38 @@
-// import bcrypt from 'bcryptjs';
-// import * as SQLite from 'expo-sqlite';
 
-// // Abre la base de datos SQLite
-// const db = SQLite.openDatabase('FoodPass.db');
-// //cerrar base de datos?
-
-// Este método devuelve una promesa true si se devuelven correctamente el id y la cara de los usuarios de la base de datos,
+import {getAllDescriptors, getUserById, getPasswordById, getSaltById} from '../service_db/Database.jsx';
+    
+// Este método devuelve true si se todas las caras de la base de datos,
 // en caso contrario devuelve falso. 
-// export async function getFacesValidator() {
-//     // Devolver una promesa que realiza la consulta a la base de datos
-//     return new Promise((resolve, reject) => {
-//         db.transaction(tx => {
-//             tx.executeSql(
-//                 'SELECT id, descriptor FROM face',
-//                 (_, { rows: {descriptores} }) => {
-//                     // Devuelve los descriptores a comparar. 
-//                     resolve(descriptores);
-//                 },
-//                 (_, error) => {
-//                     console.error('Error al ejecutar la consulta:', error);
-//                     reject(error);
-//                 }
-//             );
-//         });
-//     });
-// }
+ export async function getFacesValidator() {
+    try {
+        return getAllDescriptors(); 
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+    
+ }
 
-// Este método devuelve una promesa true si el usuario con ese id tiene la cuenta activa,
+// Devuelve true si el id ingresado existe en user
+export async function validateId(id) {
+    let user = await getUserById(id);
+    return user[0] !== undefined;
+}
+
+// Devuelve true si el password ingresado es el mismo que tiene en la db
+ export async function validatePassword(id, user_password) {
+    //const salt = getSaltById(id);
+    const user = await getUserById(id);
+    const pass = user[0].hashed_pass;
+    return pass === user_password;
+}
+
+// Este método devuelve true si el usuario con ese id tiene la cuenta activa,
 // en caso contrario devuelve falso. 
-// export async function userStateValidator(id) {
-//     // Devolver una promesa que realiza la consulta a la base de datos
-//     return new Promise((resolve, reject) => {
-//         db.transaction(tx => {
-//             tx.executeSql(
-//                 'SELECT * FROM user WHERE member_code = ?',
-//                  [id],
-//                 (_, { users }) => {
-//                     // Si se cumple la condición significa que el usuario está activo
-//                     let user = users.item[0]
-//                     resolve(user.state === 'A');
-//                 },
-//                 (_, error) => {
-//                     console.error('Error al ejecutar la consulta:', error);
-//                     reject(error);
-//                 }
-//             );
-//         });
-//     });
-// }
-
-// export async function validateId(id) {
-//     // Devolver una promesa que realiza la consulta a la base de datos
-//     return new Promise((resolve, reject) => {
-//         db.transaction(tx => {
-//             tx.executeSql(
-//                 'SELECT * FROM user member_code = ?',
-//                 [id],
-//                 (_, { rows }) => {
-//                     // Si hay alguna fila devuelta, significa que el legajo está registrado
-//                     resolve(rows.length > 0);
-//                 },
-//                 (_, error) => {
-//                     console.error('Error al ejecutar la consulta:', error);
-//                     reject(error);
-//                 }
-//             );
-//         });
-//     });
-// }
+export async function userStateValidator(id) {
+    let user = await getUserById(id);
+    return (user[0].state === 'A');
+}
 
 //  export async function validatePassword(id, user_password) {
 //     try {
@@ -103,18 +68,43 @@
 //     }
 // }
 
-//  export function takeSalt(id){
-//     db.transaction(tx => {
-//         tx.executeSql('SELECT * FROM user member_code = ?'), 
-//         [id],
-//         (_, { rows }) => {
-//             // Si la contraseña del usuario es igual lo loguea sino le da error
-//             let user = rows.item[0]
-//             return salt = user.salt;        
-//         },
-//         (_, error) => {
-//             console.error('Error al ejecutar la consulta:', error);
-//             reject(error);
-//         }
-//     })
-//  }
+  /* Obtener la contraseña hasheada del usuario por su id
+  export const getPasswordById = (member_code) => {
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        tx.executeSql(
+          "SELECT * FROM user member_code = ?",
+          [member_code],
+          (tx, results ) => {                
+            const user = results.rows._array[0];
+            let current_hashed_pass = user.hashed_pass; 
+            resolve(current_hashed_pass);           
+          },
+          (tx, error) => {
+            reject(error);
+          }
+        );
+      });
+    });
+  };
+
+// Obtener el salt de un usuario por su id
+export const getSaltById = (member_code) => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+        tx.executeSql(
+        "SELECT * FROM user member_code = ?", 
+        [member_code],
+        (tx, results) => {
+          const users = results.rows._array;
+          console.log("funciono obtener salt");
+          resolve(users[0]);       
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+*/
