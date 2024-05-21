@@ -11,7 +11,7 @@ export default function Register({ goTo, data }) {
     const [id, onChangeId] = useState(data.id || '');
     const [invalid, setInvalid] = useState('');
     const errorMessage = useState('');
-    const [descriptors, setDescriptors] = useState(null);
+    const descriptors = data.descriptors;
 
     const validateAndRegister = async () => {
         // Validación del formato del legajo
@@ -135,10 +135,7 @@ export default function Register({ goTo, data }) {
                         'Login',
                         {onlyDescriptors: true},
                         () => goTo('Register', {id,password,descriptors}),
-                        (desc) => {
-                            setDescriptors(desc);
-                            goTo('Register', {id,password,desc});
-                        }
+                        (descriptors) => goTo('Register', {id,password,descriptors})
                     )}
                     style={{ height: 75, width: 300, alignSelf: 'center'}} />
                 <MenuButton text="Registrar" onPress={validateAndRegister} style={{ height: 75, width: 300, alignSelf: 'center'}} />

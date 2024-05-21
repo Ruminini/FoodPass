@@ -15,6 +15,7 @@ export default function FaceScan({ data, after }) {
 	const [size, setSize] = useState("640x480");
 	const [landmarks, setLandmarks] = useState(null);
 	const cameraRef = useRef(null);
+	const onlyDescriptors = data.onlyDescriptors;
 
 	useEffect(() => {
 		if (!photo) return;
@@ -23,7 +24,7 @@ export default function FaceScan({ data, after }) {
 			if (response && response.length > 0) {
 				setLandmarks(response);
 				const descriptors = Object.values(response[0].descriptor);
-				if (data.onlyDescriptors) after(descriptors);
+				onlyDescriptors && after(descriptors);
 				closest = matchFaces(descriptors);
 			}
 			// Aca, cuando ande, habria q usar const userState = await userStateValidator(closestFaceId);
@@ -35,11 +36,16 @@ export default function FaceScan({ data, after }) {
 				})
 				setPhoto(null)
 			} else if (closest.distance < 0.55) {
-				Toast.show({
-					type: 'success',
-					text1: `Hola ${closest.person}!`,
-					text2: `Distancia: ${closest.distance}`
-				})
+				onlyDescriptors ?
+					Toast.show({
+						type: 'success',
+						text1: 'Captura exitosa',
+					}) :
+					Toast.show({
+						type: 'success',
+						text1: `Identidad Validada: ${closest.person}.`,
+						text2: `Distancia: ${closest.distance}`
+					})
 				after(closest.person);
 			} else {
 				Toast.show({
