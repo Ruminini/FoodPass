@@ -5,8 +5,8 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import MenuButton from './MenuButton';
 import LandmarksSvg from './LandmarksSvg';
 import ScanAnimation from './ScanAnimation';
-import people from '../data/people.json';
 import Toast from "react-native-toast-message";
+import {getFacesValidator, userStateValidator} from '../services/LoginValidator.js'
 
 export default function FaceScan({ data, after }) {
 	const [type, setType] = useState(CameraType.back);
@@ -17,18 +17,20 @@ export default function FaceScan({ data, after }) {
 	const cameraRef = useRef(null);
 	const onlyDescriptors = data.onlyDescriptors;
 
+	// FALTA PROBAR FUNCIONALIDAD DE LOGIN ONLINE
 	useEffect(() => {
 		if (!photo) return;
-		recognizeFaces(photo.base64).then((response) => {
-			let closest = null;
+		recognizeFaces(photo.base64).then(async (response) => {
+			let closestPersonIdAndDistance = null;
 			if (response && response.length > 0) {
 				setLandmarks(response);
 				const descriptors = Object.values(response[0].descriptor);
 				onlyDescriptors && after(descriptors);
 				closest = matchFaces(descriptors);
 			}
-			// Aca, cuando ande, habria q usar const userState = await userStateValidator(closestFaceId);
-			if (!closest || closest.distance > 0.65) {
+			// Comprueba el estado del usuario si está dado de baja o no
+			const userState = await userStateValidator(closestPersonIdAndDistance.person);
+			if (!closestPersonIdAndDistance || closestPersonIdAndDistance.distance > 0.65 || !userState) {
 				Toast.show({
 					type: 'error',
 					text1: 'No he podido identificarte.',
@@ -50,7 +52,7 @@ export default function FaceScan({ data, after }) {
 			} else {
 				Toast.show({
 					type: 'info',
-					text1: `Te pareces a ${closest.person}!`,
+					text1: `Te pareces a ${closestPersonIdAndDistance.person}!`,
 					text2: 'Vuelve a intentarlo o, si no lo haz hecho, registrate!'
 				})
 				setPhoto(null)
@@ -242,17 +244,23 @@ function euclideanDistance(vector1, vector2) {
     return Math.sqrt(sumOfSquares);
 }
 
-function matchFaces(face) {
-	let closestPerson = null;
+//Comprobación de caras de las diferentes personas dependiendo de su distancia euclideana
+async function matchFaces(face) {
+	let closestPersonId = null;
 	let closestDistance = Infinity;
-	// En vez de people, habria que usar const faces = await getFacesValidator();
-	for (const otherPerson in people) {
-		const otherFace = Object.values(people[otherPerson]);
-		const distance = euclideanDistance(face, otherFace);
-		if (distance < closestDistance) {
-			closestPerson = otherPerson;
-			closestDistance = distance;
+	const faces = await getFacesValidator();
+	for (const otherPerson of faces) {
+		const otherFace = otherPerson.descriptor;
+		const stringDescriptors = otherFace.match(/\-?\d+\.\d+/g);
+		if (stringDescriptors && stringDescriptors.length === 128) {
+			const floatDescriptors = stringDescriptors.map((x) => parseFloat(x));
+			const distance = euclideanDistance(face, floatDescriptors);
+			console.log(distance)
+			if (distance < closestDistance) {
+				closestPersonId = otherPerson.user_id;
+				closestDistance = distance;
+			}
 		}
 	}
-	return { 'person': closestPerson, 'distance': closestDistance };
+	return { 'person': closestPersonId, 'distance': closestDistance };
 }

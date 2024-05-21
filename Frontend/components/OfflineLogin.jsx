@@ -21,9 +21,9 @@ export default function OfflineLogin({ after }) {
         // Validación del legajo con los legajos de usuarios registrados en la base de datos
         try {
             const idIsValid = await validateId(id);
+            
             if (!idIsValid) {
                 setErrorMessage('No es un legajo registrado.');
-                resetForm();
                 return false;
             }
         } catch (error) {
@@ -36,7 +36,6 @@ export default function OfflineLogin({ after }) {
             const passwordIsValid = await validatePassword(id, password);
             if (!passwordIsValid) {
                 setErrorMessage('La contraseña es incorrecta.');
-                resetForm();
                 return false;
             }
         } catch (error) {
@@ -45,19 +44,19 @@ export default function OfflineLogin({ after }) {
         }
 
         //Validación del estado del usuario
+        
         try {
             const userState = await userStateValidator(id);
             
             if(!userState){
                 setErrorMessage('El usuario está dado de baja. Vuelva a registrarse');
-                resetForm();
                 return false;
             }
         } catch (error) {
             console.error('Error al validar el estado del usuario:', error);
             return false;
         }
-        after({ legajo: id}),
+        after(id),
         console.log('Usuario logueado')       
     }
 
