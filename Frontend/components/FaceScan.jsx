@@ -242,13 +242,18 @@ function euclideanDistance(vector1, vector2) {
 async function matchFaces(face) {
 	let closestPersonId = null;
 	let closestDistance = Infinity;
-	let faces = await getFacesValidator();
-	for (const otherPerson in faces) {
+	const faces = await getFacesValidator();
+	for (const otherPerson of faces) {
 		const otherFace = otherPerson.descriptor;
-		const distance = euclideanDistance(face, otherFace);
-		if (distance < closestDistance) {
-			closestPersonId = otherPerson.user_id;
-			closestDistance = distance;
+		const stringDescriptors = otherFace.match(/\-?\d+\.\d+/g);
+		if (stringDescriptors && stringDescriptors.length === 128) {
+			const floatDescriptors = stringDescriptors.map((x) => parseFloat(x));
+			const distance = euclideanDistance(face, floatDescriptors);
+			console.log(distance)
+			if (distance < closestDistance) {
+				closestPersonId = otherPerson.user_id;
+				closestDistance = distance;
+			}
 		}
 	}
 	return { 'person': closestPersonId, 'distance': closestDistance };
