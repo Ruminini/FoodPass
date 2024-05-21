@@ -8,13 +8,16 @@ export default function OfflineLogin({ after }) {
     const [password, onChangePassword] = useState('');
     const [id, onChangeId] = useState('');
     const [invalid, setInvalid] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
 
     const validateAndLogIn = async () => {
         
         // Validación del formato del legajo
         if (!id.match(/^[0-9]{8}-[0-9]{4}$/)) {
-            setErrorMessage('')
+            Toast.show({ 
+                type: 'info', 
+                text1: 'Formato de legajo incorrecto.',
+                text2: 'Formato correcto: 8 dígitos - (guión) 4 dígitos.'
+            });
             setInvalid('id')
             return false;
         }
@@ -23,7 +26,11 @@ export default function OfflineLogin({ after }) {
             const idIsValid = await validateId(id);
             
             if (!idIsValid) {
-                setErrorMessage('No es un legajo registrado.');
+                Toast.show({ 
+                    type: 'info', 
+                    text1: 'Formato de contraseña incorrecto.',
+                    text2: 'Formato correcto: 8+ caracteres (min/mayús + números).'
+                });
                 return false;
             }
         } catch (error) {
@@ -35,7 +42,10 @@ export default function OfflineLogin({ after }) {
         try {
             const passwordIsValid = await validatePassword(id, password);
             if (!passwordIsValid) {
-                setErrorMessage('La contraseña es incorrecta.');
+                Toast.show({ 
+                    type: 'error', 
+                    text1: 'Las contraseñas no coinciden.'
+                });
                 return false;
             }
         } catch (error) {
@@ -49,7 +59,10 @@ export default function OfflineLogin({ after }) {
             const userState = await userStateValidator(id);
             
             if(!userState){
-                setErrorMessage('El usuario está dado de baja. Vuelva a registrarse');
+                Toast.show({ 
+                    type: 'info', 
+                    text1: 'El usuario está dado de baja. Vuelva a registrarse'
+                });
                 return false;
             }
         } catch (error) {
@@ -79,7 +92,6 @@ export default function OfflineLogin({ after }) {
                     placeholder="••••••••••"
                     secureTextEntry={true}
                 />
-                {errorMessage !== '' && <Text style={styles.errorMessage}>{errorMessage}</Text>}
                 <MenuButton text="Loguearse" onPress={validateAndLogIn} style={{height: 75}}/>
             </View>
         </View>

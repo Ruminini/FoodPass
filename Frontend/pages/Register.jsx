@@ -10,7 +10,6 @@ export default function Register({ goTo, data }) {
     const [password, onChangePassword] = useState(data.password || '');
     const [id, onChangeId] = useState(data.id || '');
     const [invalid, setInvalid] = useState('');
-    const errorMessage = useState('');
     const descriptors = data.descriptors;
 
     const validateAndRegister = async () => {
@@ -128,7 +127,6 @@ export default function Register({ goTo, data }) {
                     placeholder="••••••••••"
                     secureTextEntry={true}
                 />
-                {errorMessage !== '' && <Text style={styles.errorMessage}>{errorMessage}</Text>}
                 <MenuButton
                     text="Tomar foto"
                     onPress={() => goTo(

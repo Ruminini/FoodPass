@@ -21,15 +21,12 @@ function generateSalt() {
  */
 function basicHash(inputString, salt) {
     let hash = 0;
+    inputString += salt; // Agregar la sal al hash
 
     for (let i = 0; i < inputString.length; i++) {
         const char = inputString.charCodeAt(i);
         hash = ((hash << 5) - hash) + char;
-        hash &= hash; // Convertir a un entero de 32 bits
     }
-
-    hash += salt; // Agregar la sal al hash
-
     return hash;
 }
 
@@ -42,7 +39,7 @@ function basicHash(inputString, salt) {
  */
 function compareHash(inputPassword, salt, expectedHash) {
     const generatedHash = basicHash(inputPassword, salt);
-    return generatedHash === expectedHash;
+    return generatedHash == expectedHash;
 }
 
 module.exports = {

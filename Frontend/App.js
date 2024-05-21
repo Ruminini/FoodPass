@@ -33,7 +33,7 @@ export default function App() {
 
   //Ejemplo insertando un usuario
   useEffect(() => {
-    insertUser("34985578-2024", "passwordHasheado_testSalt", "testSalt");
+    insertUser("34985578-2024", "Password123", "testSalt");
   }, []);
 
   //Ejemplo obteniendo usuario por id

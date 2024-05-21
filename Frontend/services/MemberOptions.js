@@ -1,3 +1,4 @@
+import Toast from 'react-native-toast-message';
 import { generateSalt, basicHash, compareHash } from '../utils/Hash';
 
 import * as SQLite from 'expo-sqlite';
@@ -23,6 +24,10 @@ export function updatePasswordMember(id, oldPassword, newPassword) {
                 async (_, { rows }) => {
                     if (rows.length === 0) {
                         resolve(false); // Si no se encuentra el usuario, resolver con false
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Miembro inexistente',
+                        })
                         return;
                     }
 
@@ -33,6 +38,10 @@ export function updatePasswordMember(id, oldPassword, newPassword) {
 
                     if (userState === 'I') {
                         resolve(false); // Si el estado es 'I', el usuario está desactivado, resolver con false
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Miembro inactivo',
+                        })
                         return;
                     }
 
@@ -41,6 +50,10 @@ export function updatePasswordMember(id, oldPassword, newPassword) {
 
                     if (!isOldPasswordValid) {
                         resolve(false); // Si la contraseña antigua no es válida, resolver con false
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Contraseña incorrecta.',
+                        })
                         return;
                     }
 
@@ -56,15 +69,27 @@ export function updatePasswordMember(id, oldPassword, newPassword) {
                         [newHashedPass, newSalt, id],
                         () => {
                             resolve(true); // Si la actualización es exitosa, resolver con true
+                            Toast.show({
+                                type: 'success',
+                                text1: 'Contraseña actualizada.',
+                            })
                         },
                         (_, error) => {
-                            console.error('Error al ejecutar la actualización:', error);
+                            Toast.show({
+                                type: 'error',
+                                text1: 'Error al actualizar la contraseña.',
+                                text2: error.message,
+                            })
                             reject(error);
                         }
                     );
                 },
                 (_, error) => {
-                    console.error('Error al ejecutar la consulta:', error);
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error al actualizar la contraseña.',
+                        text2: error.message,
+                    })
                     reject(error);
                 }
             );

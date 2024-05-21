@@ -3,41 +3,53 @@ import { StyleSheet, Text, TextInput, View, Alert } from 'react-native';
 import BackButton from '../components/BackButton';
 import MenuButton from '../components/MenuButton';
 import { updatePasswordMember, desactiveMember } from '../services/MemberOptions';
+import Toast from 'react-native-toast-message';
 
 export default function Options({ goTo }) {
     const [id, setId] = useState('');
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [invalid, setInvalid] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
 
     const validateAndUpdatePassword = async () => {
         // Validación del formato del legajo
         if (!id.match(/^[0-9]{8}-[0-9]{4}$/)) {
-            setErrorMessage('');
+            Toast.show({ 
+                type: 'info', 
+                text1: 'Formato de legajo incorrecto.',
+                text2: 'Formato correcto: 8 dígitos - (guión) 4 dígitos.'
+            });
             setInvalid('id');
             return false;
         }
 
         // Validación del formato de la contraseña actual
         if (!oldPassword.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)) {
-            setErrorMessage('');
+            Toast.show({ 
+                type: 'info', 
+                text1: 'Formato de contraseña incorrecto.',
+                text2: 'Formato correcto: 8+ caracteres (min/mayús + números).'
+            });
             setInvalid('oldPassword');
             return false;
         }
 
         // Validación del formato de la nueva contraseña
         if (!newPassword.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)) {
-            setErrorMessage('');
+            Toast.show({ 
+                type: 'info', 
+                text1: 'Formato de contraseña incorrecto.',
+                text2: 'Formato correcto: 8+ caracteres (min/mayús + números).'
+            });
             setInvalid('newPassword');
             return false;
         }
 
         // Actualizar nueva contraseña en la base de datos
         try {
+            console.log(id, oldPassword, newPassword);
             const passwordUpdated = await updatePasswordMember(id, oldPassword, newPassword);
             if (!passwordUpdated) {
-                setErrorMessage('Legajo y/o contraseña incorrecto/s.');
                 resetForm();
                 return false;
             }
@@ -52,14 +64,22 @@ export default function Options({ goTo }) {
     const confirmDeleteMember = () => {
         // Validación del formato del legajo
         if (!id.match(/^[0-9]{8}-[0-9]{4}$/)) {
-            setErrorMessage('');
+            Toast.show({ 
+                type: 'info', 
+                text1: 'Formato de legajo incorrecto.',
+                text2: 'Formato correcto: 8 dígitos - (guión) 4 dígitos.'
+            });
             setInvalid('id');
             return false;
         }
 
         // Validación del formato de la contraseña actual
         if (!oldPassword.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)) {
-            setErrorMessage('');
+            Toast.show({ 
+                type: 'info', 
+                text1: 'Formato de contraseña incorrecto.',
+                text2: 'Formato correcto: 8+ caracteres (min/mayús + números).'
+            });
             setInvalid('oldPassword');
             return false;
         }
@@ -84,7 +104,6 @@ export default function Options({ goTo }) {
         try {
             const desactive = await desactiveMember(id, oldPassword);
             if (!desactive) {
-                setErrorMessage('No se pudo dar de baja al miembro.');
                 resetForm();
                 return false;
             }
@@ -109,7 +128,6 @@ export default function Options({ goTo }) {
                     style={styles.input}
                     onChangeText={(text) => {
                         setId(text);
-                        if (errorMessage) setErrorMessage('');
                     }}
                     value={id}
                     placeholder="12345678-4321"
@@ -120,7 +138,6 @@ export default function Options({ goTo }) {
                     style={styles.input}
                     onChangeText={(text) => {
                         setOldPassword(text);
-                        if (errorMessage) setErrorMessage('');
                     }}
                     value={oldPassword}
                     placeholder="••••••••••"
@@ -131,13 +148,11 @@ export default function Options({ goTo }) {
                     style={styles.input}
                     onChangeText={(text) => {
                         setNewPassword(text);
-                        if (errorMessage) setErrorMessage('');
                     }}
                     value={newPassword}
                     placeholder="••••••••••"
                     secureTextEntry={true}
                 />
-                {errorMessage !== '' && <Text style={styles.errorMessage}>{errorMessage}</Text>}
                 <MenuButton 
                     text="Cambiar contraseña" 
                     onPress={validateAndUpdatePassword} 
@@ -182,11 +197,6 @@ const styles = StyleSheet.create({
         fontSize: 20,
         marginBottom: 20,
         elevation: 2,
-    },
-    errorMessage: {
-        color: 'red',
-        textAlign: 'center',
-        fontSize: 20,
     },
     menuButton: {
         height: 75,

@@ -21,38 +21,43 @@ export default function FaceScan({ data, after }) {
 	useEffect(() => {
 		if (!photo) return;
 		recognizeFaces(photo.base64).then(async (response) => {
-			let closestPersonIdAndDistance = null;
+			let closest = null;
 			if (response && response.length > 0) {
 				setLandmarks(response);
 				const descriptors = Object.values(response[0].descriptor);
-				onlyDescriptors && after(descriptors);
-				closest = matchFaces(descriptors);
+				if (onlyDescriptors) {
+					Toast.show({
+						type: 'success',
+						text1: 'Identidad capturada correctamente.',
+					})
+					after(descriptors)
+					return
+				};
+				closest = await matchFaces(descriptors);
+
 			}
 			// Comprueba el estado del usuario si está dado de baja o no
-			const userState = await userStateValidator(closestPersonIdAndDistance.person);
-			if (!closestPersonIdAndDistance || closestPersonIdAndDistance.distance > 0.65 || !userState) {
-				Toast.show({
-					type: 'error',
-					text1: 'No he podido identificarte.',
-					text2: 'Vuelve a intentarlo, si no lo haz hecho, registrate.'
-				})
-				setPhoto(null)
-			} else if (closest.distance < 0.55) {
-				onlyDescriptors ?
+			if (!closest ||
+				!closest.person ||
+				closest.distance > 0.65 ||
+				! await userStateValidator(closest.person)) {
 					Toast.show({
-						type: 'success',
-						text1: 'Captura exitosa',
-					}) :
-					Toast.show({
-						type: 'success',
-						text1: `Identidad Validada: ${closest.person}.`,
-						text2: `Distancia: ${closest.distance}`
+						type: 'error',
+						text1: 'No he podido identificarte.',
+						text2: 'Vuelve a intentarlo, si no lo haz hecho, registrate.'
 					})
+					setPhoto(null)	
+			} else if (closest.distance < 0.50) {
+				Toast.show({
+					type: 'success',
+					text1: `Identidad Validada: ${closest.person}.`,
+					text2: `Distancia: ${closest.distance}`
+				})
 				after(closest.person);
 			} else {
 				Toast.show({
 					type: 'info',
-					text1: `Te pareces a ${closestPersonIdAndDistance.person}!`,
+					text1: `Te pareces a ${closest.person}!`,
 					text2: 'Vuelve a intentarlo o, si no lo haz hecho, registrate!'
 				})
 				setPhoto(null)
@@ -255,7 +260,6 @@ async function matchFaces(face) {
 		if (stringDescriptors && stringDescriptors.length === 128) {
 			const floatDescriptors = stringDescriptors.map((x) => parseFloat(x));
 			const distance = euclideanDistance(face, floatDescriptors);
-			console.log(distance)
 			if (distance < closestDistance) {
 				closestPersonId = otherPerson.user_id;
 				closestDistance = distance;
