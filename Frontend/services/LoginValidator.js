@@ -1,5 +1,6 @@
 
 import {getAllDescriptors, getUserById, getPasswordById, getSaltById} from '../service_db/Database.jsx';
+import { basicHash, compareHash } from '../utils/Hash.js';
     
 // Este método devuelve true si se todas las caras de la base de datos,
 // en caso contrario devuelve falso. 
@@ -23,8 +24,7 @@ export async function validateId(id) {
  export async function validatePassword(id, user_password) {
     //const salt = getSaltById(id);
     const user = await getUserById(id);
-    const pass = user[0].hashed_pass;
-    return pass === user_password;
+    return compareHash(user_password, user[0].salt, user[0].hashed_pass);
 }
 
 // Este método devuelve true si el usuario con ese id tiene la cuenta activa,

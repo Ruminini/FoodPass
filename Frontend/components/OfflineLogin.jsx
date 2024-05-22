@@ -2,6 +2,7 @@ import { StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
 import MenuButton from './MenuButton';
 import { validateId, validatePassword, userStateValidator} from '../services/LoginValidator';
+import Toast from 'react-native-toast-message';
 //import {createLoginLog} from '../services/LogCreator'
 
 export default function OfflineLogin({ after }) {
@@ -28,8 +29,7 @@ export default function OfflineLogin({ after }) {
             if (!idIsValid) {
                 Toast.show({ 
                     type: 'info', 
-                    text1: 'Formato de contraseña incorrecto.',
-                    text2: 'Formato correcto: 8+ caracteres (min/mayús + números).'
+                    text1: 'Legajo no registrado',
                 });
                 return false;
             }
@@ -44,7 +44,7 @@ export default function OfflineLogin({ after }) {
             if (!passwordIsValid) {
                 Toast.show({ 
                     type: 'error', 
-                    text1: 'Las contraseñas no coinciden.'
+                    text1: 'Contraseña incorrecta'
                 });
                 return false;
             }
