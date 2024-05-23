@@ -11,9 +11,6 @@
       "resizeMode": "cover",
       "backgroundColor": "#2c1039"
     },
-    "dev": {
-      "isDev": true
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
