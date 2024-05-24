@@ -18,6 +18,7 @@ import {
   insertValidMember,
   insertFaceData,
 } from "./service_db/Database";
+import OrderConfirm from './pages/OrderConfirm';
 // import useDatabase from "./hooks/useDatabase"; // Import the hook
 
 export default function App() {
@@ -208,6 +209,9 @@ export default function App() {
     switch (option) {
       case "FoodPicker":
         setPage(<FoodPicker data={data} goTo={goTo} />);
+        break;
+      case "OrderConfirm":
+        setPage(<OrderConfirm data={data} goTo={goTo} />);
         break;
       case 'Login':
         setPage(<Login data={data} before={before} after={after} goTo={goTo}/>);
