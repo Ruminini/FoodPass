@@ -58,19 +58,14 @@ export default function FoodPicker({data, goTo}) {
                 <View style={{ height: '100%', overflow: 'hidden', aspectRatio: 1}}>
                     <BackButton
                         style={{transform: [{rotate: '180deg'}]}}
-                        
-                        // En vez de login, antes podria mostrarse una pestaña de confirmacion con los detalles del pedido
-                        onPress={() => goTo(
-                            'Login',
-                            {foods: selectedFoods},
-                            () => goTo('FoodPicker',{foods:selectedFoods}),
-                            (id) => {
-                                Toast.show({ type: 'success', text1: 'Pedido Realizado',text2: 'Gracias por tu pedido', id })
-                                console.log('Gracias por pedir',id)
-                                // TODO: Guardar pedido en db
-                                console.log('Tu pedido:',selectedFoods)
-                                goTo('MainMenu')
-                            })}
+                        onPress={() => {
+                            if (selectedFoods.length === 0) {
+                                Toast.show({ type: 'info', text1: 'Primero debes seleccionar algun plato' })
+                                return
+                            }
+                            goTo('OrderConfirm', {foods: selectedFoods, totalPrice: totalPrice})
+                        }}
+
                     />
                 </View>
             </View>

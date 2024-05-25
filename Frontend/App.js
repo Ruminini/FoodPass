@@ -4,21 +4,11 @@ import MainMenu from "./pages/MainMenu";
 import ConfigMenu from "./pages/ConfigMenu";
 import FoodPicker from "./pages/FoodPicker";
 import Register from "./pages/Register";
-import Toast from "react-native-toast-message";
 import Login from "./pages/Login";
 import Options from "./pages/Options";
 import OrderPickUp from "./pages/OrderPickUp";
-// import {
-// initializeDatabase,
-// getValidMemberById,
-// getValidMembers,
-// getUsers,
-// getUserById,
-// insertUser,
-// insertValidMember,
-// insertFaceData,
-// } from "./service_db/Database";
-
+import OrderConfirm from "./pages/OrderConfirm";
+import Toast from "react-native-toast-message";
 import { initializeDatabase } from "./service_db/DBInit";
 import {
   insertParameters,
@@ -58,17 +48,16 @@ export default function App() {
       console.log("Parameters inserted");
     }, []);
 
-    //ACtualizar stock de alimento
+    //Actualizar stock de alimento
     useEffect(() => {
       updateStock(1, 20);
     }, []);
 
-    console.log("ACAAAAAAAAAAAAAAA");
     //Obtener alimento por id
     useEffect(() => {
       getFoodByID(1).then((res) => console.log("Alimento elegido: ", res));
     }, []);
-    console.log("ACAAAAAAAAAAAAAAA2");
+
     //Listar alimentos
     useEffect(() => {
       getAllFood().then((res) => console.log("Lista de alimentos:", res));
@@ -255,6 +244,9 @@ export default function App() {
     switch (option) {
       case "FoodPicker":
         setPage(<FoodPicker data={data} goTo={goTo} />);
+        break;
+      case "OrderConfirm":
+        setPage(<OrderConfirm data={data} goTo={goTo} />);
         break;
       case "Login":
         setPage(
