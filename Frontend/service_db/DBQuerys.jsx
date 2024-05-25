@@ -340,7 +340,7 @@ export const insertValidMember = (code, name, last_name) => {
         "A",
       ],
       (tx, results) => {
-        console.log("Miembro blanqueado correctamente", results);
+        console.log("Miembro blanqueado correctamente", code);
       },
       (tx, error) => {
         console.error("Error al blanquear miembro:", error);
@@ -364,7 +364,7 @@ export const insertUser = (member_code, hashed_pass, salt) => {
         "A",
       ],
       (tx, results) => {
-        console.log("Usuario insertado correctamente", results);
+        console.log("Usuario insertado correctamente", member_code);
       },
       (tx, error) => {
         console.error("Error al insertar usuario:", error);
@@ -421,7 +421,7 @@ export const insertFood = (
         "A",
       ],
       (tx, results) => {
-        console.log("Alimento agregado correctamente: ", name, results);
+        console.log("Alimento agregado correctamente: ", name);
       },
       (tx, error) => {
         console.error("Error al insertar el alimento ", name, error);
@@ -447,5 +447,53 @@ export const updateStock = (id_food, stock) => {
         console.error("Error al actualizar stock ", id_food, stock, error);
       }
     );
+  });
+};
+
+//Marcar orden como enviada
+export const markSentSupplierOrder = (order_id) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "UPDATE order_for_supplier SET state = 'B' WHERE id = ?",
+        [order_id],
+        (tx, results) => {
+          resolve(order_id);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+//Actualiza el stock de la comida agregando la cantidad de la orden
+export const addStockFromSupplierOrder = (order_id) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `UPDATE food
+        SET stock = stock + (
+          SELECT amount
+          FROM order_for_supplier
+          WHERE id = ?
+          AND id_food = food.id
+        )
+        WHERE EXISTS (
+          SELECT 1
+          FROM order_for_supplier
+          WHERE id = ?
+          AND id_food = food.id
+        )`,
+        [order_id, order_id],
+        (tx, results) => {
+          resolve(order_id);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
   });
 };

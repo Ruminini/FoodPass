@@ -118,7 +118,7 @@ export const createOrderForSupplierTable = `CREATE TABLE IF NOT EXISTS order_for
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     id_food INTEGER NOT NULL,
     amount REAL NOT NULL, 
-    create_date TEXT NOT NULL, 
-    last_update TEXT NOT NULL, 
+    create_date TEXT DEFAULT (DATE()), 
+    last_update TEXT DEFAULT (DATE()), 
     state TEXT DEFAULT 'A'
   );`;

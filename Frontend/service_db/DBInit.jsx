@@ -22,7 +22,7 @@ export const initializeDatabase = () => {
       createTypeUserTable,
       [],
       (tx, results) => {
-        console.log("Tabla type_user creada correctamente", results);
+        console.log("Tabla type_user creada correctamente");
       },
       (tx, error) => {
         console.error("Error al crear la tabla type_user:", error);
@@ -32,7 +32,7 @@ export const initializeDatabase = () => {
       createValidMemberTable,
       [],
       (tx, results) => {
-        console.log("Tabla valid_member creada correctamente", results);
+        console.log("Tabla valid_member creada correctamente");
       },
       (tx, error) => {
         console.error("Error al crear la tabla usuario:", error);
@@ -42,7 +42,7 @@ export const initializeDatabase = () => {
       createUserTable,
       [],
       (tx, results) => {
-        console.log("Tabla user creada correctamente", results);
+        console.log("Tabla user creada correctamente");
       },
       (tx, error) => {
         console.error("Error al crear la tabla user:", error);
@@ -52,7 +52,7 @@ export const initializeDatabase = () => {
       createFaceTable,
       [],
       (tx, results) => {
-        console.log("Tabla face creada correctamente", results);
+        console.log("Tabla face creada correctamente");
       },
       (tx, error) => {
         console.error("Error al crear la tabla face:", error);
@@ -62,7 +62,7 @@ export const initializeDatabase = () => {
       createLogsLoginTable,
       [],
       (tx, results) => {
-        console.log("Tabla logs_login creada correctamente", results);
+        console.log("Tabla logs_login creada correctamente");
       },
       (tx, error) => {
         console.error("Error al crear la tabla logs_login:", error);
@@ -72,7 +72,7 @@ export const initializeDatabase = () => {
       createTypeFoodTable,
       [],
       (tx, results) => {
-        console.log("Tabla type_food creada correctamente", results);
+        console.log("Tabla type_food creada correctamente");
       },
       (tx, error) => {
         console.error("Error al crear la tabla type_food", error);
@@ -82,10 +82,7 @@ export const initializeDatabase = () => {
       createTypeFoodRestrictionTable,
       [],
       (tx, results) => {
-        console.log(
-          "Tabla type_food_restriction creada correctamente",
-          results
-        );
+        console.log("Tabla type_food_restriction creada correctamente");
       },
       (tx, error) => {
         console.error("Error al crear la tabla type_food_restriction", error);
@@ -95,7 +92,7 @@ export const initializeDatabase = () => {
       createOrderStateTable,
       [],
       (tx, results) => {
-        console.log("Tabla order_state creada correctamente", results);
+        console.log("Tabla order_state creada correctamente");
       },
       (tx, error) => {
         console.error("Error al crear la tabla order_state", error);
@@ -105,7 +102,7 @@ export const initializeDatabase = () => {
       createMenuTable,
       [],
       (tx, results) => {
-        console.log("Tabla menu creada correctamente", results);
+        console.log("Tabla menu creada correctamente");
       },
       (tx, error) => {
         console.error("Error al crear la tabla menu", error);
@@ -115,7 +112,7 @@ export const initializeDatabase = () => {
       createOrderTable,
       [],
       (tx, results) => {
-        console.log("Tabla order creada correctamente", results);
+        console.log("Tabla order creada correctamente");
       },
       (tx, error) => {
         console.error("Error al crear la tabla order", error);
@@ -125,7 +122,7 @@ export const initializeDatabase = () => {
       createFoodTable,
       [],
       (tx, results) => {
-        console.log("Tabla food creada correctamente", results);
+        console.log("Tabla food creada correctamente");
       },
       (tx, error) => {
         console.error("Error al crear la tabla food", error);
@@ -135,7 +132,7 @@ export const initializeDatabase = () => {
       createRelationFoodMenuTable,
       [],
       (tx, results) => {
-        console.log("Tabla relation_food_menu creada correctamente", results);
+        console.log("Tabla relation_food_menu creada correctamente");
       },
       (tx, error) => {
         console.error("Error al crear la tabla relation_food_menu", error);
@@ -145,10 +142,7 @@ export const initializeDatabase = () => {
       createRelationRestrictionFood,
       [],
       (tx, results) => {
-        console.log(
-          "Tabla relation_restriction_food creada correctamente",
-          results
-        );
+        console.log("Tabla relation_restriction_food creada correctamente");
       },
       (tx, error) => {
         console.error(
@@ -161,11 +155,17 @@ export const initializeDatabase = () => {
       createOrderForSupplierTable,
       [],
       (tx, results) => {
-        console.log("Tabla order_for_supplier creada correctamente", results);
+        console.log("Tabla order_for_supplier creada correctamente");
       },
       (tx, error) => {
         console.error("Error al crear la tabla order_for_supplier", error);
       }
     );
+  },
+  (error) => {
+    console.error("Error al inicializar la base de datos:", error);
+  },
+  () => {
+    console.log("Base de datos inicializada");
   });
 };

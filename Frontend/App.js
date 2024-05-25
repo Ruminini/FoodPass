@@ -23,14 +23,22 @@ import {
   getAllFood,
   getFoodByID,
   updateStock,
+  markSentSupplierOrder,
+  addStockFromSupplierOrder,
 } from "./service_db/DBQuerys";
+import { createTriggers, dropTriggers } from "./service_db/DBTriggers";
+import { basicHash } from "./utils/Hash";
 
 export default function App() {
   const [page, setPage] = useState(<View />);
   useEffect(() => setPage(<MainMenu goTo={goTo} />), []);
   useEffect(() => {
     initializeDatabase();
-    console.log("Database initialized");
+  }, []);
+
+  useEffect(() => {
+    dropTriggers();
+    createTriggers();
   }, []);
 
   {
@@ -45,12 +53,18 @@ export default function App() {
         10,
         3
       );
-      console.log("Parameters inserted");
     }, []);
 
     //Actualizar stock de alimento
     useEffect(() => {
-      updateStock(1, 20);
+      updateStock(1, 2);
+      //El stock bajó del minimo
+      //El trigger restock_food genera orden
+      markSentSupplierOrder(1);
+      //Marcamos orden como enviada
+      //Asumimos que se recibe la orden
+      addStockFromSupplierOrder(1);
+      //El stock aumentó
     }, []);
 
     //Obtener alimento por id
@@ -65,7 +79,11 @@ export default function App() {
 
     //Ejemplo insertando un usuario
     useEffect(() => {
-      insertUser("34985578-2024", "Password123", "testSalt");
+      insertUser(
+        "34985578-2024",
+        basicHash("Password123", "testSalt"),
+        "testSalt"
+      );
     }, []);
 
     //Ejemplo obteniendo usuario por id
