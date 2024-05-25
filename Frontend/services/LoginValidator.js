@@ -1,37 +1,40 @@
+import {
+  getAllDescriptors,
+  getUserById,
+  getPasswordById,
+  getSaltById,
+} from "../service_db/DBQuerys.jsx";
+import { basicHash, compareHash } from "../utils/Hash.js";
 
-import {getAllDescriptors, getUserById, getPasswordById, getSaltById} from '../service_db/Database.jsx';
-import { basicHash, compareHash } from '../utils/Hash.js';
-    
 // Este método devuelve true si se todas las caras de la base de datos,
-// en caso contrario devuelve falso. 
- export async function getFacesValidator() {
-    try {
-        return getAllDescriptors(); 
-    } catch (error) {
-        console.error(error);
-        return null;
-    }
-    
- }
+// en caso contrario devuelve falso.
+export async function getFacesValidator() {
+  try {
+    return getAllDescriptors();
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
 
 // Devuelve true si el id ingresado existe en user
 export async function validateId(id) {
-    let user = await getUserById(id);
-    return user[0] !== undefined;
+  let user = await getUserById(id);
+  return user[0] !== undefined;
 }
 
 // Devuelve true si el password ingresado es el mismo que tiene en la db
- export async function validatePassword(id, user_password) {
-    //const salt = getSaltById(id);
-    const user = await getUserById(id);
-    return compareHash(user_password, user[0].salt, user[0].hashed_pass);
+export async function validatePassword(id, user_password) {
+  //const salt = getSaltById(id);
+  const user = await getUserById(id);
+  return compareHash(user_password, user[0].salt, user[0].hashed_pass);
 }
 
 // Este método devuelve true si el usuario con ese id tiene la cuenta activa,
-// en caso contrario devuelve falso. 
+// en caso contrario devuelve falso.
 export async function userStateValidator(id) {
-    let user = await getUserById(id);
-    return (user[0].state === 'A');
+  let user = await getUserById(id);
+  return user[0].state === "A";
 }
 
 //  export async function validatePassword(id, user_password) {
@@ -53,7 +56,7 @@ export async function userStateValidator(id) {
 //                             let current_hashed_pass = user.hashed_pass;
 //                             resolve(bcrypt.compareSync(hashed_new_pass, current_hashed_pass));
 //                             bcrypt.compareSync(oldPassword + oldSalt, oldHashedPass); Puede funcar este
-//                         }            
+//                         }
 //                     },
 //                     (_, error) => {
 //                         console.error('Error al ejecutar la consulta:', error);
@@ -68,7 +71,7 @@ export async function userStateValidator(id) {
 //     }
 // }
 
-  /* Obtener la contraseña hasheada del usuario por su id
+/* Obtener la contraseña hasheada del usuario por su id
   export const getPasswordById = (member_code) => {
     return new Promise((resolve, reject) => {
       db.transaction(tx => {
