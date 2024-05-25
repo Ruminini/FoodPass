@@ -13,6 +13,7 @@ import {
   createTypeUserTable,
   createUserTable,
   createValidMemberTable,
+  createOrderForSupplierTable,
 } from "./DBSchema";
 
 export const initializeDatabase = () => {
@@ -154,6 +155,16 @@ export const initializeDatabase = () => {
           "Error al crear la tabla relation_restriction_food",
           error
         );
+      }
+    );
+    tx.executeSql(
+      createOrderForSupplierTable,
+      [],
+      (tx, results) => {
+        console.log("Tabla order_for_supplier creada correctamente", results);
+      },
+      (tx, error) => {
+        console.error("Error al crear la tabla order_for_supplier", error);
       }
     );
   });

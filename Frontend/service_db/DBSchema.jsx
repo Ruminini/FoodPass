@@ -84,7 +84,8 @@ export const createFoodTable = `CREATE TABLE IF NOT EXISTS food (
     name TEXT NOT NULL UNIQUE,
     description TEXT NOT NULL,
     price REAL DEFAULT 0,
-    stock INTEGER DEFAULT 1000000,
+    stock INTEGER NOT NULL,
+    minimum_amount DEFAULT 0,
     create_date TEXT NOT NULL, 
     last_update TEXT NOT NULL, 
     state TEXT DEFAULT 'A'
@@ -111,4 +112,13 @@ export const createRelationRestrictionFood = `CREATE TABLE IF NOT EXISTS relatio
     --FOREIGN KEY(id_food) REFERENCES food(id)
     --FOREIGN KEY(code_restriction) REFERENCES type_food_restriction(code)
     PRIMARY KEY (id_food, code_restriction)
+  );`;
+
+export const createOrderForSupplierTable = `CREATE TABLE IF NOT EXISTS order_for_supplier ( 
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_food INTEGER NOT NULL,
+    amount REAL NOT NULL, 
+    create_date TEXT NOT NULL, 
+    last_update TEXT NOT NULL, 
+    state TEXT DEFAULT 'A'
   );`;

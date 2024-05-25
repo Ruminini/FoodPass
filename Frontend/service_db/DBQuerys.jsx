@@ -1,6 +1,158 @@
 import db from "./DB";
 
-//Inserta todos los datos de parametría. Ejecutar al iniciar junto con el initDatabase.
+//Pasando el legajo del usuario por parametro (member_code), la función retorna un array de los registros que existan en la tabla valid_member.
+export const getValidMemberById = (member_code) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM valid_member WHERE code = ?",
+        [member_code],
+        (tx, results) => {
+          const members = results.rows._array;
+          resolve(members);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+//Obtener listado de usuarios blanqueados (valid members)
+export const getValidMembers = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM valid_member",
+        [],
+        (tx, results) => {
+          const members = results.rows._array;
+          resolve(members);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+//Obtener usuario de la tabla user por id
+export const getUserById = (member_code) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM user where member_code = ?",
+        [member_code],
+        (tx, results) => {
+          const user = results.rows._array;
+          resolve(user);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+//Obtener listado de todos los usuarios de la tabla user
+export const getUsers = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM user",
+        [],
+        (tx, results) => {
+          const users = results.rows._array;
+          resolve(users);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+//Obtener un listado de todos los descriptores de la tabla face
+export const getAllDescriptors = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM face",
+        [],
+        (tx, results) => {
+          const users = results.rows._array;
+          resolve(users);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+//Obtener todos los descriptores de un usuario por id de usuario
+export const getDescriptorsById = (user_id) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM face WHERE user_id = ?",
+        [user_id],
+        (tx, results) => {
+          const users = results.rows._array;
+          resolve(users);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+//Obtener todos los alimentos
+export const getAllFood = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM food",
+        [],
+        (tx, results) => {
+          const foods = results.rows._array;
+          resolve(foods);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+//Obtener alimento por id
+export const getFoodByID = (id_food) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM food WHERE id = ?",
+        [id_food],
+        (tx, results) => {
+          const food = results.rows._array;
+          resolve(food);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+//INSERTAR PARAMETRIA INICIAL
 export const insertParameters = () => {
   db.transaction((tx) => {
     tx.executeSql(
@@ -174,68 +326,6 @@ export const insertParameters = () => {
   });
 };
 
-//Insertar usuario en tabla user. Se utilizará para nuevos registros.
-export const insertUser = (member_code, hashed_pass, salt) => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      "INSERT OR IGNORE INTO user (member_code, type_code, hashed_pass, salt, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [
-        member_code,
-        2,
-        hashed_pass,
-        salt,
-        new Date().toString(),
-        new Date().toString(),
-        "A",
-      ],
-      (tx, results) => {
-        console.log("Usuario insertado correctamente", results);
-      },
-      (tx, error) => {
-        console.error("Error al insertar usuario:", error);
-      }
-    );
-  });
-};
-
-//Pasando el legajo del usuario por parametro (member_code), la función retorna un array de los registros que existan en la tabla valid_member.
-export const getValidMemberById = (member_code) => {
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT * FROM valid_member WHERE code = ?",
-        [member_code],
-        (tx, results) => {
-          const members = results.rows._array;
-          resolve(members);
-        },
-        (tx, error) => {
-          reject(error);
-        }
-      );
-    });
-  });
-};
-
-//Obtener listado de usuarios blanqueados (valid members)
-export const getValidMembers = () => {
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT * FROM valid_member",
-        [],
-        (tx, results) => {
-          const members = results.rows._array;
-          resolve(members);
-        },
-        (tx, error) => {
-          reject(error);
-        }
-      );
-    });
-  });
-};
-
 //Función para insertar miembro en la tabla valid_member (blanquear usuario)
 export const insertValidMember = (code, name, last_name) => {
   db.transaction((tx) => {
@@ -259,41 +349,27 @@ export const insertValidMember = (code, name, last_name) => {
   });
 };
 
-//Obtener usuario de la tabla user por id
-export const getUserById = (member_code) => {
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT * FROM user where member_code = ?",
-        [member_code],
-        (tx, results) => {
-          const user = results.rows._array;
-          resolve(user);
-        },
-        (tx, error) => {
-          reject(error);
-        }
-      );
-    });
-  });
-};
-
-//Obtener listado de todos los usuarios de la tabla user
-export const getUsers = () => {
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT * FROM user",
-        [],
-        (tx, results) => {
-          const users = results.rows._array;
-          resolve(users);
-        },
-        (tx, error) => {
-          reject(error);
-        }
-      );
-    });
+//Insertar usuario en tabla user. Se utilizará para nuevos registros.
+export const insertUser = (member_code, hashed_pass, salt) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "INSERT OR IGNORE INTO user (member_code, type_code, hashed_pass, salt, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [
+        member_code,
+        2,
+        hashed_pass,
+        salt,
+        new Date().toString(),
+        new Date().toString(),
+        "A",
+      ],
+      (tx, results) => {
+        console.log("Usuario insertado correctamente", results);
+      },
+      (tx, error) => {
+        console.error("Error al insertar usuario:", error);
+      }
+    );
   });
 };
 
@@ -322,40 +398,54 @@ export const insertFaceData = (user_id, descriptor) => {
   });
 };
 
-//Obtener un listado de todos los descriptores de la tabla face
-export const getAllDescriptors = () => {
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT * FROM face",
-        [],
-        (tx, results) => {
-          const users = results.rows._array;
-          resolve(users);
-        },
-        (tx, error) => {
-          reject(error);
-        }
-      );
-    });
+//Insertar alimentos
+export const insertFood = (
+  type_code,
+  name,
+  description,
+  stock,
+  minimum_amount
+) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "INSERT OR IGNORE INTO food (type_code, name, description, price, stock, minimum_amount, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [
+        type_code,
+        name,
+        description,
+        0,
+        stock,
+        minimum_amount,
+        new Date().toString(),
+        new Date().toString(),
+        "A",
+      ],
+      (tx, results) => {
+        console.log("Alimento agregado correctamente: ", name, results);
+      },
+      (tx, error) => {
+        console.error("Error al insertar el alimento ", name, error);
+      }
+    );
   });
 };
 
-//Obtener todos los descriptores de un usuario por id de usuario
-export const getDescriptorsById = (user_id) => {
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT * FROM face WHERE user_id = ?",
-        [user_id],
-        (tx, results) => {
-          const users = results.rows._array;
-          resolve(users);
-        },
-        (tx, error) => {
-          reject(error);
-        }
-      );
-    });
+export const updateStock = (id_food, stock) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE food SET stock = ?, last_update = ? WHERE id = ?",
+      [stock, new Date().toString(), id_food],
+      (tx, results) => {
+        console.log(
+          "Stock actualizado correctamente: ",
+          id_food,
+          stock,
+          results
+        );
+      },
+      (tx, error) => {
+        console.error("Error al actualizar stock ", id_food, stock, error);
+      }
+    );
   });
 };

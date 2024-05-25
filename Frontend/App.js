@@ -29,6 +29,10 @@ import {
   insertUser,
   insertValidMember,
   insertFaceData,
+  insertFood,
+  getAllFood,
+  getFoodByID,
+  updateStock,
 } from "./service_db/DBQuerys";
 
 export default function App() {
@@ -38,50 +42,75 @@ export default function App() {
     initializeDatabase();
     console.log("Database initialized");
   }, []);
-  useEffect(() => {
-    insertParameters();
-    console.log("Parameters inserted");
-  }, []);
 
-  //REGION EJEMPLOS DE USO DE LAS FUNCIONES PARA ADMINISTAR LA BASE DE DATOS
+  {
+    //EJEMPLOS DE USO
 
-  //Ejemplo insertando un usuario
-  useEffect(() => {
-    insertUser("34985578-2024", "Password123", "testSalt");
-  }, []);
+    //Insertar alimento
+    useEffect(() => {
+      insertFood(
+        1,
+        "Pollo al horno",
+        "pollo al horno gratinado con finas hierbas",
+        10,
+        3
+      );
+      console.log("Parameters inserted");
+    }, []);
 
-  //Ejemplo obteniendo usuario por id
-  useEffect(() => {
-    getUserById("34985578-2024").then((res) =>
-      console.log("Usuario por id:", res)
-    );
-  }, []);
+    //ACtualizar stock de alimento
+    useEffect(() => {
+      updateStock(1, 20);
+    }, []);
 
-  //Ejemplo obteniendo lista de usuarios
-  useEffect(() => {
-    getUsers().then((res) => console.log("Lista de usuarios:", res));
-  }, []);
+    console.log("ACAAAAAAAAAAAAAAA");
+    //Obtener alimento por id
+    useEffect(() => {
+      getFoodByID(1).then((res) => console.log("Alimento elegido: ", res));
+    }, []);
+    console.log("ACAAAAAAAAAAAAAAA2");
+    //Listar alimentos
+    useEffect(() => {
+      getAllFood().then((res) => console.log("Lista de alimentos:", res));
+    }, []);
 
-  //Ejemplo insertando miembro válido
-  useEffect(() => {
-    insertValidMember("87654321-1234", "NombreTest", "ApellidoTest");
-  }, []);
+    //Ejemplo insertando un usuario
+    useEffect(() => {
+      insertUser("34985578-2024", "Password123", "testSalt");
+    }, []);
 
-  //Ejemplo obteniendo miembro valido por id
-  useEffect(() => {
-    getValidMemberById("34985578-2024").then((res) =>
-      console.log("Miembro valido por id:", res)
-    );
-  }, []);
+    //Ejemplo obteniendo usuario por id
+    useEffect(() => {
+      getUserById("34985578-2024").then((res) =>
+        console.log("Usuario por id:", res)
+      );
+    }, []);
 
-  //Ejemplo obteniendo lista de miembros válidos
-  useEffect(() => {
-    getValidMembers().then((res) =>
-      console.log("Lista de miembros validos:", res)
-    );
-  }, []);
+    //Ejemplo obteniendo lista de usuarios
+    useEffect(() => {
+      getUsers().then((res) => console.log("Lista de usuarios:", res));
+    }, []);
 
-  const descriptorExample = `{
+    //Ejemplo insertando miembro válido
+    useEffect(() => {
+      insertValidMember("87654321-1234", "NombreTest", "ApellidoTest");
+    }, []);
+
+    //Ejemplo obteniendo miembro valido por id
+    useEffect(() => {
+      getValidMemberById("34985578-2024").then((res) =>
+        console.log("Miembro valido por id:", res)
+      );
+    }, []);
+
+    //Ejemplo obteniendo lista de miembros válidos
+    useEffect(() => {
+      getValidMembers().then((res) =>
+        console.log("Lista de miembros validos:", res)
+      );
+    }, []);
+
+    const descriptorExample = `{
         "0":-0.06022194027900696,
         "1":0.12927846610546112,
         "2":0.042801350355148315,
@@ -212,12 +241,11 @@ export default function App() {
         "127": 0.05519556626677513
     }`;
 
-  //Ejemplo insertando descriptor
-  useEffect(() => {
-    insertFaceData("34985578-2024", descriptorExample);
-  }, []);
-  //#endregion
-
+    //Ejemplo insertando descriptor
+    useEffect(() => {
+      insertFaceData("34985578-2024", descriptorExample);
+    }, []);
+  }
   const goTo = (
     option = "MainMenu",
     data = {},
