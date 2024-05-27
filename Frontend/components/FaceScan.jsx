@@ -7,6 +7,8 @@ import LandmarksSvg from './LandmarksSvg';
 import ScanAnimation from './ScanAnimation';
 import Toast from "react-native-toast-message";
 import {getFacesValidator, userStateValidator} from '../services/LoginValidator.js'
+import { getDescriptors } from '../services/Api.js';
+import { matchFaces } from '../services/FaceMatcher.js';
 
 export default function FaceScan({ data, after }) {
 	const [type, setType] = useState(CameraType.back);
@@ -20,7 +22,7 @@ export default function FaceScan({ data, after }) {
 	// FALTA PROBAR FUNCIONALIDAD DE LOGIN ONLINE
 	useEffect(() => {
 		if (!photo) return;
-		recognizeFaces(photo.base64).then(async (response) => {
+		getDescriptors(photo.base64).then(async (response) => {
 			let closest = null;
 			if (response && response.length > 0) {
 				setLandmarks(response);
@@ -205,66 +207,3 @@ const styles = StyleSheet.create({
 		height: 100,
 	}
 });
-
-const API_URL = 'https://foodpass.onrender.com';
-// const API_URL = 'https://quality-cicada-wrongly.ngrok-free.app';
-const recognizeFaces = async (base64Image) => {
-	if (!base64Image) throw new error('Error: Tried to recognize faces with no image');
-	try {
-		let startTime = performance.now();
-		const response = await fetch(API_URL + '/recognizeFaces', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ base64Image }),
-		});
-		// console.log(`Request time: ${performance.now()-startTime}ms`);
-		if (response.ok) {
-			const responseData = await response.json();
-			return responseData;
-		} else {
-			Toast.show({
-				type: 'error',
-				text1: 'Failed to upload image',
-				text2: `Error status: ${response.status}`
-			})
-		}
-	} catch (error) {
-		Toast.show({
-			type: 'error',
-			text1: 'Error uploading image:',
-			text2: error.message
-		})
-	}
-};
-
-function euclideanDistance(vector1, vector2) {
-    if (vector1.length !== vector2.length) {
-        throw new Error('Vectors must be of the same length');
-    }
-    let sumOfSquares = 0;
-    for (let i = 0; i < vector1.length; i++) {
-        const difference = vector1[i] - vector2[i];
-        sumOfSquares += difference * difference;
-    }
-    return Math.sqrt(sumOfSquares);
-}
-
-//Comprobación de caras de las diferentes personas dependiendo de su distancia euclideana
-async function matchFaces(face) {
-	let closestPersonId = null;
-	let closestDistance = Infinity;
-	const faces = await getFacesValidator();
-	for (const otherPerson of faces) {
-		const otherFace = otherPerson.descriptor;
-		const stringDescriptors = otherFace.match(/\-?\d+\.\d+/g);
-		if (stringDescriptors && stringDescriptors.length === 128) {
-			const floatDescriptors = stringDescriptors.map((x) => parseFloat(x));
-			const distance = euclideanDistance(face, floatDescriptors);
-			if (distance < closestDistance) {
-				closestPersonId = otherPerson.user_id;
-				closestDistance = distance;
-			}
-		}
-	}
-	return { 'person': closestPersonId, 'distance': closestDistance };
-}

@@ -24,6 +24,7 @@
         "backgroundColor": "#ffffff"
       },
       "permissions": [
+        "RECEIVE_BOOT_COMPLETED",
         "android.permission.CAMERA"
       ],
       "package": "com.FoodTech.FoodPass"

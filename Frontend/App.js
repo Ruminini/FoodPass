@@ -28,6 +28,7 @@ import {
 } from "./service_db/DBQuerys";
 import { createTriggers, dropTriggers } from "./service_db/DBTriggers";
 import { basicHash } from "./utils/Hash";
+import { registerRestockerTask } from "./services/RestockerTask";
 
 export default function App() {
   const [page, setPage] = useState(<View />);
@@ -39,6 +40,10 @@ export default function App() {
   useEffect(() => {
     dropTriggers();
     createTriggers();
+  }, []);
+
+  useEffect(() => {
+    registerRestockerTask();
   }, []);
 
   {

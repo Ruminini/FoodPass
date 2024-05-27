@@ -497,3 +497,26 @@ export const addStockFromSupplierOrder = (order_id) => {
     });
   });
 };
+
+//Actualiza el stock de la comida agregando la cantidad de la orden
+export const getOrdersForSupplier = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `SELECT o.id, o.amount, f.name
+        FROM order_for_supplier o
+        INNER JOIN food f ON o.id_food = f.id
+        WHERE o.state = 'A';`,
+        [],
+        (tx, results) => {
+          console.log('getOrdersForSupplier',results.rows._array)
+          resolve(results.rows._array);
+        },
+        (tx, error) => {
+          console.error("Error al obtener las ordenes:", error);
+          reject(error);
+        }
+      );
+    });
+  });
+};
