@@ -83,8 +83,19 @@ export default function App() {
     useEffect(() => {
       insertUser(
         "34985578-2024",
+        2,
         basicHash("Password123", "testSalt"),
         "testSalt"
+      );
+    }, []);
+
+    //Ejemplo insertando un usuario administrador
+    useEffect(() => {
+      insertUser(
+        "00000000-0000",
+        1,
+        basicHash("admin", "admin_salt"),
+        "admin_salt"
       );
     }, []);
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, Modal } from 'react-native';
 import Toast from 'react-native-toast-message';
 import BackButton from '../components/BackButton';
+import { validateId, validatePassword, userStateValidator} from '../services/LoginValidator';
 
 export default function ProductForm({ goTo }) {
   const [categoria, setCategoria] = useState('');
@@ -43,9 +44,41 @@ export default function ProductForm({ goTo }) {
     setModalVisible(true);
   };
 
-  const confirmAction = () => {
-    if (adminUser === 'admin' && adminPassword === 'admin') {
-      console.log(`Realizar acción ${currentAction} para:`, nombre);
+  const confirmAction = async () => {
+    // Validar credenciales del admin
+    const adminUserIsValid = await validateId(adminUser);
+    
+    if (adminUserIsValid === false) {
+      Toast.show({
+        type: 'error',
+        text1: 'Usuario no existe.',
+      });
+      return; // Salir de la función si el usuario no es válido
+    }
+
+    // Validación de la contraseña en la base de datos
+    const adminPasswordIsValid = await validatePassword(adminUser, adminPassword);
+    if (adminPasswordIsValid === false) {
+      Toast.show({
+        type: 'error',
+        text1: 'Contraseña incorrecta.',
+      });
+      return; // Salir de la función si la contraseña no es válida
+    }
+
+    // Validación del estado del usuario
+    const adminStateIsValid = await userStateValidator(adminUser);
+    if (adminStateIsValid === false) {
+      Toast.show({
+        type: 'error',
+        text1: 'Usuario inactivo.',
+      });
+      return; // Salir de la función si el estado del usuario no es válido
+    }
+
+    try {
+      // Si todas las validaciones son exitosas, realizar la acción correspondiente
+      console.log(`Realizar acción ${currentAction} a producto:`, nombre, categoria, stock);
       setModalVisible(false);
       setAdminUser('');
       setAdminPassword('');
@@ -57,11 +90,16 @@ export default function ProductForm({ goTo }) {
         type: 'success', 
         text1: `¡${currentAction} concretada!`,
       });
-    } else {
+      Toast.show({ 
+        type: 'success', 
+        text1: '¡Acción realizada correctamente!'
+      });
+    } catch (error) {
+      console.error('Error en la validación del usuario:', error);
       Toast.show({ 
         type: 'error', 
-        text1: '¡Credenciales incorrectas!',
-        text2: 'Por favor, ingrese las credenciales correctas del administrador.'
+        text1: '¡Error de validación!',
+        text2: 'Ocurrió un error al validar las credenciales del administrador.'
       });
     }
   };
@@ -217,9 +255,9 @@ const styles = StyleSheet.create({
   },
   radio: {
     backgroundColor: '#666666',
-    padding: 5,
-    borderRadius: 5,
-    marginHorizontal: 5,
+    padding: 7,
+    borderRadius: 20,
+    marginHorizontal: 2,
   },
   selectedRadio: {
     backgroundColor: '#222222',

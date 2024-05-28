@@ -350,13 +350,13 @@ export const insertValidMember = (code, name, last_name) => {
 };
 
 //Insertar usuario en tabla user. Se utilizará para nuevos registros.
-export const insertUser = (member_code, hashed_pass, salt) => {
+export const insertUser = (member_code, type_user, hashed_pass, salt) => {
   db.transaction((tx) => {
     tx.executeSql(
       "INSERT OR IGNORE INTO user (member_code, type_code, hashed_pass, salt, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [
         member_code,
-        2,
+        type_user,
         hashed_pass,
         salt,
         new Date().toString(),

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, Modal } from 'react-native';
 import BackButton from '../components/BackButton';
 import Toast from 'react-native-toast-message';
+import { validateId, validatePassword, userStateValidator} from '../services/LoginValidator';
 
 export default function ManageMembersGuests({ goTo }) {
   const [id, setId] = useState('');
@@ -28,19 +29,54 @@ export default function ManageMembersGuests({ goTo }) {
     setModalVisible(true);
   };
 
-  const confirmAction = () => {
+  const confirmAction = async () => {
     // Validar credenciales del admin
-    if (adminUser === 'admin' && adminPassword === 'admin') {
-      // Realizar la acción correspondiente
+    const adminUserIsValid = await validateId(adminUser);
+    
+    if (adminUserIsValid === false) {
+      Toast.show({
+        type: 'error',
+        text1: 'Usuario no existe.',
+      });
+      return; // Salir de la función si el usuario no es válido
+    }
+
+    // Validación de la contraseña en la base de datos
+    const adminPasswordIsValid = await validatePassword(adminUser, adminPassword);
+    if (adminPasswordIsValid === false) {
+      Toast.show({
+        type: 'error',
+        text1: 'Contraseña incorrecta.',
+      });
+      return; // Salir de la función si la contraseña no es válida
+    }
+
+    // Validación del estado del usuario
+    const adminStateIsValid = await userStateValidator(adminUser);
+    if (adminStateIsValid === false) {
+      Toast.show({
+        type: 'error',
+        text1: 'Usuario inactivo.',
+      });
+      return; // Salir de la función si el estado del usuario no es válido
+    }
+
+    try {
+      // Si todas las validaciones son exitosas, realizar la acción correspondiente
       console.log(`Realizar acción ${currentAction} con el legajo:`, id);
       setModalVisible(false);
       setAdminUser('');
       setAdminPassword('');
-    } else {
+      Toast.show({ 
+        type: 'success', 
+        text1: '¡Acción realizada correctamente!'
+      });
+    } catch (error) {
+      console.error('Error en la validación del usuario:', error);
       Toast.show({ 
         type: 'error', 
-        text1: '¡Credenciales incorrectas!',
-        text2: 'Por favor, ingrese las credenciales correctas del administrador.'
+        text1: '¡Error de validación!',
+        text2: 'Ocurrió un error al validar las credenciales del administrador.'
       });
     }
   };
