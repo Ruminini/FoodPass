@@ -1,7 +1,7 @@
 import { StyleSheet, View, StatusBar } from "react-native";
 import { useState, useEffect } from "react";
 import MainMenu from "./pages/MainMenu";
-import ConfigMenu from "./pages/ConfigMenu";
+import Admin from "./pages/Admin";
 import FoodPicker from "./pages/FoodPicker";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
@@ -28,6 +28,8 @@ import {
 } from "./service_db/DBQuerys";
 import { createTriggers, dropTriggers } from "./service_db/DBTriggers";
 import { basicHash } from "./utils/Hash";
+import ManageMembersGuests from "./pages/ManageMembersGuests";
+import ManageMenus from "./pages/ManageMenus";
 
 export default function App() {
   const [page, setPage] = useState(<View />);
@@ -277,8 +279,14 @@ export default function App() {
       case "Options":
         setPage(<Options goTo={goTo} />);
         break;
-      case "ConfigMenu":
-        setPage(<ConfigMenu goTo={goTo} />);
+      case "Admin":
+        setPage(<Admin goTo={goTo} />);
+        break;
+      case "ManageMenus":
+        setPage(<ManageMenus data={data} goTo={goTo} />);
+        break;
+      case "ManageMembersGuests":
+        setPage(<ManageMembersGuests data={data} goTo={goTo} />);
         break;
       case "OrderPickUp":
         setPage(<OrderPickUp data={data} goTo={goTo} />);

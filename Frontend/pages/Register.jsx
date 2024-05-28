@@ -137,7 +137,6 @@ export default function Register({ goTo, data }) {
                     )}
                     style={{ height: 75, width: 300, alignSelf: 'center'}} />
                 <MenuButton text="Registrar" onPress={validateAndRegister} style={{ height: 75, width: 300, alignSelf: 'center'}} />
-                
             </View>
             <BackButton onPress={() => goTo('MainMenu')} />
         </View>
