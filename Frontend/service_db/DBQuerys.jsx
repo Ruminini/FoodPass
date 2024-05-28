@@ -57,6 +57,25 @@ export const getUserById = (member_code) => {
   });
 };
 
+//Obtener tipo de usuario de la tabla user por id
+export const getTypeUserById = (member_code) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT type_code FROM user where member_code = ?",
+        [member_code],
+        (tx, results) => {
+          const type_code = results.rows._array[0].type_code;
+          resolve(type_code);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
 //Obtener listado de todos los usuarios de la tabla user
 export const getUsers = () => {
   return new Promise((resolve, reject) => {
@@ -350,13 +369,13 @@ export const insertValidMember = (code, name, last_name) => {
 };
 
 //Insertar usuario en tabla user. Se utilizará para nuevos registros.
-export const insertUser = (member_code, type_user, hashed_pass, salt) => {
+export const insertUser = (member_code, type_code, hashed_pass, salt) => {
   db.transaction((tx) => {
     tx.executeSql(
       "INSERT OR IGNORE INTO user (member_code, type_code, hashed_pass, salt, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [
         member_code,
-        type_user,
+        type_code,
         hashed_pass,
         salt,
         new Date().toString(),

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, Modal } from 'react-native';
 import Toast from 'react-native-toast-message';
 import BackButton from '../components/BackButton';
-import { validateId, validatePassword, userStateValidator} from '../services/LoginValidator';
+import { validateId, validateTypeUser, validatePassword, userStateValidator} from '../services/LoginValidator';
 
 export default function ProductForm({ goTo }) {
   const [categoria, setCategoria] = useState('');
@@ -54,6 +54,16 @@ export default function ProductForm({ goTo }) {
         text1: 'Usuario no existe.',
       });
       return; // Salir de la función si el usuario no es válido
+    }
+
+    // Validar usuario admin
+    const adminTypeUserIsValid = await validateTypeUser(adminUser)
+    if (adminTypeUserIsValid === false){
+      Toast.show({
+        type: 'error',
+        text1: 'El usuario no es admin.',
+      });
+      return; // Salir de la función si el usuario no es admin
     }
 
     // Validación de la contraseña en la base de datos
