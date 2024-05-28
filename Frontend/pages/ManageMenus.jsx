@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, Modal } from 'react-native';
 import Toast from 'react-native-toast-message';
 import BackButton from '../components/BackButton';
 
@@ -8,40 +8,21 @@ export default function ProductForm({ goTo }) {
   const [tipo, setTipo] = useState('');
   const [nombre, setNombre] = useState('');
   const [stock, setStock] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [adminUser, setAdminUser] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [currentAction, setCurrentAction] = useState('');
 
   const handleCategoriaSelection = (selectedCategoria) => {
-    // Si la categoría ya está seleccionada, deseleccionarla
-    if (categoria === selectedCategoria) {
-      setCategoria('');
-    } else {
-      setCategoria(selectedCategoria);
-    }
+    setCategoria(categoria === selectedCategoria ? '' : selectedCategoria);
   };
 
   const handleTipoSelection = (selectedTipo) => {
-    // Si el tipo ya está seleccionado, deseleccionarlo
-    if (tipo === selectedTipo) {
-      setTipo('');
-    } else {
-      setTipo(selectedTipo);
-    }
+    setTipo(tipo === selectedTipo ? '' : selectedTipo);
   };
 
-  const handleAlta = () => {
-    submitAction('Alta');
-  };
-
-  const handleBaja = () => {
-    submitAction('Baja');
-  };
-
-  const handleActualizarStock = () => {
-    submitAction('Actualización de stock');
-  };
-
-  const submitAction = (action) => {
-    // Validación de los campos antes de enviar según la acción
-    if (action === 'Alta') {
+  const validateAndAction = (action) => {
+    if (action === 'Alta' || action === 'Actualización de stock') {
       if (categoria === '' || nombre === '' || stock === '') {
         Toast.show({ 
           type: 'info', 
@@ -57,40 +38,41 @@ export default function ProductForm({ goTo }) {
         });
         return;
       }
-    } else if (action === 'Actualización de stock') {
-      if (categoria === '' || nombre === '' || stock === '') {
-        Toast.show({ 
-          type: 'info', 
-          text1: 'Categoria, Nombre y Stock son obligatorios.',
-        });
-        return;
-      }
     }
+    setCurrentAction(action);
+    setModalVisible(true);
+  };
 
-    console.log('Realizar acción', action, 'para:', nombre);
-
-    // Limpiar los campos después del envío
-    setCategoria('');
-    setTipo('');
-    setNombre('');
-    setStock('');
-
-    // Mostrar mensaje de éxito
-    Toast.show({ 
-      type: 'success', 
-      text1: `¡${action} concretada!`,
-    });
+  const confirmAction = () => {
+    if (adminUser === 'admin' && adminPassword === 'admin') {
+      console.log(`Realizar acción ${currentAction} para:`, nombre);
+      setModalVisible(false);
+      setAdminUser('');
+      setAdminPassword('');
+      setCategoria('');
+      setTipo('');
+      setNombre('');
+      setStock('');
+      Toast.show({ 
+        type: 'success', 
+        text1: `¡${currentAction} concretada!`,
+      });
+    } else {
+      Toast.show({ 
+        type: 'error', 
+        text1: '¡Credenciales incorrectas!',
+        text2: 'Por favor, ingrese las credenciales correctas del administrador.'
+      });
+    }
   };
 
   const handleNombreChange = (text) => {
-    // Validar que solo se ingresen letras
     if (/^[a-zA-Z\s]*$/.test(text) || text === '') {
       setNombre(text);
     }
   };
 
   const handleStockChange = (text) => {
-    // Validar que solo se ingresen números
     if (/^\d+$/.test(text) || text === '') {
       setStock(text);
     }
@@ -102,7 +84,7 @@ export default function ProductForm({ goTo }) {
         <View style={styles.field}>
           <Text style={styles.label}>Categoria</Text>
           <View style={styles.radioGroup}>
-          <TouchableOpacity
+            <TouchableOpacity
               style={[styles.radio, categoria === 'Comida' && styles.selectedRadio]}
               onPress={() => handleCategoriaSelection('Comida')}>
               <Text style={styles.radioText}>Comida</Text>
@@ -122,7 +104,7 @@ export default function ProductForm({ goTo }) {
         <View style={styles.field}>
           <Text style={styles.label}>Tipo</Text>
           <View style={styles.radioGroup}>
-          <TouchableOpacity
+            <TouchableOpacity
               style={[styles.radio, tipo === 'Vegano' && styles.selectedRadio]}
               onPress={() => handleTipoSelection('Vegano')}>
               <Text style={styles.radioText}>Vegano</Text>
@@ -145,7 +127,7 @@ export default function ProductForm({ goTo }) {
             style={styles.input}
             onChangeText={handleNombreChange}
             value={nombre}
-            placeholder="Ingrese el nombre del producto"
+            placeholder="Milanesa con pure"
           />
         </View>
         <View style={styles.field}>
@@ -154,23 +136,62 @@ export default function ProductForm({ goTo }) {
             style={styles.input}
             onChangeText={handleStockChange}
             value={stock}
-            placeholder="Ingrese el stock disponible"
+            placeholder="10"
             keyboardType="numeric"
           />
         </View>
         <View style={styles.buttonGroup}>
-          <TouchableOpacity style={[styles.button, styles.greenButton]} onPress={handleAlta}>
+          <TouchableOpacity style={[styles.button, styles.greenButton]} onPress={() => validateAndAction('Alta')}>
             <Text style={styles.buttonText}>Dar de alta</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.redButton]} onPress={handleBaja}>
+          <TouchableOpacity style={[styles.button, styles.redButton]} onPress={() => validateAndAction('Baja')}>
             <Text style={styles.buttonText}>Dar de baja</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.blueButton]} onPress={handleActualizarStock}>
+          <TouchableOpacity style={[styles.button, styles.blueButton]} onPress={() => validateAndAction('Actualización de stock')}>
             <Text style={styles.buttonText}>Actualizar stock</Text>
           </TouchableOpacity>
         </View>
       </View>
       <BackButton onPress={() => goTo('Admin')} style={styles.backButton} />
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Credenciales de Admin</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                onChangeText={setAdminUser}
+                value={adminUser}
+                placeholder="Usuario"
+                keyboardType="default"
+              />
+              <TextInput
+                style={styles.input}
+                onChangeText={setAdminPassword}
+                value={adminPassword}
+                placeholder="Contraseña"
+                secureTextEntry={true}
+              />
+            </View>
+            <TouchableOpacity 
+              style={[styles.button, { backgroundColor: '#ffcc00' }]} 
+              onPress={confirmAction}>
+              <Text style={styles.buttonText}>Aceptar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.button, { backgroundColor: '#6c757d' }]} 
+              onPress={() => setModalVisible(false)}>
+              <Text style={styles.buttonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -198,6 +219,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#666666',
     padding: 5,
     borderRadius: 5,
+    marginHorizontal: 5,
   },
   selectedRadio: {
     backgroundColor: '#222222',
@@ -224,6 +246,11 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 0,
     fontSize: 20,
     marginBottom: 20,
+    width: '100%',
+  },
+  inputContainer: {
+    width: '100%',
+    alignItems: 'center',
   },
   buttonGroup: {
     flexDirection: 'column',
@@ -255,5 +282,22 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    marginBottom: 20,
   },
 });

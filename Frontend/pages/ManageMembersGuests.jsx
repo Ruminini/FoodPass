@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, Modal } from 'react-native';
 import BackButton from '../components/BackButton';
 import Toast from 'react-native-toast-message';
 
 export default function ManageMembersGuests({ goTo }) {
   const [id, setId] = useState('');
   const [invalid, setInvalid] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [adminUser, setAdminUser] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [currentAction, setCurrentAction] = useState('');
 
-  const validateAndAction = () => {
+  const validateAndAction = (action) => {
     // Validación del formato del legajo
     if (!id.match(/^[0-9]{8}-[0-9]{4}$/)) {
       Toast.show({ 
@@ -16,11 +20,29 @@ export default function ManageMembersGuests({ goTo }) {
         text2: 'Formato correcto: 8 dígitos - (guión) 4 dígitos.'
       });
       setInvalid('id');
-      return ;
+      return;
     }
 
-    // Aquí puedes agregar la lógica para las acciones de "Dar de alta" y "Dar de baja"
-    console.log('Realizar acción con el legajo:', id);
+    // Guardar la acción actual (alta o baja) y mostrar el modal
+    setCurrentAction(action);
+    setModalVisible(true);
+  };
+
+  const confirmAction = () => {
+    // Validar credenciales del admin
+    if (adminUser === 'admin' && adminPassword === 'admin') {
+      // Realizar la acción correspondiente
+      console.log(`Realizar acción ${currentAction} con el legajo:`, id);
+      setModalVisible(false);
+      setAdminUser('');
+      setAdminPassword('');
+    } else {
+      Toast.show({ 
+        type: 'error', 
+        text1: '¡Credenciales incorrectas!',
+        text2: 'Por favor, ingrese las credenciales correctas del administrador.'
+      });
+    }
   };
 
   return (
@@ -34,14 +56,57 @@ export default function ManageMembersGuests({ goTo }) {
           placeholder="12345678-4321"
           keyboardType="numeric"
         />
-        <TouchableOpacity style={[styles.button, { backgroundColor: '#28a745' }]} onPress={validateAndAction}>
+        <TouchableOpacity 
+          style={[styles.button, { backgroundColor: '#28a745' }]} 
+          onPress={() => validateAndAction('alta')}>
           <Text style={styles.buttonText}>Dar de alta</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, { backgroundColor: '#dc3545' }]} onPress={validateAndAction}>
+        <TouchableOpacity 
+          style={[styles.button, { backgroundColor: '#dc3545' }]} 
+          onPress={() => validateAndAction('baja')}>
           <Text style={styles.buttonText}>Dar de baja</Text>
         </TouchableOpacity>
       </View>
       <BackButton onPress={() => goTo('Admin')} style={styles.backButton} />
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Credenciales de Admin</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                onChangeText={setAdminUser}
+                value={adminUser}
+                placeholder="Usuario"
+                keyboardType="default"
+              />
+              <TextInput
+                style={styles.input}
+                onChangeText={setAdminPassword}
+                value={adminPassword}
+                placeholder="Contraseña"
+                secureTextEntry={true}
+              />
+            </View>
+            <TouchableOpacity 
+              style={[styles.button, { backgroundColor: '#ffcc00' }]} 
+              onPress={confirmAction}>
+              <Text style={styles.buttonText}>Aceptar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.button, { backgroundColor: '#6c757d' }]} 
+              onPress={() => setModalVisible(false)}>
+              <Text style={styles.buttonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -75,6 +140,11 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 0,
     fontSize: 20,
     marginBottom: 20,
+    width: '100%',
+  },
+  inputContainer: {
+    width: '100%',
+    alignItems: 'center',
   },
   button: {
     backgroundColor: '#007bff',
@@ -82,6 +152,7 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: 'center',
     marginBottom: 10,
+    width: '100%',
   },
   buttonText: {
     color: 'white',
@@ -92,5 +163,22 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0, 
     left: 0,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    marginBottom: 20,
   },
 });

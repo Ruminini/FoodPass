@@ -14,7 +14,7 @@ export default function MainMenu({goTo}) {
     const showAdminToast = () => {
         Toast.show({ 
             type: 'info', 
-            text1: 'Solo los Administradores pueden realizar acciones.',
+            text1: 'Solo los administradores pueden realizar acciones.',
             visibilityTime: 3000, // Tiempo en milisegundos que se muestra el Toast
             autoHide: true, // Auto ocultar el Toast después de visibilityTime
         });
