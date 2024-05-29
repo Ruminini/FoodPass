@@ -89,13 +89,22 @@ export default function App() {
       );
     }, []);
 
-    //Ejemplo insertando un usuario administrador
+    //Ejemplo insertando un usuario administrador en la tabla user
     useEffect(() => {
       insertUser(
         "00000000-0000",
         1,
         basicHash("admin", "admin_salt"),
         "admin_salt"
+      );
+    }, []);
+
+    //Ejemplo insertando un usuario administrador en la tabla valid_member
+    useEffect(() => {
+      insertValidMember(
+        "00000000-0000",
+        "Admin",
+        "Admin"
       );
     }, []);
 

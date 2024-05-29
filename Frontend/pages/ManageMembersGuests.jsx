@@ -2,21 +2,54 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, Modal } from 'react-native';
 import BackButton from '../components/BackButton';
 import Toast from 'react-native-toast-message';
-import { validateId, validateTypeUser, validatePassword, userStateValidator} from '../services/LoginValidator';
+import { validateId, validateTypeUser, validatePassword, userStateValidator } from '../services/LoginValidator';
+import { validMemberRegister, validMemberDelete } from '../services/ValidMemberActions';
 
 export default function ManageMembersGuests({ goTo }) {
   const [id, setId] = useState('');
+  const [nameMember, setNameMember] = useState('');
+  const [lastnameMember, setLastnameMember] = useState('');
   const [invalid, setInvalid] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [adminUser, setAdminUser] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [currentAction, setCurrentAction] = useState('');
 
-  const validateAndAction = (action) => {
-    // Validación del formato del legajo
-    if (!id.match(/^[0-9]{8}-[0-9]{4}$/)) {
-      Toast.show({ 
-        type: 'info', 
+  const resetFields = () => {
+    setId('');
+    setNameMember('');
+    setLastnameMember('');
+    setAdminUser('');
+    setAdminPassword('');
+    setCurrentAction('');
+    setModalVisible(false);
+  };
+
+  const handleIdChange = (text) => {
+    setId(text);
+    if (/^[0-9]{8}-[0-9]{4}$/.test(text)) {
+      setInvalid('');
+    } else {
+      setInvalid('id');
+    }
+  };
+
+  const handleNameChange = (text) => {
+    if (/^[a-zA-Z\s]*$/.test(text) || text === '') {
+      setNameMember(text);
+    }
+  };
+
+  const handleLastnameChange = (text) => {
+    if (/^[a-zA-Z\s]*$/.test(text) || text === '') {
+      setLastnameMember(text);
+    }
+  };
+
+  const validateAndAction = async (action) => {
+    if (!/^[0-9]{8}-[0-9]{4}$/.test(id)) {
+      Toast.show({
+        type: 'info',
         text1: 'Formato de legajo incorrecto.',
         text2: 'Formato correcto: 8 dígitos - (guión) 4 dígitos.'
       });
@@ -24,67 +57,119 @@ export default function ManageMembersGuests({ goTo }) {
       return;
     }
 
-    // Guardar la acción actual (alta o baja) y mostrar el modal
+    if (!nameMember.trim() || !lastnameMember.trim()) {
+      Toast.show({
+        type: 'info',
+        text1: 'Nombre y apellido son campos requeridos.',
+      });
+      return;
+    }
+
     setCurrentAction(action);
     setModalVisible(true);
   };
 
   const confirmAction = async () => {
-    // Validar credenciales del admin
     const adminUserIsValid = await validateId(adminUser);
-    
+
     if (adminUserIsValid === false) {
       Toast.show({
         type: 'error',
         text1: 'Usuario no existe.',
       });
-      return; // Salir de la función si el usuario no es válido
+      return;
     }
 
-    // Validar usuario admin
-    const adminTypeUserIsValid = await validateTypeUser(adminUser)
-    if (adminTypeUserIsValid === false){
+    const adminTypeUserIsValid = await validateTypeUser(adminUser);
+    if (adminTypeUserIsValid === false) {
       Toast.show({
         type: 'error',
         text1: 'El usuario no es admin.',
       });
-      return; // Salir de la función si el usuario no es admin
+      return;
     }
 
-    // Validación de la contraseña en la base de datos
     const adminPasswordIsValid = await validatePassword(adminUser, adminPassword);
     if (adminPasswordIsValid === false) {
       Toast.show({
         type: 'error',
         text1: 'Contraseña incorrecta.',
       });
-      return; // Salir de la función si la contraseña no es válida
+      return;
     }
 
-    // Validación del estado del usuario
     const adminStateIsValid = await userStateValidator(adminUser);
     if (adminStateIsValid === false) {
       Toast.show({
         type: 'error',
         text1: 'Usuario inactivo.',
       });
-      return; // Salir de la función si el estado del usuario no es válido
+      return;
     }
 
     try {
-      // Si todas las validaciones son exitosas, realizar la acción correspondiente
       console.log(`Realizar acción ${currentAction} con el legajo:`, id);
-      setModalVisible(false);
-      setAdminUser('');
-      setAdminPassword('');
-      Toast.show({ 
-        type: 'success', 
+
+      if (currentAction === 'alta') {
+        try {
+          const validMemberRegistered = await validMemberRegister(id, nameMember, lastnameMember);
+
+          if (validMemberRegistered) {
+            Toast.show({
+              type: 'info',
+              text1: '¡Alta de miembro!',
+            });
+            resetFields();
+            return false;
+          } else {
+            Toast.show({
+              type: 'error',
+              text1: 'Error en el alta del miembro.',
+            });
+            resetFields();
+            return false;
+          }
+        } catch (error) {
+          console.error(error);
+          return false;
+        }
+
+      } else if (currentAction === 'baja') {
+        try {
+          const validMemberDeleted = await validMemberDelete(id);
+
+          if (validMemberDeleted) {
+            Toast.show({
+              type: 'info',
+              text1: '¡Baja de miembro!',
+            });
+            resetFields();
+            return false;
+          } else {
+            Toast.show({
+              type: 'error',
+              text1: 'Error en la baja del miembro.',
+            });
+            resetFields();
+            return false;
+          }
+        } catch (error) {
+          console.error(error);
+          return false;
+        }
+      } else {
+        console.log('Acción no reconocida.');
+      }
+
+      Toast.show({
+        type: 'success',
         text1: '¡Acción realizada correctamente!'
       });
+      resetFields();
     } catch (error) {
       console.error('Error en la validación del usuario:', error);
-      Toast.show({ 
-        type: 'error', 
+      Toast.show({
+        type: 'error',
         text1: '¡Error de validación!',
         text2: 'Ocurrió un error al validar las credenciales del administrador.'
       });
@@ -97,18 +182,32 @@ export default function ManageMembersGuests({ goTo }) {
         <Text style={[styles.title, invalid === 'id' && { color: 'red' }]}>Legajo</Text>
         <TextInput
           style={styles.input}
-          onChangeText={setId}
+          onChangeText={handleIdChange}
           value={id}
           placeholder="12345678-4321"
           keyboardType="numeric"
         />
-        <TouchableOpacity 
-          style={[styles.button, { backgroundColor: '#28a745' }]} 
+        <Text style={styles.title}>Nombre</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={handleNameChange}
+          value={nameMember}
+          placeholder="Leonel"
+        />
+        <Text style={styles.title}>Apellido</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={handleLastnameChange}
+          value={lastnameMember}
+          placeholder="Messi"
+        />
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: '#28a745' }]}
           onPress={() => validateAndAction('alta')}>
           <Text style={styles.buttonText}>Dar de alta</Text>
         </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.button, { backgroundColor: '#dc3545' }]} 
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: '#dc3545' }]}
           onPress={() => validateAndAction('baja')}>
           <Text style={styles.buttonText}>Dar de baja</Text>
         </TouchableOpacity>
@@ -119,7 +218,7 @@ export default function ManageMembersGuests({ goTo }) {
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+        onRequestClose={resetFields}
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -140,14 +239,14 @@ export default function ManageMembersGuests({ goTo }) {
                 secureTextEntry={true}
               />
             </View>
-            <TouchableOpacity 
-              style={[styles.button, { backgroundColor: '#ffcc00' }]} 
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: '#ffcc00' }]}
               onPress={confirmAction}>
               <Text style={styles.buttonText}>Aceptar</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.button, { backgroundColor: '#6c757d' }]} 
-              onPress={() => setModalVisible(false)}>
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: '#6c757d' }]}
+              onPress={resetFields}>
               <Text style={styles.buttonText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
@@ -207,7 +306,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 0, 
+    top: 0,
     left: 0,
   },
   modalContainer: {

@@ -23,11 +23,21 @@ export function validateIdMember(id) {
     return new Promise((resolve, reject) => {
         db.transaction(tx => {
             tx.executeSql(
-                'SELECT * FROM valid_member WHERE code = ?',
+                'SELECT state FROM valid_member WHERE code = ?',
                 [id],
                 (_, { rows }) => {
-                    // Si hay alguna fila devuelta, significa que el legajo existe
-                    resolve(rows.length > 0);
+                    if (rows.length > 0) {
+                        const state = rows.item(0).state;
+                        if (state === 'A') {
+                            resolve(true); // El miembro está activo
+                        } else if (state === 'I') {
+                            resolve(false); // El miembro está inactivo
+                        } else {
+                            resolve(false); // El estado no es reconocido, por lo que lo consideramos no válido
+                        }
+                    } else {
+                        resolve(false); // No se encontró ningún miembro con ese legajo
+                    }
                 },
                 (_, error) => {
                     console.error('Error al ejecutar la consulta:', error);
@@ -38,6 +48,26 @@ export function validateIdMember(id) {
     });
 }
 
+/**
+ * Inserta o actualiza un miembro en la base de datos con la contraseña proporcionada.
+ *
+ * @param {string} id - El legajo del miembro, un string en el formato adecuado.
+ * @param {string} password - La contraseña del miembro, que debe cumplir con los criterios de formato especificados.
+ * @returns {Promise<boolean>} - Una promesa que se resuelve con `true` si la inserción o actualización es exitosa, y `false` en caso contrario.
+ *
+ * @throws {Error} - Lanza un error si hay un problema al generar el hash de la contraseña o durante la transacción de la base de datos.
+ *
+ * La función realiza los siguientes pasos:
+ * 1. Valida el formato de la contraseña. Debe tener al menos 8 caracteres, incluyendo al menos una letra mayúscula, una letra minúscula y un número.
+ * 2. Genera un salt de manera segura utilizando el método `generateSalt`.
+ * 3. Genera un hash de la contraseña con el salt utilizando el método `basicHash`.
+ * 4. Realiza una transacción en la base de datos para verificar si el miembro ya existe:
+ *    - Si no existe, inserta un nuevo registro con el estado "A" (activo).
+ *    - Si existe pero su estado es "I" (inactivo), actualiza el estado a "A" y actualiza la contraseña.
+ *    - Si ya está activo, no realiza ninguna actualización y resuelve con `false`.
+ * 5. Si la inserción o actualización es exitosa, verifica si el registro se realizó correctamente.
+ * 6. Maneja y reporta errores durante la transacción de la base de datos.
+ */
 export async function insertMember(id, password) {
     // Validar el formato de la contraseña
     if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(password)) {
