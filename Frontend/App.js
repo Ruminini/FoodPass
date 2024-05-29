@@ -2,7 +2,7 @@ import { StyleSheet, View, StatusBar } from "react-native";
 import { useState, useEffect } from "react";
 import MainMenu from "./pages/MainMenu";
 import ConfigMenu from "./pages/ConfigMenu";
-import FoodPicker from "./pages/FoodPicker";
+import FoodPicker2 from "./pages/FoodPicker2";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Options from "./pages/Options";
@@ -28,12 +28,14 @@ import {
 } from "./service_db/DBQuerys";
 import { createTriggers, dropTriggers } from "./service_db/DBTriggers";
 import { basicHash } from "./utils/Hash";
+import { chargeFoodsInDatabase } from "./service_db/DBChargeFoods";
 
 export default function App() {
   const [page, setPage] = useState(<View />);
   useEffect(() => setPage(<MainMenu goTo={goTo} />), []);
   useEffect(() => {
     initializeDatabase();
+    chargeFoodsInDatabase();
   }, []);
 
   useEffect(() => {
@@ -261,7 +263,7 @@ export default function App() {
   ) => {
     switch (option) {
       case "FoodPicker":
-        setPage(<FoodPicker data={data} goTo={goTo} />);
+        setPage(<FoodPicker2 data={data} goTo={goTo} />);
         break;
       case "OrderConfirm":
         setPage(<OrderConfirm data={data} goTo={goTo} />);

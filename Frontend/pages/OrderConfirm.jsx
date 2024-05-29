@@ -22,7 +22,7 @@ export default function OrderConfirm({ data, goTo }) {
                 {foods.map((food, index) => (
                     <FoodItem
                     key={index}
-                    title={food.title}
+                    title={food.name}
                     description={food.description} />
                 ))}
             </MenuList>
