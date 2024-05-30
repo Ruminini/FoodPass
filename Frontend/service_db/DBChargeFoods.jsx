@@ -5,7 +5,7 @@ export const chargeFoodsInDatabase = async () => {
     // Dos comidas principales sin restricción, una vegana, una vegetariana y una celíaca
 
     insertFood(
-        1, // Tipo de Alimento (Comida principal)
+        1, // Tipo de Alimento 1 (Comida principal), 2 (bebida) y 3 (postre)
         "Pollo al horno", // Nombre de alimento
         "Pollo al horno gratinado con finas hierbas", // Descripción del alimento
         150, // Stock del alimento

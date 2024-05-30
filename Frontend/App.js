@@ -2,7 +2,7 @@ import { StyleSheet, View, StatusBar } from "react-native";
 import { useState, useEffect } from "react";
 import MainMenu from "./pages/MainMenu";
 import ConfigMenu from "./pages/ConfigMenu";
-import FoodPicker2 from "./pages/FoodPicker2";
+import FoodPicker from "./pages/FoodPicker";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Options from "./pages/Options";
@@ -263,7 +263,7 @@ export default function App() {
   ) => {
     switch (option) {
       case "FoodPicker":
-        setPage(<FoodPicker2 data={data} goTo={goTo} />);
+        setPage(<FoodPicker data={data} goTo={goTo} />);
         break;
       case "OrderConfirm":
         setPage(<OrderConfirm data={data} goTo={goTo} />);
