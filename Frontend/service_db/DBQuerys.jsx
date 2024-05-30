@@ -192,6 +192,25 @@ export const getAllFood = () => {
   });
 };
 
+//Obtener todos los alimentos activos y con stock
+export const getAllFoodWithStockAndActive = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM food WHERE state = 'A' AND stock != 0",
+        [],
+        (tx, results) => {
+          const foods = results.rows._array;
+          resolve(foods);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
 //Obtener alimento por id
 export const getFoodByID = (id_food) => {
   return new Promise((resolve, reject) => {
@@ -210,6 +229,43 @@ export const getFoodByID = (id_food) => {
     });
   });
 };
+
+//Obtener alimento por nombre
+export const getFoodIdByName = (food_name) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM food WHERE name = ?",
+        [food_name],
+        (tx, results) => {
+          const food = results.rows._array[0].id; // Id del alimento
+          resolve(food);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+// Devuelve las diferentes relaciones de restricción que tienen las comidas de la db (vegano, vegetariano o celíaco)
+export const getRelationOfFood = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM relation_restriction_food", [],
+        (tx, results) => {
+          const relations = results.rows._array;
+          resolve(relations);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+}
 
 //INSERTAR PARAMETRIA INICIAL
 export const insertParameters = () => {
@@ -535,37 +591,90 @@ export const activeFaceMember = (user_id) => {
   });
 };
 
-//Insertar alimentos
+//Insertar alimentos y sus restricciones
 export const insertFood = (
   type_code,
   name,
   description,
   stock,
-  minimum_amount
+  minimum_amount,
+  code_restriction
 ) => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      "INSERT OR IGNORE INTO food (type_code, name, description, price, stock, minimum_amount, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      [
-        type_code,
-        name,
-        description,
-        0,
-        stock,
-        minimum_amount,
-        new Date().toString(),
-        new Date().toString(),
-        "A",
-      ],
-      (tx, results) => {
-        console.log("Alimento agregado correctamente: ", name);
-      },
-      (tx, error) => {
-        console.error("Error al insertar el alimento ", name, error);
-      }
-    );
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      // Insertar el alimento en la tabla food
+      tx.executeSql(
+        "INSERT OR IGNORE INTO food (type_code, name, description, price, stock, minimum_amount, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [
+          type_code,
+          name,
+          description,
+          0,
+          stock,
+          minimum_amount,
+          new Date().toString(),
+          new Date().toString(),
+          "A",
+        ],
+        (tx, results) => {
+          // Obtener el ID del alimento recién insertado
+          tx.executeSql(
+            "SELECT id FROM food WHERE name = ?",
+            [name],
+            (tx, results) => {
+              const food_id = results.rows._array[0].id;
+
+              if (code_restriction) {
+                // Insertar la restricción correspondiente
+                insertRestriction(food_id, code_restriction)
+                  .then(() => {
+                    console.log("Alimento y restricción insertados correctamente: ", name);
+                    resolve();
+                  })
+                  .catch((error) => {
+                    console.error("Error al insertar la restricción: ", error);
+                    reject(error);
+                  });
+              } else {
+                console.log("Alimento insertado sin restricción: ", name);
+                resolve();
+              }
+            },
+            (tx, error) => {
+              console.error("Error al obtener el ID del alimento: ", error);
+              reject(error);
+            }
+          );
+        },
+        (tx, error) => {
+          console.error("Error al insertar el alimento: ", name, error);
+          reject(error);
+        }
+      );
+    });
   });
 };
+
+// Inserta una nueva restricción al alimento si es para vegetarianos, veganos o celíacos
+export const insertRestriction = (food_id, restriction_code) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "INSERT OR IGNORE INTO relation_restriction_food (id_food, code_restriction, create_date, last_update) VALUES (?, ?, ?, ?)",
+        [
+          food_id, restriction_code, new Date().toString(), new Date().toString(),
+        ],
+        (tx, results) => {
+          console.log("Se le asigno una restricción al alimento con id "+food_id+" correctamente");
+        },
+        (tx, error) => {
+          console.error("Error al insertar restricción al alimento ", error);
+        },
+      )
+    });
+  });
+}
+
 
 export const updateStock = (id_food, stock) => {
   db.transaction((tx) => {

@@ -31,12 +31,14 @@ import { basicHash } from "./utils/Hash";
 import { registerRestockerTask } from "./services/RestockerTask";
 import ManageMembersGuests from "./pages/ManageMembersGuests";
 import ManageMenus from "./pages/ManageMenus";
+import { chargeFoodsInDatabase } from "./service_db/DBChargeFoods";
 
 export default function App() {
   const [page, setPage] = useState(<View />);
   useEffect(() => setPage(<MainMenu goTo={goTo} />), []);
   useEffect(() => {
     initializeDatabase();
+    chargeFoodsInDatabase();
   }, []);
 
   useEffect(() => {

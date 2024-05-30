@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 
-export default function FoodItem({ title, description, selected=false, onPress, imgPath=require('../assets/icon.png'), style }) {
+export default function FoodItem({ title, description, stock, selected=false, onPress, imgPath=require('../assets/icon.png'), style }) {
     return (
         <View style={[styles.container, style]}>
             <TouchableOpacity style={styles.image_holder} onPress={onPress}>
@@ -9,7 +9,7 @@ export default function FoodItem({ title, description, selected=false, onPress, 
             </TouchableOpacity>
             <TouchableOpacity style={[styles.background,  selected && styles.selectedStyle]} onPress={onPress}>
                 <Text style={styles.title}>{title}</Text>
-                {description && <Text style={styles.description}>{description}</Text>}
+                {description && <Text style={styles.description}>{description} {stock}</Text>}
             </TouchableOpacity>
         </View>
     )
