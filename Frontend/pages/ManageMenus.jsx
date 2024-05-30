@@ -51,7 +51,7 @@ export default function ProductForm({ goTo }) {
     if (adminUserIsValid === false) {
       Toast.show({
         type: 'error',
-        text1: 'Usuario no existe.',
+        text1: 'Ingrese usuario correcto.',
       });
       return; // Salir de la función si el usuario no es válido
     }
@@ -71,7 +71,7 @@ export default function ProductForm({ goTo }) {
     if (adminPasswordIsValid === false) {
       Toast.show({
         type: 'error',
-        text1: 'Contraseña incorrecta.',
+        text1: 'Ingrese contraseña correcta.',
       });
       return; // Salir de la función si la contraseña no es válida
     }
@@ -81,7 +81,7 @@ export default function ProductForm({ goTo }) {
     if (adminStateIsValid === false) {
       Toast.show({
         type: 'error',
-        text1: 'Usuario inactivo.',
+        text1: 'Usuario administrador inactivo.',
       });
       return; // Salir de la función si el estado del usuario no es válido
     }

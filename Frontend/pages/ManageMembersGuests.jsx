@@ -57,6 +57,16 @@ export default function ManageMembersGuests({ goTo }) {
       return;
     }
 
+    // Legajos reservados para administradores
+    if (id.endsWith('-0000')) {
+      Toast.show({
+        type: 'info',
+        text1: 'Legajo reservado para admin.',
+        text2: 'Los legajos que terminan en -0000 son administradores.'
+      });
+      return;
+    }
+
     if (!nameMember.trim() || !lastnameMember.trim()) {
       Toast.show({
         type: 'info',
@@ -75,7 +85,7 @@ export default function ManageMembersGuests({ goTo }) {
     if (adminUserIsValid === false) {
       Toast.show({
         type: 'error',
-        text1: 'Usuario no existe.',
+        text1: 'Ingrese usuario correcto.',
       });
       return;
     }
@@ -93,7 +103,7 @@ export default function ManageMembersGuests({ goTo }) {
     if (adminPasswordIsValid === false) {
       Toast.show({
         type: 'error',
-        text1: 'Contraseña incorrecta.',
+        text1: 'Ingrese contraseña correcta.',
       });
       return;
     }
@@ -102,7 +112,7 @@ export default function ManageMembersGuests({ goTo }) {
     if (adminStateIsValid === false) {
       Toast.show({
         type: 'error',
-        text1: 'Usuario inactivo.',
+        text1: 'Usuario administrador inactivo.',
       });
       return;
     }
