@@ -269,12 +269,10 @@ export default function App() {
         setPage(<FoodPicker data={data} goTo={goTo} />);
         break;
       case "OrderConfirm":
-        setPage(<OrderConfirm data={data} goTo={goTo} />);
+        setPage(<OrderConfirm data={data} before={before} after={after} />);
         break;
       case "Login":
-        setPage(
-          <Login data={data} before={before} after={after} goTo={goTo} />
-        );
+        setPage(<Login data={data} before={before} after={after} />);
         break;
       case "Register":
         setPage(<Register data={data} goTo={goTo} />);

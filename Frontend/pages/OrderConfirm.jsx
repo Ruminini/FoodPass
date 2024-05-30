@@ -6,11 +6,11 @@ import Toast from 'react-native-toast-message'
 import BackButton from '../components/BackButton'
 import FoodItem from '../components/FoodItem'
 
-export default function OrderConfirm({ data, goTo }) {
+export default function OrderConfirm({ data, before, after }) {
     const foods = data.foods ||  []
 
     if (foods.length === 0) {
-        goTo('FoodPicker', data)
+        before()
         Toast.show({ type: 'info', text1: 'Primero debes seleccionar algun plato' })
     }
     return (
@@ -27,21 +27,10 @@ export default function OrderConfirm({ data, goTo }) {
                 ))}
             </MenuList>
             <MenuButton
-                text='Confirmar pedido'
+                text='Confirmar'
                 style={styles.button}
-                onPress={() =>
-                    goTo(
-                        'Login', {},
-                        () => goTo('OrderConfirm', data),
-                        (id) => {
-                            Toast.show({ type: 'success', text1: 'Pedido Realizado',text2: 'Gracias por tu pedido ' + id })
-                            // TODO: Guardar pedido en db
-                            console.log('Gracias por pedir',id)
-                            console.log('Tu pedido:',foods)
-                            goTo('MainMenu') }
-                    )
-                } />
-            <BackButton onPress={() => goTo('FoodPicker', data)}/>
+                onPress={after} />
+            <BackButton onPress={before}/>
         </View>
     )
 }

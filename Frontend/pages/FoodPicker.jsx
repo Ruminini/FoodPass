@@ -28,6 +28,31 @@ export default function FoodPicker({data, goTo}) {
             setSelectedFoods([...selectedFoods, food])
         }
     }
+
+    const goToConfirm = () => {
+        goTo(
+            'OrderConfirm',
+            {foods: selectedFoods, totalPrice},
+            backToPicker,
+            afterConfirm
+        )
+    }
+    const backToPicker = () => {
+        goTo('FoodPicker', {foods: selectedFoods})
+    }
+    const afterConfirm = () => {
+        goTo(
+            'Login', {},
+            goToConfirm,
+            (id) => {
+                Toast.show({ type: 'success', text1: 'Pedido Realizado',text2: 'Gracias por tu pedido ' + id })
+                // TODO: Guardar pedido en db
+                console.log('Gracias por pedir',id)
+                console.log('Tu pedido:',foods)
+                goTo('MainMenu') }
+            )
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.navContainer}>
@@ -63,7 +88,7 @@ export default function FoodPicker({data, goTo}) {
                                 Toast.show({ type: 'info', text1: 'Primero debes seleccionar algun plato' })
                                 return
                             }
-                            goTo('OrderConfirm', {foods: selectedFoods, totalPrice: totalPrice})
+                            goToConfirm();
                         }}
 
                     />
