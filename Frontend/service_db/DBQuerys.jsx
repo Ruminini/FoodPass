@@ -1,15 +1,15 @@
 import db from "./DB";
 
-//Pasando el legajo del usuario por parametro (member_code), la función retorna un array de los registros que existan en la tabla valid_member.
-export const getValidMemberById = (member_code) => {
+//Funcion para obtener miembro valido mediante el id
+export const getValidMemberById = (code) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
         "SELECT * FROM valid_member WHERE code = ?",
-        [member_code],
+        [code],
         (tx, results) => {
-          const members = results.rows._array;
-          resolve(members);
+          const member = results.rows._array;
+          resolve(member);
         },
         (tx, error) => {
           reject(error);
@@ -54,6 +54,65 @@ export const getUserById = (member_code) => {
         }
       );
     });
+  });
+};
+
+//Obtener tipo de usuario de la tabla user por id
+export const getTypeUserById = (member_code) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT type_code FROM user where member_code = ?",
+        [member_code],
+        (tx, results) => {
+          const type_code = results.rows._array[0].type_code;
+          resolve(type_code);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+//Función para inactivar miembro en la tabla user
+export const inactiveUserMember = (member_code) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE user SET state = ?, last_update = ? WHERE member_code = ?",
+      [
+        "I",
+        new Date().toString(),
+        member_code
+      ],
+      (tx, results) => {
+        console.log("Miembro usuario inactivado correctamente", member_code);
+      },
+      (tx, error) => {
+        console.error("Error inactivar miembro usuario:", error);
+      }
+    );
+  });
+};
+
+//Función para activar miembro en la tabla user
+export const activeUserMember = (member_code) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE user SET state = ?, last_update = ? WHERE member_code = ?",
+      [
+        "A",
+        new Date().toString(),
+        member_code
+      ],
+      (tx, results) => {
+        console.log("Miembro usuario activado correctamente", member_code);
+      },
+      (tx, error) => {
+        console.error("Error activar miembro usuario:", error);
+      }
+    );
   });
 };
 
@@ -326,7 +385,7 @@ export const insertParameters = () => {
   });
 };
 
-//Función para insertar miembro en la tabla valid_member (blanquear usuario)
+//Función para insertar miembro en la tabla valid_member
 export const insertValidMember = (code, name, last_name) => {
   db.transaction((tx) => {
     tx.executeSql(
@@ -340,23 +399,63 @@ export const insertValidMember = (code, name, last_name) => {
         "A",
       ],
       (tx, results) => {
-        console.log("Miembro blanqueado correctamente", code);
+        console.log("Miembro registrado correctamente", code);
       },
       (tx, error) => {
-        console.error("Error al blanquear miembro:", error);
+        console.error("Error al registrar miembro:", error);
+      }
+    );
+  });
+};
+
+//Función para inactivar miembro en la tabla valid_member
+export const inactiveValidMember = (code) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE valid_member SET state = ?, last_update = ? WHERE code = ?",
+      [
+        "I",
+        new Date().toString(),
+        code
+      ],
+      (tx, results) => {
+        console.log("Miembro valido inactivado correctamente", code);
+      },
+      (tx, error) => {
+        console.error("Error inactivar miembro valido:", error);
+      }
+    );
+  });
+};
+
+//Función para activar miembro en la tabla valid_member
+export const activeValidMember = (code) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE valid_member SET state = ?, last_update = ? WHERE code = ?",
+      [
+        "A",
+        new Date().toString(),
+        code
+      ],
+      (tx, results) => {
+        console.log("Miembro valido activado correctamente", code);
+      },
+      (tx, error) => {
+        console.error("Error activar miembro valido:", error);
       }
     );
   });
 };
 
 //Insertar usuario en tabla user. Se utilizará para nuevos registros.
-export const insertUser = (member_code, hashed_pass, salt) => {
+export const insertUser = (member_code, type_code, hashed_pass, salt) => {
   db.transaction((tx) => {
     tx.executeSql(
       "INSERT OR IGNORE INTO user (member_code, type_code, hashed_pass, salt, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [
         member_code,
-        2,
+        type_code,
         hashed_pass,
         salt,
         new Date().toString(),
@@ -393,6 +492,44 @@ export const insertFaceData = (user_id, descriptor) => {
           user_id,
           error
         );
+      }
+    );
+  });
+};
+
+//Función para inactivar miembro en la tabla face
+export const inactiveFaceMember = (user_id) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE face SET state = ? WHERE user_id = ?",
+      [
+        "I",
+        user_id
+      ],
+      (tx, results) => {
+        console.log("Rostro del miembro inactivado correctamente", user_id);
+      },
+      (tx, error) => {
+        console.error("Error al inactivar rostro del miembro:", error);
+      }
+    );
+  });
+};
+
+//Función para activar miembro en la tabla valid_member
+export const activeFaceMember = (user_id) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE face SET state = ? WHERE user_id = ?",
+      [
+        "A",
+        user_id
+      ],
+      (tx, results) => {
+        console.log("Rostro del miembro activado correctamente", user_id);
+      },
+      (tx, error) => {
+        console.error("Error inactivar rostro del miembro:", error);
       }
     );
   });

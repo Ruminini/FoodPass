@@ -1,7 +1,7 @@
 import { StyleSheet, View, StatusBar } from "react-native";
 import { useState, useEffect } from "react";
 import MainMenu from "./pages/MainMenu";
-import ConfigMenu from "./pages/ConfigMenu";
+import Admin from "./pages/Admin";
 import FoodPicker from "./pages/FoodPicker";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
@@ -29,6 +29,8 @@ import {
 import { createTriggers, dropTriggers } from "./service_db/DBTriggers";
 import { basicHash } from "./utils/Hash";
 import { registerRestockerTask } from "./services/RestockerTask";
+import ManageMembersGuests from "./pages/ManageMembersGuests";
+import ManageMenus from "./pages/ManageMenus";
 
 export default function App() {
   const [page, setPage] = useState(<View />);
@@ -86,8 +88,28 @@ export default function App() {
     useEffect(() => {
       insertUser(
         "34985578-2024",
+        2,
         basicHash("Password123", "testSalt"),
         "testSalt"
+      );
+    }, []);
+
+    //Ejemplo insertando un usuario administrador en la tabla user
+    useEffect(() => {
+      insertUser(
+        "00000000-0000",
+        1,
+        basicHash("admin", "admin_salt"),
+        "admin_salt"
+      );
+    }, []);
+
+    //Ejemplo insertando un usuario administrador en la tabla valid_member
+    useEffect(() => {
+      insertValidMember(
+        "00000000-0000",
+        "Admin",
+        "Admin"
       );
     }, []);
 
@@ -282,8 +304,14 @@ export default function App() {
       case "Options":
         setPage(<Options goTo={goTo} />);
         break;
-      case "ConfigMenu":
-        setPage(<ConfigMenu goTo={goTo} />);
+      case "Admin":
+        setPage(<Admin goTo={goTo} />);
+        break;
+      case "ManageMenus":
+        setPage(<ManageMenus data={data} goTo={goTo} />);
+        break;
+      case "ManageMembersGuests":
+        setPage(<ManageMembersGuests data={data} goTo={goTo} />);
         break;
       case "OrderPickUp":
         setPage(<OrderPickUp data={data} goTo={goTo} />);

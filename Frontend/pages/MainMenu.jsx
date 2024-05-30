@@ -7,8 +7,19 @@ import Face from '../assets/svg/face-scan.svg'
 import Register from '../assets/svg/register.svg'
 import Options from '../assets/svg/options.svg'
 import SettingsButton from '../components/SettingsButton'
+import Toast from 'react-native-toast-message';
 
 export default function MainMenu({goTo}) {
+
+    const showAdminToast = () => {
+        Toast.show({ 
+            type: 'info', 
+            text1: 'Solo los administradores pueden realizar acciones.',
+            visibilityTime: 3000, // Tiempo en milisegundos que se muestra el Toast
+            autoHide: true, // Auto ocultar el Toast después de visibilityTime
+        });
+    };
+
     return (
         <View style={{flex: 1}}>
             <MenuList>
@@ -24,7 +35,7 @@ export default function MainMenu({goTo}) {
                         '',
                         () => {goTo('MainMenu')},
                         (id) => {
-                            console.log('pedido recibido',id);
+                            console.log('Pedido recibido',id);
                             goTo('OrderPickUp', {legajo: id})
                         })} />
                 <MenuButton
@@ -36,7 +47,10 @@ export default function MainMenu({goTo}) {
                     text='Opciones'
                     onPress={() => goTo('Options')} />
             </MenuList>
-            <SettingsButton onPress={() => goTo('ConfigMenu')}/>
+            <SettingsButton onPress={() => {
+                showAdminToast();
+                goTo('Admin');
+            }}/>
         </View>
     )
 }

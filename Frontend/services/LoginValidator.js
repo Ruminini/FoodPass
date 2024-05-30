@@ -1,6 +1,7 @@
 import {
   getAllDescriptors,
   getUserById,
+  getTypeUserById,
   getPasswordById,
   getSaltById,
 } from "../service_db/DBQuerys.jsx";
@@ -21,6 +22,12 @@ export async function getFacesValidator() {
 export async function validateId(id) {
   let user = await getUserById(id);
   return user[0] !== undefined;
+}
+
+// Devuelve true si es un user admin
+export async function validateTypeUser(id){
+  let type_code = await getTypeUserById(id);
+  return type_code === 1;
 }
 
 // Devuelve true si el password ingresado es el mismo que tiene en la db
