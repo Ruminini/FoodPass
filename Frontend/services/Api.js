@@ -38,6 +38,9 @@ export const getDescriptors = async (base64Image) => {
 };
 
 export const sendRestockEmail = async () => {
+  //Hacemos el pedido de restock pasado el horario de cierre para no enviar mas de un mail
+  const isRestockTime = 10 <= new Date().getHours()
+  if (!isRestockTime) return false;
   const orders = await getOrdersForSupplier();
   if (orders.length == 0) return false;
   const orderList = orders.reduce(

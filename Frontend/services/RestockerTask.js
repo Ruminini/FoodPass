@@ -15,6 +15,9 @@ TaskManager.defineTask(EMAIL_RESTOCK_ORDER, async () => {
 });
 
 export const registerRestockerTask = async () => {
+  //Checkear cada 15 min con la app abierta
+  setInterval(sendRestockEmail, 1000 * 60 * 15)
+  //Checkear cada 15 min en segundo plano
   try {
     await BackgroundFetch.registerTaskAsync(EMAIL_RESTOCK_ORDER, {
       minimumInterval: 60 * 15,
