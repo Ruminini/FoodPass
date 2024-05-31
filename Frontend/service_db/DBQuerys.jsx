@@ -694,26 +694,6 @@ export const insertRestriction = (food_id, restriction_code) => {
   });
 }
 
-export const updateStock = (id_food, stock) => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      "UPDATE food SET stock = ?, last_update = ? WHERE id = ?",
-      [stock, new Date().toString(), id_food],
-      (tx, results) => {
-        console.log(
-          "Stock actualizado correctamente: ",
-          id_food,
-          stock,
-          results
-        );
-      },
-      (tx, error) => {
-        console.error("Error al actualizar stock ", id_food, stock, error);
-      }
-    );
-  });
-};
-
 //Marcar orden como enviada
 export const markSentSupplierOrder = (order_id) => {
   return new Promise((resolve, reject) => {
@@ -785,8 +765,8 @@ export const getOrdersForSupplier = () => {
   });
 };
 
-//Función para inactivar alimento en la tabla food
-export const inactiveFood = (name) => {
+//Función para inactivar alimento indicando el name en la tabla food
+export const inactiveFoodByName = (name) => {
   db.transaction((tx) => {
     tx.executeSql(
       "UPDATE food SET state = ?, last_update = ? WHERE name = ?",
@@ -800,6 +780,47 @@ export const inactiveFood = (name) => {
       },
       (tx, error) => {
         console.error("Error al inactivar alimento:", error);
+      }
+    );
+  });
+};
+
+//Función para actualizar stock de alimentos indicando id y stock en la tabla food
+export const updateStockFoodById = (id, stock) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE food SET stock = ?, last_update = ? WHERE id = ?",
+      [
+        stock, 
+        new Date().toString(), 
+        id
+      ],
+      (tx, results) => {
+        console.log("Stock actualizado correctamente: ", id, stock);
+      },
+      (tx, error) => {
+        console.error("Error al actualizar stock ", error);
+      }
+    );
+  });
+};
+
+//Función para actualizar stock de alimentos idicando name y stock en la tabla food
+export const updateStockFoodByName = (name, stock) => {
+  console.log(name, stock)
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE food SET stock = ?, last_update = ? WHERE name = ?",
+      [
+        stock, 
+        new Date().toString(), 
+        name
+      ],
+      (tx, results) => {
+        console.log("Stock actualizado correctamente: ", name, stock);
+      },
+      (tx, error) => {
+        console.error("Error al actualizar stock ", error);
       }
     );
   });

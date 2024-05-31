@@ -22,7 +22,7 @@ import {
   insertFood,
   getAllFood,
   getFoodByID,
-  updateStock,
+  updateStockFoodById,
   markSentSupplierOrder,
   addStockFromSupplierOrder,
 } from "./service_db/DBQuerys";
@@ -66,7 +66,7 @@ export default function App() {
 
     //Actualizar stock de alimento
     useEffect(() => {
-      updateStock(1, 2);
+      updateStockFoodById(1, 2);
       //El stock bajó del minimo
       //El trigger restock_food genera orden
       markSentSupplierOrder(1);

@@ -34,11 +34,30 @@ export default function ProductForm({ goTo }) {
         });
         return;
       }
-    } else if (action === 'Actualización de stock') {
-      if (category === '' || name === '' || stock === '') {
+      // Convertir stock a una cadena y verificar la longitud
+      const stockString = String(stock);
+      if (stockString.length > 4) {
         Toast.show({ 
           type: 'info', 
-          text1: 'Categoria, nombre y stock son obligatorios.',
+          text1: 'Cantidad de stock supera el limite (4 dígitos).',
+        });
+        return;
+      }
+    } else if (action === 'Actualización de stock') {
+      // Verificar si name o stock están vacíos
+      if (name === '' || stock === '') {
+        Toast.show({ 
+          type: 'info', 
+          text1: 'Nombre y stock son obligatorios.',
+        });
+        return;
+      }
+      // Convertir stock a una cadena y verificar la longitud
+      const stockString = String(stock);
+      if (stockString.length > 4) {
+        Toast.show({ 
+          type: 'info', 
+          text1: 'Cantidad de stock supera el limite (4 dígitos).',
         });
         return;
       }
@@ -177,7 +196,7 @@ export default function ProductForm({ goTo }) {
           </View>
         </View>
         <View style={styles.field}>
-          <Text style={styles.label}>Tipo</Text>
+          <Text style={styles.label}>Tipo (opcional)</Text>
           <View style={styles.radioGroup}>
             <TouchableOpacity
               style={[styles.radio, type === 'Vegano' && styles.selectedRadio]}
