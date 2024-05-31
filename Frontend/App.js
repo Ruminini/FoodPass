@@ -20,6 +20,7 @@ import {
   insertFaceData,
   getAllFood,
   getFoodByID,
+  getOrdersForSupplier,
 } from "./service_db/DBQuerys";
 import { createTriggers, dropTriggers } from "./service_db/DBTriggers";
 import { basicHash } from "./utils/Hash";
@@ -39,6 +40,7 @@ export default function App() {
   useEffect(() => {
     dropTriggers();
     createTriggers();
+    getOrdersForSupplier(); 
   }, []);
 
   useEffect(() => {

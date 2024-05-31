@@ -93,16 +93,26 @@ export default function FoodPicker({ data, goTo }) {
   };
   const afterConfirm = () => {
     goTo("Login", {}, goToConfirm, (id) => {
-      Toast.show({
-        type: "success",
-        text1: "Pedido Realizado",
-        text2: "Gracias por tu pedido " + id,
-      });
       const foodIds = selectedFoods.map((food) => food.id);
-      insertMenu(id, foodIds);
-      console.log("Gracias por pedir", id);
-      console.log("Tu pedido:", selectedFoods);
-      goTo("MainMenu");
+      insertMenu(id, foodIds)
+      .then(() => {
+        Toast.show({
+          type: "success",
+          text1: "Pedido Realizado",
+          text2: "Gracias por tu pedido " + id,
+        });
+        console.log("Gracias por pedir", id);
+        console.log("Tu pedido:", selectedFoods);
+        goTo("MainMenu");
+      }).catch(() => {
+        Toast.show({
+          type: "error",
+          text1: "Pedido Cancelado",
+          text2: "Ya hiciste tu pedido por hoy " + id,
+        });
+        console.log("Pedido rechazado", id);
+        goTo("MainMenu");
+      })
     });
   };
 

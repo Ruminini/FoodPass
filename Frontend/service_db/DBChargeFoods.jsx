@@ -65,7 +65,7 @@ export const chargeFoodsInDatabase = async () => {
         2, 
         "Jugo de remolacha y stevia", 
         "Jugo dulce con azucares naturales y bajos carbohidratos.",
-        150,
+        50,
         50,
         1
     );

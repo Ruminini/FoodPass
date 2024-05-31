@@ -839,6 +839,17 @@ export const insertMenu = (user_id, food_ids) => {
                   reject(error);
                 }
               );
+              tx.executeSql(
+                'UPDATE food SET stock = stock-1 WHERE id = ?',
+                [food_id],
+                (tx, result) => {
+                  console.log(`Updated stock form food id:` + food_id);
+                },
+                (tx, error) => {
+                  console.error(`Error updating food stock ` + food_id, error);
+                  reject(error);
+                }
+              );
             });
             // Ver que onda el order_state_code...
             tx.executeSql(
