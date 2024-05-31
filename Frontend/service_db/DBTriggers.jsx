@@ -79,7 +79,7 @@ const triggers = {
     WHEN NEW.state = 'C'
     BEGIN
         UPDATE order_for_supplier
-        SET last_update = date()
+        SET last_update = CURRENT_DATE
         WHERE id = NEW.id;
     END;`,
 };

@@ -15,6 +15,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#EEE',
+        width: '100%',
     },
     contentContainer: {
       flexGrow: 1,
