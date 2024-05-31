@@ -6,7 +6,7 @@ import OfflineLogin from '../components/OfflineLogin';
 import BackButton from '../components/BackButton';
 import Toast from 'react-native-toast-message';
 
-export default function Login({ data, before, after, goTo }) {
+export default function Login({ data, before, after }) {
 	const [internet, setInternet] = useState(true);
     useEffect(() => {
 		const unsubscribe = NetInfo.addEventListener(state => {

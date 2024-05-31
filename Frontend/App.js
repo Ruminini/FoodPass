@@ -11,7 +11,6 @@ import OrderConfirm from "./pages/OrderConfirm";
 import Toast from "react-native-toast-message";
 import { initializeDatabase } from "./service_db/DBInit";
 import {
-  insertParameters,
   getValidMemberById,
   getValidMembers,
   getUsers,
@@ -22,9 +21,6 @@ import {
   insertFood,
   getAllFood,
   getFoodByID,
-  updateStock,
-  markSentSupplierOrder,
-  addStockFromSupplierOrder,
 } from "./service_db/DBQuerys";
 import { createTriggers, dropTriggers } from "./service_db/DBTriggers";
 import { basicHash } from "./utils/Hash";
@@ -62,18 +58,20 @@ export default function App() {
         10,
         3
       );
-    }, []);
-
-    //Actualizar stock de alimento
-    useEffect(() => {
-      updateStock(1, 2);
-      //El stock bajó del minimo
-      //El trigger restock_food genera orden
-      markSentSupplierOrder(1);
-      //Marcamos orden como enviada
-      //Asumimos que se recibe la orden
-      addStockFromSupplierOrder(1);
-      //El stock aumentó
+      insertFood(
+        2,
+        "Mousse de chocolate",
+        "Mousse realizado con chocolate 72%",
+        10,
+        3
+      );
+      insertFood(
+        3,
+        "Coca Cola",
+        "Gaseosa cola de 600ml",
+        10,
+        3
+      );
     }, []);
 
     //Obtener alimento por id
@@ -293,12 +291,10 @@ export default function App() {
         setPage(<FoodPicker data={data} goTo={goTo} />);
         break;
       case "OrderConfirm":
-        setPage(<OrderConfirm data={data} goTo={goTo} />);
+        setPage(<OrderConfirm data={data} before={before} after={after} />);
         break;
       case "Login":
-        setPage(
-          <Login data={data} before={before} after={after} goTo={goTo} />
-        );
+        setPage(<Login data={data} before={before} after={after} />);
         break;
       case "Register":
         setPage(<Register data={data} goTo={goTo} />);

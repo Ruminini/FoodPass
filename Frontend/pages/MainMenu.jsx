@@ -30,14 +30,7 @@ export default function MainMenu({goTo}) {
                 <MenuButton
                     svg={<Face/>}
                     text='Retirar pedido'
-                    onPress={() => goTo(
-                        'Login',
-                        '',
-                        () => {goTo('MainMenu')},
-                        (id) => {
-                            console.log('Pedido recibido',id);
-                            goTo('OrderPickUp', {legajo: id})
-                        })} />
+                    onPress={() => goTo('OrderPickUp')} />
                 <MenuButton
                     svg={<Register/>}
                     text='Registro'

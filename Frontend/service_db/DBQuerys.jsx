@@ -766,3 +766,121 @@ export const getOrdersForSupplier = () => {
     });
   });
 };
+
+//Obtiene el pedido por su id
+export const getOrderFoodsByUserId = (id) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `SELECT f.name, f.description, o.menu_id
+        FROM food f
+        INNER JOIN relation_food_menu r ON r.id_food = f.id
+        INNER JOIN menu m ON r.id_menu = m.id
+        INNER JOIN "order" o ON o.menu_id = r.id_menu
+        WHERE o.user_id = ? AND o.create_date = CURRENT_DATE AND o.order_state_code = 1;`,
+        [id],
+        (tx, results) => {
+          console.log('getOrderFoodsByUserId',results.rows._array)
+          if(results.rows._array.length == 0)
+            reject("No orders");
+          resolve(results.rows._array);
+        },
+        (tx, error) => {
+          console.error("Error al obtener las ordenes:", error);
+          reject(error);
+        }
+      );
+    });
+  });
+}
+
+//Chequea si el usuario ya ha realizado una orden
+export const checkIfAlreadyOrdered = (user_id) => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+      tx.executeSql(
+        'SELECT * FROM "order" WHERE user_id = ? AND create_date = CURRENT_DATE',
+        [user_id],
+        (tx, { rows }) => {
+          resolve(rows.length > 0);
+        },
+        (tx, error) => {
+          console.error('Error checking user order: ', error);
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+//Inserta un nuevo menu para el usuario
+export const insertMenu = (user_id, food_ids) => {
+  return new Promise((resolve, reject) => {
+    checkIfAlreadyOrdered(user_id).then(alreadyOrdered => {
+      if (alreadyOrdered) {
+        reject('User already made an order today');
+        return
+      }
+      db.transaction(tx => {
+        tx.executeSql(
+          'INSERT INTO menu (create_date) VALUES (CURRENT_DATE)',
+          [],
+          (_, result) => {
+            const menu_id = result.insertId;
+            food_ids.forEach(food_id => {
+              tx.executeSql(
+                'INSERT INTO relation_food_menu (id_menu, id_food, create_date, last_update, state) VALUES (?, ?, CURRENT_DATE, CURRENT_DATE, "A")',
+                [menu_id, food_id],
+                (tx, result) => {
+                  console.log(`Inserted food_id ${food_id} with menu_id ${menu_id}`);
+                },
+                (tx, error) => {
+                  console.error(`Error inserting food_id ${food_id} with menu_id ${menu_id}: `, error);
+                  reject(error);
+                }
+              );
+            });
+            // Ver que onda el order_state_code...
+            tx.executeSql(
+              'INSERT INTO "order" (user_id, create_date, order_state_code, menu_id) VALUES (?, CURRENT_DATE, 1, ?)',
+              [user_id, menu_id],
+              (tx, result) => {
+                console.log(`Inserted order with user_id ${user_id} and menu_id ${menu_id}`);
+                resolve(menu_id);
+              },
+              (tx, error) => {
+                console.error('Error inserting order: ', error);
+                reject(error);
+              }
+            );
+          },
+          (tx, error) => {
+            console.error('Error inserting into menu: ', error);
+            reject(error);
+          }
+        );
+      }, error => {
+        console.error('Error creating transaction: ', error);
+        reject(error);
+      });
+    });
+  });
+};
+
+//Marca una orden como retirada
+export const pickupOrder = (user_id) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        'UPDATE "order" SET order_state_code = 2 WHERE user_id = ? AND create_date = CURRENT_DATE AND order_state_code = 1',
+        [user_id],
+        (tx, results) => {
+          resolve(results.rowsAffected>0);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+}
