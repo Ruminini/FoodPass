@@ -772,7 +772,7 @@ export const getOrderFoodsByUserId = (id) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        `SELECT f.name, f.description, o.menu_id
+        `SELECT f.name, f.description, o.menu_id, f.id
         FROM food f
         INNER JOIN relation_food_menu r ON r.id_food = f.id
         INNER JOIN menu m ON r.id_menu = m.id

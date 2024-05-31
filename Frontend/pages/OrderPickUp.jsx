@@ -9,13 +9,13 @@ import Toast from 'react-native-toast-message';
 export default function OrderPickUp({ data, goTo }) {
     const [order, setOrder] = useState(null);
     if (!data || !data.legajo) {
-        goTo(
+        setTimeout(() => goTo(
             'Login',
             {},
             () => goTo('MainMenu'),
             (id) => goTo('OrderPickUp', {legajo: id})
-        );
-        return
+        ), 50);
+        return <View/>;
     }
     const legajo = data.legajo;
     useEffect(() => {

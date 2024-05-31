@@ -16,6 +16,7 @@ import Toast from "react-native-toast-message";
 import {
   getAllFoodWithStockAndActive,
   getRelationOfFood,
+  insertMenu,
 } from "../service_db/DBQuerys.jsx"; // Importar las funciones de la DB
 
 export default function FoodPicker({ data, goTo }) {
@@ -26,9 +27,6 @@ export default function FoodPicker({ data, goTo }) {
     type: "comida",
   });
   const [selectedFoods, setSelectedFoods] = useState(data.foods || []);
-  const foodList = foods.filter((food) => matchesFilters(food, filters));
-  const totalPrice = selectedFoods.reduce((acc, food) => acc + food.price, 0);
-  // useEffect(() => console.log(selectedFoods.map(food => food.title)), [selectedFoods]);
   const [foods, setFoods] = useState([]);
 
   useEffect(() => {
@@ -68,6 +66,9 @@ export default function FoodPicker({ data, goTo }) {
     loadFoods();
   }, [data.foods]);
 
+  const foodList = foods.filter((food) => matchesFilters(food, filters));
+  const totalPrice = selectedFoods.reduce((acc, food) => acc + food.price, 0);
+
   // Guarda las comidas seleccionadas y cambia el color del front
   function toggleSelectedFood(food) {
     if (selectedFoods.includes(food)) {
@@ -97,9 +98,10 @@ export default function FoodPicker({ data, goTo }) {
         text1: "Pedido Realizado",
         text2: "Gracias por tu pedido " + id,
       });
-      // TODO: Guardar pedido en db
+      const foodIds = selectedFoods.map((food) => food.id);
+      insertMenu(id, foodIds);
       console.log("Gracias por pedir", id);
-      console.log("Tu pedido:", foods);
+      console.log("Tu pedido:", selectedFoods);
       goTo("MainMenu");
     });
   };

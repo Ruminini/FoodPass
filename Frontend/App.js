@@ -18,7 +18,6 @@ import {
   insertUser,
   insertValidMember,
   insertFaceData,
-  insertFood,
   getAllFood,
   getFoodByID,
 } from "./service_db/DBQuerys";
@@ -48,31 +47,6 @@ export default function App() {
 
   {
     //EJEMPLOS DE USO
-
-    //Insertar alimento
-    useEffect(() => {
-      insertFood(
-        1,
-        "Pollo al horno",
-        "pollo al horno gratinado con finas hierbas",
-        10,
-        3
-      );
-      insertFood(
-        2,
-        "Mousse de chocolate",
-        "Mousse realizado con chocolate 72%",
-        10,
-        3
-      );
-      insertFood(
-        3,
-        "Coca Cola",
-        "Gaseosa cola de 600ml",
-        10,
-        3
-      );
-    }, []);
 
     //Obtener alimento por id
     useEffect(() => {
