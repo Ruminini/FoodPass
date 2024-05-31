@@ -143,7 +143,6 @@ export default function ManageMembersGuests({ goTo }) {
           console.error(error);
           return false;
         }
-
       } else if (currentAction === 'baja') {
         try {
           const validMemberDeleted = await validMemberDelete(id);
@@ -170,7 +169,6 @@ export default function ManageMembersGuests({ goTo }) {
       } else {
         console.log('Acción no reconocida.');
       }
-
       Toast.show({
         type: 'success',
         text1: '¡Acción realizada correctamente!'
@@ -238,19 +236,19 @@ export default function ManageMembersGuests({ goTo }) {
                 style={styles.input}
                 onChangeText={setAdminUser}
                 value={adminUser}
-                placeholder="Usuario"
+                placeholder="00000000-0000"
                 keyboardType="default"
               />
               <TextInput
                 style={styles.input}
                 onChangeText={setAdminPassword}
                 value={adminPassword}
-                placeholder="Contraseña"
+                placeholder="••••••••••"
                 secureTextEntry={true}
               />
             </View>
             <TouchableOpacity
-              style={[styles.button, { backgroundColor: '#ffcc00' }]}
+              style={[styles.button, { backgroundColor: '#6c757d' }]}
               onPress={confirmAction}>
               <Text style={styles.buttonText}>Aceptar</Text>
             </TouchableOpacity>

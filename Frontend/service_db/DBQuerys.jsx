@@ -230,7 +230,7 @@ export const getFoodByID = (id_food) => {
   });
 };
 
-//Obtener alimento por nombre
+//Obtener id del alimento por nombre
 export const getFoodIdByName = (food_name) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
@@ -239,6 +239,25 @@ export const getFoodIdByName = (food_name) => {
         [food_name],
         (tx, results) => {
           const food = results.rows._array[0].id; // Id del alimento
+          resolve(food);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+//Obtener todos los datos del alimento por nombre
+export const getTotalDataFoodByName = (food_name) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM food WHERE name = ?",
+        [food_name],
+        (tx, results) => {
+          const food = results.rows._array;
           resolve(food);
         },
         (tx, error) => {
@@ -675,7 +694,6 @@ export const insertRestriction = (food_id, restriction_code) => {
   });
 }
 
-
 export const updateStock = (id_food, stock) => {
   db.transaction((tx) => {
     tx.executeSql(
@@ -764,5 +782,25 @@ export const getOrdersForSupplier = () => {
         }
       );
     });
+  });
+};
+
+//Función para inactivar alimento en la tabla food
+export const inactiveFood = (name) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE food SET state = ?, last_update = ? WHERE name = ?",
+      [
+        "I",
+        new Date().toString(),
+        name
+      ],
+      (tx, results) => {
+        console.log("Alimento inactivado correctamente", name);
+      },
+      (tx, error) => {
+        console.error("Error al inactivar alimento:", error);
+      }
+    );
   });
 };
