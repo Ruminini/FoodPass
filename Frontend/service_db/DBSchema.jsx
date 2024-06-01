@@ -40,6 +40,13 @@ export const createLogsLoginTable = `CREATE TABLE IF NOT EXISTS logs_login (
     --FOREIGN KEY(user_id) REFERENCES user(member_code)
   );`;
 
+export const createLogsOrderRetireTable = `CREATE TABLE IF NOT EXISTS logs_order_retire (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, 
+  user_id TEXT NOT NULL,
+  create_date TEXT NOT NULL
+  --FOREIGN KEY(user_id) REFERENCES user(member_code),
+);`;
+
 export const createTypeFoodTable = `CREATE TABLE IF NOT EXISTS type_food (
     code INTEGER PRIMARY KEY AUTOINCREMENT, 
     name TEXT NOT NULL UNIQUE,

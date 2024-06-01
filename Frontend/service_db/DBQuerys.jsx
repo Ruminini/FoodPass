@@ -989,10 +989,10 @@ export const createLoginLog = (member_code) => {
             'INSERT INTO logs_login (user_id, create_date) values (?, ?)',
             [member_code, new Date().toString()],
             (_, result) => {
-                console.log(`Log insertado de ${member_code} a las ` + new Date().toString())
+                console.log(`Log de login de ${member_code} insertado en la fecha ` + new Date().toString())
             },
             (_, error) => {
-                console.error('Error al ejecutar la consulta:', error);
+                console.error('Error al crear el log de login ', error);
                 reject(error);
             }
         );
@@ -1006,6 +1006,43 @@ export const getLoginLogs = () => {
     db.transaction((tx) => {
       tx.executeSql(
         "SELECT * FROM logs_login",
+        [],
+        (tx, results) => {
+          resolve(JSON.stringify(results.rows._array));
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+// Crea un log del login con el id del usuario y el año, mes, día y hora
+export const createOrderRetireLog = (member_code) => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+        tx.executeSql(
+            'INSERT INTO logs_order_retire (user_id, create_date) values (?, ?)',
+            [member_code, new Date().toString()],
+            (_, result) => {
+                console.log(`Log de retiro de pedido de ${member_code} insertado en la fecha ` + new Date().toString())
+            },
+            (_, error) => {
+                console.error('Error al crear el log de retiro de pedido ', error);
+                reject(error);
+            }
+        );
+    });
+  });
+}
+
+//Funcion para obtener miembro valido mediante el id
+export const getOrderRetireLogs = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM logs_order_retire",
         [],
         (tx, results) => {
           resolve(JSON.stringify(results.rows._array));

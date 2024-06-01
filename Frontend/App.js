@@ -26,6 +26,7 @@ import {
   markSentSupplierOrder,
   addStockFromSupplierOrder,
   getLoginLogs,
+  getOrderRetireLogs,
 } from "./service_db/DBQuerys";
 import { createTriggers, dropTriggers } from "./service_db/DBTriggers";
 import { basicHash } from "./utils/Hash";
@@ -62,7 +63,17 @@ export default function App() {
         console.error("Error fetching login logs:", error);
       }
     };
+    // Toma y muestra los logs de retiro de pedidos de la aplicación
+    const fetchOrderRetireLogs = async () => {
+      try {
+        const logs = await getOrderRetireLogs();
+        console.log("El registro de logs de los pedidos retirados es el siguiente: " + logs);
+      } catch (error) {
+        console.error("Error fetching order retire logs:", error);
+      }
+    };
     fetchLoginLogs();
+    fetchOrderRetireLogs();
   }, []);
 
   {

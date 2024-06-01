@@ -1,7 +1,7 @@
 import React, { useEffect, useState }  from 'react';
 import { View, Text, StyleSheet, TouchableOpacity  } from 'react-native';
 import BackButton from '../components/BackButton';
-import { getOrderFoodsByUserId, pickupOrder } from '../service_db/DBQuerys';
+import { createOrderRetireLog, getOrderFoodsByUserId, pickupOrder } from '../service_db/DBQuerys';
 import MenuList from '../components/MenuList';
 import FoodItem from '../components/FoodItem';
 import Toast from 'react-native-toast-message';
@@ -44,8 +44,9 @@ export default function OrderPickUp({ data, goTo }) {
                 <TouchableOpacity
                     style={[styles.largeBlueButton]}
                     onPress={() => {
-                        pickupOrder(legajo)
-                        Toast.show({ type: 'success', text1: 'Pedido Retirado' })
+                        pickupOrder(legajo);
+                        createOrderRetireLog(legajo);
+                        Toast.show({ type: 'success', text1: 'Pedido Retirado' });
                         goTo('MainMenu');
                     }}
                 >

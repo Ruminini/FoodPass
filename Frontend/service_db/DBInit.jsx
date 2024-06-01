@@ -14,6 +14,7 @@ import {
   createUserTable,
   createValidMemberTable,
   createOrderForSupplierTable,
+  createLogsOrderRetireTable,
 } from "./DBSchema";
 
 export const initializeDatabase = () => {
@@ -66,6 +67,16 @@ export const initializeDatabase = () => {
       },
       (tx, error) => {
         console.error("Error al crear la tabla logs_login:", error);
+      }
+    );
+    tx.executeSql(
+      createLogsOrderRetireTable,
+      [],
+      (tx, results) => {
+        console.log("Tabla logs_order_retire creada correctamente");
+      },
+      (tx, error) => {
+        console.error("Error al crear la tabla logs_order_retire:", error);
       }
     );
     tx.executeSql(
