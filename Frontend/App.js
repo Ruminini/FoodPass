@@ -53,29 +53,6 @@ export default function App() {
   {
     //EJEMPLOS DE USO
 
-    //Insertar alimento
-    useEffect(() => {
-      insertFood(
-        1,
-        "Pollo al horno",
-        "pollo al horno gratinado con finas hierbas",
-        10,
-        3
-      );
-    }, []);
-
-    //Actualizar stock de alimento
-    useEffect(() => {
-      updateStockFoodById(1, 2);
-      //El stock bajó del minimo
-      //El trigger restock_food genera orden
-      markSentSupplierOrder(1);
-      //Marcamos orden como enviada
-      //Asumimos que se recibe la orden
-      addStockFromSupplierOrder(1);
-      //El stock aumentó
-    }, []);
-
     //Obtener alimento por id
     useEffect(() => {
       getFoodByID(1).then((res) => console.log("Alimento elegido: ", res));
