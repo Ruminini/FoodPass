@@ -68,7 +68,6 @@ export default function FoodPicker({ data, goTo }) {
 
   const foodList = foods.filter((food) => matchesFilters(food, filters));
   const totalPrice = selectedFoods.reduce((acc, food) => acc + food.price, 0);
-
   // Guarda las comidas seleccionadas y cambia el color del front
   function toggleSelectedFood(food) {
     if (selectedFoods.includes(food)) {
@@ -76,7 +75,18 @@ export default function FoodPicker({ data, goTo }) {
         selectedFoods.filter((selectedFood) => selectedFood.id !== food.id)
       );
     } else {
-      setSelectedFoods([...selectedFoods, food]);
+      const hasSameType = selectedFoods.some((selectedFood) => selectedFood.type_code === food.type_code);
+      
+      // Si la comida que se selecciona tiene el mismo tipo que otra que ya está entonces no permite seleccionarla
+      if (!hasSameType) {
+        setSelectedFoods([...selectedFoods, food]);
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Solo un tipo de comida/bebida/postre por menú",
+          text2: "Seleccione uno solo de cada uno",
+        });
+      }
     }
   }
 
