@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import MenuButton from './MenuButton';
 import { validateId, validatePassword, userStateValidator} from '../services/LoginValidator';
 import Toast from 'react-native-toast-message';
-//import {createLoginLog} from '../services/LogCreator'
+import { createLoginLog } from '../service_db/DBQuerys.jsx';
 
 export default function OfflineLogin({ after }) {
     const [password, onChangePassword] = useState('');
@@ -69,8 +69,10 @@ export default function OfflineLogin({ after }) {
             console.error('Error al validar el estado del usuario:', error);
             return false;
         }
-        after(id),
-        console.log('Usuario logueado')       
+        // Crea un log del login
+        createLoginLog(id);
+        after(id);
+        console.log('Usuario logueado');   
     }
 
     return (

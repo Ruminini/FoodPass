@@ -980,3 +980,40 @@ export const updateStockFoodByName = (name, stock) => {
     );
   });
 };
+
+// Crea un log del login con el id del usuario y el año, mes, día y hora
+export const createLoginLog = (member_code) => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+        tx.executeSql(
+            'INSERT INTO logs_login (user_id, create_date) values (?, ?)',
+            [member_code, new Date().toString()],
+            (_, result) => {
+                console.log(`Log insertado de ${member_code} a las ` + new Date().toString())
+            },
+            (_, error) => {
+                console.error('Error al ejecutar la consulta:', error);
+                reject(error);
+            }
+        );
+    });
+  });
+}
+
+//Funcion para obtener miembro valido mediante el id
+export const getLoginLogs = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM logs_login",
+        [],
+        (tx, results) => {
+          resolve(JSON.stringify(results.rows._array));
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};

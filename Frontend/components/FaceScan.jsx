@@ -8,6 +8,7 @@ import ScanAnimation from './ScanAnimation';
 import Toast from "react-native-toast-message";
 import {getFacesValidator, userStateValidator} from '../services/LoginValidator.js'
 import { getDescriptors } from '../services/Api.js';
+import { createLoginLog } from '../service_db/DBQuerys.jsx';
 import { matchFaces } from '../services/FaceMatcher.js';
 
 export default function FaceScan({ data, after }) {
@@ -19,7 +20,6 @@ export default function FaceScan({ data, after }) {
 	const cameraRef = useRef(null);
 	const onlyDescriptors = data.onlyDescriptors;
 
-	// FALTA PROBAR FUNCIONALIDAD DE LOGIN ONLINE
 	useEffect(() => {
 		if (!photo) return;
 		getDescriptors(photo.base64).then(async (response) => {
@@ -55,6 +55,8 @@ export default function FaceScan({ data, after }) {
 					text1: `Identidad Validada: ${closest.person}.`,
 					text2: `Distancia: ${closest.distance}`
 				})
+				// Crea un log del login
+				createLoginLog(closest.person);
 				after(closest.person);
 			} else {
 				Toast.show({

@@ -19,11 +19,13 @@ import {
   insertValidMember,
   insertFaceData,
   getAllFood,
+  insertFood,
   getFoodByID,
   getOrdersForSupplier,
   updateStockFoodById,
   markSentSupplierOrder,
   addStockFromSupplierOrder,
+  getLoginLogs,
 } from "./service_db/DBQuerys";
 import { createTriggers, dropTriggers } from "./service_db/DBTriggers";
 import { basicHash } from "./utils/Hash";
@@ -49,8 +51,22 @@ export default function App() {
   useEffect(() => {
     registerRestockerTask();
   }, []);
+  
+  useEffect(() => {
+    // Toma y muestra los logs de login de la aplicación
+    const fetchLoginLogs = async () => {
+      try {
+        const logs = await getLoginLogs();
+        console.log("El registro de logs de logins es el siguiente: " + logs);
+      } catch (error) {
+        console.error("Error fetching login logs:", error);
+      }
+    };
+    fetchLoginLogs();
+  }, []);
 
   {
+
     //EJEMPLOS DE USO
 
     //Insertar alimento
