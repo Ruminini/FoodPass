@@ -55,9 +55,6 @@ export default function Register({ goTo, data }) {
         if (!descriptors) {
             Alert.alert('Error', 'Debe tomar una foto primero.');
             return false;
-        } else if (descriptors.length === 0) {
-            Alert.alert('Error', 'No se pudieron detectar los descriptores faciales. Por favor, tome una foto nuevamente.');
-            return false;
         }
         
         // Registrar miembro en la base de datos
@@ -131,7 +128,7 @@ export default function Register({ goTo, data }) {
                     text="Tomar foto"
                     onPress={() => goTo(
                         'Login',
-                        {onlyDescriptors: true},
+                        {register: true},
                         () => goTo('Register', {id,password,descriptors}),
                         (descriptors) => goTo('Register', {id,password,descriptors})
                     )}

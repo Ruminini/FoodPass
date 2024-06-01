@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, Button, Image, Alert } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, Alert, TouchableOpacity } from 'react-native';
 import { Camera, CameraType } from 'expo-camera';
 import * as ImageManipulator from 'expo-image-manipulator';
 import MenuButton from './MenuButton';
@@ -9,6 +9,7 @@ import Toast from "react-native-toast-message";
 import {getFacesValidator, userStateValidator} from '../services/LoginValidator.js'
 import { getDescriptors } from '../services/Api.js';
 import { matchFaces } from '../services/FaceMatcher.js';
+import Flip from '../assets/svg/flip.svg'
 
 export default function FaceScan({ data, after }) {
 	const [type, setType] = useState(CameraType.back);
@@ -17,7 +18,7 @@ export default function FaceScan({ data, after }) {
 	const [size, setSize] = useState("640x480");
 	const [landmarks, setLandmarks] = useState(null);
 	const cameraRef = useRef(null);
-	const onlyDescriptors = data.onlyDescriptors;
+	const register = data.register;
 
 	// FALTA PROBAR FUNCIONALIDAD DE LOGIN ONLINE
 	useEffect(() => {
@@ -27,7 +28,7 @@ export default function FaceScan({ data, after }) {
 			if (response && response.length > 0) {
 				setLandmarks(response);
 				const descriptors = Object.values(response[0].descriptor);
-				if (onlyDescriptors) {
+				if (register) {
 					Toast.show({
 						type: 'success',
 						text1: 'Identidad capturada correctamente.',
@@ -69,7 +70,7 @@ export default function FaceScan({ data, after }) {
 	
 	if (!permission) {
 		// Camera permissions are still loading
-		return <View />;
+		return <View style={{ flex: 1 }} />;
 	}
 
     if (!permission.granted) {
@@ -142,15 +143,15 @@ export default function FaceScan({ data, after }) {
 							ref={cameraRef}
 							onCameraReady={getPictureSizes}
 						/>
+						<TouchableOpacity
+							onPress={toggleCameraType}
+							style={styles.flip}>
+							<Flip fill="white" />
+						</TouchableOpacity>
 					</View>
 					<View style={styles.buttonContainer}>
 						<MenuButton
-							text="Flip Camera"
-							onPress={toggleCameraType}
-							style={styles.button}
-						/>
-						<MenuButton
-							text="Take Picture"
+							text="Validar Identidad"
 							onPress={takePicture}
 							style={styles.button}
 						/>
@@ -182,15 +183,16 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		flexDirection: "column",
-		justifyContent: "space-around",
+		justifyContent: "space-between",
 		position: "relative",
+		paddingTop: 20
 	},
 	roundedContainer: {
 		position: "relative",
 		justifyContent: "center",
 		overflow: "hidden",
 		borderRadius: 30,
-		marginHorizontal: "20%",
+		marginHorizontal: "15%",
 		alignItems: "center",
 		aspectRatio: 3 / 4,
 	},
@@ -198,12 +200,19 @@ const styles = StyleSheet.create({
 		aspectRatio: 3 / 4,
 		height: "100%",
 	},
+	flip: {
+		width: 30,
+		height: 30,
+		position: "absolute",
+		bottom: 15,
+		right: 15,
+	},
 	buttonContainer: {
 		flexDirection: "row",
 		justifyContent: "space-around",
+		marginHorizontal: "15%",
 	},
 	button: {
-		width: "40%",
 		height: 100,
 	}
 });
