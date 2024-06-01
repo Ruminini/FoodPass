@@ -273,7 +273,8 @@ export const getRelationOfFood = () => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "SELECT * FROM relation_restriction_food", [],
+        "SELECT * FROM relation_restriction_food", 
+        [],
         (tx, results) => {
           const relations = results.rows._array;
           resolve(relations);
@@ -679,15 +680,21 @@ export const insertRestriction = (food_id, restriction_code) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "INSERT OR IGNORE INTO relation_restriction_food (id_food, code_restriction, create_date, last_update) VALUES (?, ?, ?, ?)",
+        "INSERT OR IGNORE INTO relation_restriction_food (id_food, code_restriction, create_date, last_update, state) VALUES (?, ?, ?, ?, ?)",
         [
-          food_id, restriction_code, new Date().toString(), new Date().toString(),
+          food_id, 
+          restriction_code, 
+          new Date().toString(), 
+          new Date().toString(),
+          'A'
         ],
         (tx, results) => {
-          console.log("Se le asigno una restricción al alimento con id "+food_id+" correctamente");
+          console.log("Se le asigno una restricción al alimento con id "+ food_id +" correctamente");
+          resolve(food_id);
         },
         (tx, error) => {
           console.error("Error al insertar restricción al alimento ", error);
+          reject(error);
         },
       )
     });
@@ -780,6 +787,26 @@ export const inactiveFoodByName = (name) => {
       },
       (tx, error) => {
         console.error("Error al inactivar alimento:", error);
+      }
+    );
+  });
+};
+
+//Función para activar alimento indicando el name en la tabla food
+export const activeFoodByName = (name) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE food SET state = ?, last_update = ? WHERE name = ?",
+      [
+        "A",
+        new Date().toString(),
+        name
+      ],
+      (tx, results) => {
+        console.log("Alimento activado correctamente", name);
+      },
+      (tx, error) => {
+        console.error("Error al activado alimento:", error);
       }
     );
   });
