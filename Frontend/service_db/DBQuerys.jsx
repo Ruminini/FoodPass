@@ -230,7 +230,7 @@ export const getFoodByID = (id_food) => {
   });
 };
 
-//Obtener alimento por nombre
+//Obtener id del alimento por nombre
 export const getFoodIdByName = (food_name) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
@@ -249,12 +249,32 @@ export const getFoodIdByName = (food_name) => {
   });
 };
 
+//Obtener todos los datos del alimento por nombre
+export const getTotalDataFoodByName = (food_name) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM food WHERE name = ?",
+        [food_name],
+        (tx, results) => {
+          const food = results.rows._array;
+          resolve(food);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
 // Devuelve las diferentes relaciones de restricción que tienen las comidas de la db (vegano, vegetariano o celíaco)
 export const getRelationOfFood = () => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "SELECT * FROM relation_restriction_food", [],
+        "SELECT * FROM relation_restriction_food", 
+        [],
         (tx, results) => {
           const relations = results.rows._array;
           resolve(relations);
@@ -660,41 +680,26 @@ export const insertRestriction = (food_id, restriction_code) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "INSERT OR IGNORE INTO relation_restriction_food (id_food, code_restriction, create_date, last_update) VALUES (?, ?, ?, ?)",
+        "INSERT OR IGNORE INTO relation_restriction_food (id_food, code_restriction, create_date, last_update, state) VALUES (?, ?, ?, ?, ?)",
         [
-          food_id, restriction_code, new Date().toString(), new Date().toString(),
+          food_id, 
+          restriction_code, 
+          new Date().toString(), 
+          new Date().toString(),
+          'A'
         ],
         (tx, results) => {
-          console.log("Se le asigno una restricción al alimento con id "+food_id+" correctamente");
+          console.log("Se le asigno una restricción al alimento con id "+ food_id +" correctamente");
+          resolve(food_id);
         },
         (tx, error) => {
           console.error("Error al insertar restricción al alimento ", error);
+          reject(error);
         },
       )
     });
   });
 }
-
-
-export const updateStock = (id_food, stock) => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      "UPDATE food SET stock = ?, last_update = ? WHERE id = ?",
-      [stock, new Date().toString(), id_food],
-      (tx, results) => {
-        console.log(
-          "Stock actualizado correctamente: ",
-          id_food,
-          stock,
-          results
-        );
-      },
-      (tx, error) => {
-        console.error("Error al actualizar stock ", id_food, stock, error);
-      }
-    );
-  });
-};
 
 //Marcar orden como enviada
 export const markSentSupplierOrder = (order_id) => {
@@ -895,3 +900,83 @@ export const pickupOrder = (user_id) => {
     });
   });
 }
+//Función para inactivar alimento indicando el name en la tabla food
+export const inactiveFoodByName = (name) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE food SET state = ?, last_update = ? WHERE name = ?",
+      [
+        "I",
+        new Date().toString(),
+        name
+      ],
+      (tx, results) => {
+        console.log("Alimento inactivado correctamente", name);
+      },
+      (tx, error) => {
+        console.error("Error al inactivar alimento:", error);
+      }
+    );
+  });
+};
+
+//Función para activar alimento indicando el name en la tabla food
+export const activeFoodByName = (name) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE food SET state = ?, last_update = ? WHERE name = ?",
+      [
+        "A",
+        new Date().toString(),
+        name
+      ],
+      (tx, results) => {
+        console.log("Alimento activado correctamente", name);
+      },
+      (tx, error) => {
+        console.error("Error al activado alimento:", error);
+      }
+    );
+  });
+};
+
+//Función para actualizar stock de alimentos indicando id y stock en la tabla food
+export const updateStockFoodById = (id, stock) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE food SET stock = ?, last_update = ? WHERE id = ?",
+      [
+        stock, 
+        new Date().toString(), 
+        id
+      ],
+      (tx, results) => {
+        console.log("Stock actualizado correctamente: ", id, stock);
+      },
+      (tx, error) => {
+        console.error("Error al actualizar stock ", error);
+      }
+    );
+  });
+};
+
+//Función para actualizar stock de alimentos idicando name y stock en la tabla food
+export const updateStockFoodByName = (name, stock) => {
+  console.log(name, stock)
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE food SET stock = ?, last_update = ? WHERE name = ?",
+      [
+        stock, 
+        new Date().toString(), 
+        name
+      ],
+      (tx, results) => {
+        console.log("Stock actualizado correctamente: ", name, stock);
+      },
+      (tx, error) => {
+        console.error("Error al actualizar stock ", error);
+      }
+    );
+  });
+};

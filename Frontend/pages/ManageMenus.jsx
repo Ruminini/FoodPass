@@ -2,40 +2,70 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, Modal } from 'react-native';
 import Toast from 'react-native-toast-message';
 import BackButton from '../components/BackButton';
-import { validateId, validateTypeUser, validatePassword, userStateValidator} from '../services/LoginValidator';
+import { validateId, validateTypeUser, validatePassword, userStateValidator } from '../services/LoginValidator';
+import { decideAction } from '../services/MenuActions';
 
 export default function ProductForm({ goTo }) {
-  const [categoria, setCategoria] = useState('');
-  const [tipo, setTipo] = useState('');
-  const [nombre, setNombre] = useState('');
+  const [category, setCategory] = useState('');
+  const [type, setType] = useState('');
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
   const [stock, setStock] = useState('');
+  const [pointReOrder, setPointReOrder] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [adminUser, setAdminUser] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [currentAction, setCurrentAction] = useState('');
 
-  const handleCategoriaSelection = (selectedCategoria) => {
-    setCategoria(categoria === selectedCategoria ? '' : selectedCategoria);
+  const handleCategoriaSelection = (selectedCategory) => {
+    setCategory(category === selectedCategory ? '' : selectedCategory);
   };
 
-  const handleTipoSelection = (selectedTipo) => {
-    setTipo(tipo === selectedTipo ? '' : selectedTipo);
+  const handleTipoSelection = (selectedType) => {
+    setType(type === selectedType ? '' : selectedType);
   };
 
   const validateAndAction = (action) => {
-    if (action === 'Alta' || action === 'Actualización de stock') {
-      if (categoria === '' || nombre === '' || stock === '') {
+    if (action === 'Alta'){
+      if (category === '' || name === '' || setDescription === '' || stock === '' || pointReOrder === '') {
         Toast.show({ 
           type: 'info', 
-          text1: 'Categoria, Nombre y Stock son obligatorios.',
+          text1: 'Todos los campos son obligatorios.',
+        });
+        return;
+      }
+      // Convertir stock a una cadena y verificar la longitud
+      const stockString = String(stock);
+      if (stockString.length > 4) {
+        Toast.show({ 
+          type: 'info', 
+          text1: 'Cantidad de stock supera el limite (4 dígitos).',
+        });
+        return;
+      }
+    } else if (action === 'Actualización de stock') {
+      // Verificar si name o stock están vacíos
+      if (name === '' || stock === '') {
+        Toast.show({ 
+          type: 'info', 
+          text1: 'Nombre y stock son obligatorios.',
+        });
+        return;
+      }
+      // Convertir stock a una cadena y verificar la longitud
+      const stockString = String(stock);
+      if (stockString.length > 4) {
+        Toast.show({ 
+          type: 'info', 
+          text1: 'Cantidad de stock supera el limite (4 dígitos).',
         });
         return;
       }
     } else if (action === 'Baja') {
-      if (categoria === '' || nombre === '') {
+      if (name === '') {
         Toast.show({ 
           type: 'info', 
-          text1: 'Categoria y Nombre son obligatorios.',
+          text1: 'Nombre es obligatorio.',
         });
         return;
       }
@@ -88,41 +118,57 @@ export default function ProductForm({ goTo }) {
 
     try {
       // Si todas las validaciones son exitosas, realizar la acción correspondiente
-      console.log(`Realizar acción ${currentAction} a producto:`, nombre, categoria, stock);
+      console.log(`Realizar acción ${currentAction} a producto:`, name, category, type, description, stock, pointReOrder);
+      const actionResult = await decideAction(currentAction, name, category, type, description, stock, pointReOrder);
       setModalVisible(false);
       setAdminUser('');
       setAdminPassword('');
-      setCategoria('');
-      setTipo('');
-      setNombre('');
+      setCategory('');
+      setType('');
+      setName('');
+      setDescription('');
       setStock('');
-      Toast.show({ 
-        type: 'success', 
-        text1: `¡${currentAction} concretada!`,
-      });
-      Toast.show({ 
-        type: 'success', 
-        text1: '¡Acción realizada correctamente!'
-      });
+      setPointReOrder('');
+    
+      if (actionResult.success) {
+        Toast.show({
+            type: 'info',
+            text1: actionResult.message,
+        });
+      } else {
+          // Hubo un error al realizar la acción
+          Toast.show({
+              type: 'error',
+              text1: actionResult.message,
+          });
+      }
     } catch (error) {
-      console.error('Error en la validación del usuario:', error);
-      Toast.show({ 
-        type: 'error', 
-        text1: '¡Error de validación!',
-        text2: 'Ocurrió un error al validar las credenciales del administrador.'
-      });
+      // Manejo de errores
+      console.error('Error en la ejecución de la acción:', error);
+    }
+  }
+
+  const handleNameChange = (text) => {
+    if (/^[a-zA-Z\s]*$/.test(text) || text === '') {
+      setName(text);
     }
   };
 
-  const handleNombreChange = (text) => {
+  const handleDescriptionChange = (text) => {
     if (/^[a-zA-Z\s]*$/.test(text) || text === '') {
-      setNombre(text);
+      setDescription(text);
     }
   };
 
   const handleStockChange = (text) => {
     if (/^\d+$/.test(text) || text === '') {
       setStock(text);
+    }
+  };
+
+  const handlePointReOrderChange = (text) => {
+    if (/^\d+$/.test(text) || text === '') {
+      setPointReOrder(text);
     }
   };
 
@@ -133,37 +179,37 @@ export default function ProductForm({ goTo }) {
           <Text style={styles.label}>Categoria</Text>
           <View style={styles.radioGroup}>
             <TouchableOpacity
-              style={[styles.radio, categoria === 'Comida' && styles.selectedRadio]}
+              style={[styles.radio, category === 'Comida' && styles.selectedRadio]}
               onPress={() => handleCategoriaSelection('Comida')}>
               <Text style={styles.radioText}>Comida</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, categoria === 'Bebida' && styles.selectedRadio]}
+              style={[styles.radio, category === 'Bebida' && styles.selectedRadio]}
               onPress={() => handleCategoriaSelection('Bebida')}>
               <Text style={styles.radioText}>Bebida</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, categoria === 'Postre' && styles.selectedRadio]}
+              style={[styles.radio, category === 'Postre' && styles.selectedRadio]}
               onPress={() => handleCategoriaSelection('Postre')}>
               <Text style={styles.radioText}>Postre</Text>
             </TouchableOpacity>
           </View>
         </View>
         <View style={styles.field}>
-          <Text style={styles.label}>Tipo</Text>
+          <Text style={styles.label}>Tipo (opcional)</Text>
           <View style={styles.radioGroup}>
             <TouchableOpacity
-              style={[styles.radio, tipo === 'Vegano' && styles.selectedRadio]}
+              style={[styles.radio, type === 'Vegano' && styles.selectedRadio]}
               onPress={() => handleTipoSelection('Vegano')}>
               <Text style={styles.radioText}>Vegano</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, tipo === 'Vegetariano' && styles.selectedRadio]}
+              style={[styles.radio, type === 'Vegetariano' && styles.selectedRadio]}
               onPress={() => handleTipoSelection('Vegetariano')}>
               <Text style={styles.radioText}>Vegetariano</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, tipo === 'Celiaco' && styles.selectedRadio]}
+              style={[styles.radio, type === 'Celiaco' && styles.selectedRadio]}
               onPress={() => handleTipoSelection('Celiaco')}>
               <Text style={styles.radioText}>Celiaco</Text>
             </TouchableOpacity>
@@ -173,9 +219,18 @@ export default function ProductForm({ goTo }) {
           <Text style={styles.title}>Nombre</Text>
           <TextInput
             style={styles.input}
-            onChangeText={handleNombreChange}
-            value={nombre}
+            onChangeText={handleNameChange}
+            value={name}
             placeholder="Milanesa con pure"
+          />
+        </View>
+        <View style={styles.field}>
+          <Text style={styles.title}>Descripción</Text>
+          <TextInput
+            style={styles.input}
+            onChangeText={handleDescriptionChange}
+            value={description}
+            placeholder="Milanesa de carne con pure de papa"
           />
         </View>
         <View style={styles.field}>
@@ -185,6 +240,16 @@ export default function ProductForm({ goTo }) {
             onChangeText={handleStockChange}
             value={stock}
             placeholder="10"
+            keyboardType="numeric"
+          />
+        </View>
+        <View style={styles.field}>
+          <Text style={styles.title}>Punto de re-orden</Text>
+          <TextInput
+            style={styles.input}
+            onChangeText={handlePointReOrderChange}
+            value={pointReOrder}
+            placeholder="50"
             keyboardType="numeric"
           />
         </View>
@@ -216,19 +281,19 @@ export default function ProductForm({ goTo }) {
                 style={styles.input}
                 onChangeText={setAdminUser}
                 value={adminUser}
-                placeholder="Usuario"
+                placeholder="00000000-0000"
                 keyboardType="default"
               />
               <TextInput
                 style={styles.input}
                 onChangeText={setAdminPassword}
                 value={adminPassword}
-                placeholder="Contraseña"
+                placeholder="••••••••••"
                 secureTextEntry={true}
               />
             </View>
             <TouchableOpacity 
-              style={[styles.button, { backgroundColor: '#ffcc00' }]} 
+              style={[styles.button, { backgroundColor: '#6c757d' }]} 
               onPress={confirmAction}>
               <Text style={styles.buttonText}>Aceptar</Text>
             </TouchableOpacity>
