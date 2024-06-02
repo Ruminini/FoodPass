@@ -28,9 +28,10 @@ import {
 import { createTriggers, dropTriggers } from "./service_db/DBTriggers";
 import { basicHash } from "./utils/Hash";
 import { registerRestockerTask } from "./services/RestockerTask";
-import ManageMembersGuests from "./pages/ManageMembersGuests";
+import ManageMembers from "./pages/ManageMembers";
 import ManageMenus from "./pages/ManageMenus";
 import { chargeFoodsInDatabase } from "./service_db/DBChargeFoods";
+import ManageGuests from "./pages/ManageGuests";
 
 export default function App() {
   const [page, setPage] = useState(<View />);
@@ -287,8 +288,11 @@ export default function App() {
       case "ManageMenus":
         setPage(<ManageMenus data={data} goTo={goTo} />);
         break;
-      case "ManageMembersGuests":
-        setPage(<ManageMembersGuests data={data} goTo={goTo} />);
+      case "ManageMembers":
+        setPage(<ManageMembers data={data} goTo={goTo} />);
+        break;
+      case "ManageGuests":
+        setPage(<ManageGuests goTo={goTo} />);
         break;
       case "OrderPickUp":
         setPage(<OrderPickUp data={data} goTo={goTo} />);

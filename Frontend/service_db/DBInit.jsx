@@ -14,6 +14,7 @@ import {
   createUserTable,
   createValidMemberTable,
   createOrderForSupplierTable,
+  createGuestExpirationTable,
 } from "./DBSchema";
 
 export const initializeDatabase = () => {
@@ -159,6 +160,16 @@ export const initializeDatabase = () => {
       },
       (tx, error) => {
         console.error("Error al crear la tabla order_for_supplier", error);
+      }
+    );
+    tx.executeSql(
+      createGuestExpirationTable,
+      [],
+      (tx, results) => {
+        console.log("Tabla guest_expiration creada correctamente");
+      },
+      (tx, error) => {
+        console.error("Error al crear la tabla guest_expiration", error);
       }
     );
   },
