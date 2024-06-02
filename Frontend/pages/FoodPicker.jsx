@@ -84,7 +84,7 @@ export default function FoodPicker({ data, goTo }) {
         Toast.show({
           type: "error",
           text1: "Solo un tipo de comida/bebida/postre por menú",
-          text2: "Seleccione uno solo de cada uno",
+          text2: "Seleccione uno solo de cada",
         });
       }
     }
@@ -111,8 +111,14 @@ export default function FoodPicker({ data, goTo }) {
           text1: "Pedido Realizado",
           text2: "Gracias por tu pedido " + id,
         });
+        // Crear una copia de selectedFoods con el stock reducido en 1
+        const updatedSelectedFoods = selectedFoods.map(food => ({
+          ...food,
+          stock: food.stock - 1,
+        }));
+
         console.log("Gracias por pedir", id);
-        console.log("Tu pedido:", selectedFoods);
+        console.log("Tu pedido:", updatedSelectedFoods);
         goTo("MainMenu");
       }).catch(() => {
         Toast.show({
@@ -262,7 +268,12 @@ function matchesFilters(food, filters) {
     if (filters.celiac && !food.restrictions.includes(3)) return false; // 3: celíaco
   }
 
-  if (filters.type !== "comida") {
+  if (filters.type === "bebida") {
+    // Las vegetarianas no tienen restricción
+    if (filters.vegan && !food.restrictions.includes(1)) return false; // 1: vegano
+    if (filters.celiac && !food.restrictions.includes(3)) return false; // 3: celíaco
+  }
+  if (filters.type === "postre") {
     if (filters.vegan && !food.restrictions.includes(1)) return false; // 1: vegano
     if (
       filters.vegetarian &&

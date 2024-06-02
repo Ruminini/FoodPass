@@ -612,7 +612,7 @@ export const activeFaceMember = (user_id) => {
   });
 };
 
-//Insertar alimentos y sus restricciones
+//Insertar alimentos y su restricción
 export const insertFood = (
   type_code,
   name,
@@ -658,6 +658,78 @@ export const insertFood = (
                   });
               } else {
                 console.log("Alimento insertado sin restricción: ", name);
+                resolve();
+              }
+            },
+            (tx, error) => {
+              console.error("Error al obtener el ID del alimento: ", error);
+              reject(error);
+            }
+          );
+        },
+        (tx, error) => {
+          console.error("Error al insertar el alimento: ", name, error);
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+//Insertar alimentos y sus restricciones
+export const insertFoodWithVariousRestrictions = (
+  type_code,
+  name,
+  description,
+  stock,
+  minimum_amount,
+  code_restrictions
+) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      // Insertar el alimento en la tabla food
+      tx.executeSql(
+        "INSERT OR IGNORE INTO food (type_code, name, description, price, stock, minimum_amount, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [
+          type_code,
+          name,
+          description,
+          0,
+          stock,
+          minimum_amount,
+          new Date().toString(),
+          new Date().toString(),
+          "A",
+        ],
+        (tx, results) => {
+          // Obtener el ID del alimento recién insertado
+          tx.executeSql(
+            "SELECT id FROM food WHERE name = ?",
+            [name],
+            (tx, results) => {
+              const food_id = results.rows._array[0].id;
+
+              // Función para insertar todas las restricciones de manera recursiva
+              const insertAllRestrictions = (restrictions, index = 0) => {
+                if (index < restrictions.length) {
+                  insertRestriction(food_id, restrictions[index])
+                    .then(() => {
+                      insertAllRestrictions(restrictions, index + 1);
+                    })
+                    .catch((error) => {
+                      console.error("Error al insertar la restricción: ", error);
+                      reject(error);
+                    });
+                } else {
+                  console.log("Alimento y restricciones insertados correctamente: ", name);
+                  resolve();
+                }
+              };
+
+              if (code_restrictions && code_restrictions.length > 0) {
+                insertAllRestrictions(code_restrictions);
+              } else {
+                console.log("Alimento insertado sin restricciones: ", name);
                 resolve();
               }
             },
