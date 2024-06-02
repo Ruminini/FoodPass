@@ -4,10 +4,10 @@
  * Genera una cadena de salt aleatoria para ser utilizada en el hash de contraseñas.
  * @returns {string} - Una cadena de sal generada aleatoriamente.
  */
-function generateSalt() {
+function generateSalt(len = 10) {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let salt = '';
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < len; i++) {
         salt += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     return salt;

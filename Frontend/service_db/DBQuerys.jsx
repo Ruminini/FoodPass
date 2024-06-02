@@ -1,3 +1,4 @@
+import { basicHash, generateSalt } from "../utils/Hash";
 import db from "./DB";
 
 //Funcion para obtener miembro valido mediante el id
@@ -1054,3 +1055,31 @@ export const getOrderRetireLogs = () => {
     });
   });
 };
+
+export const insertGuest = (dni, expiration) => {
+  return new Promise((resolve, reject) => {
+    const pass = generateSalt(6);
+    const salt = generateSalt();
+    const id = `${dni}-9999`;
+    insertUser(id, 3, basicHash(pass,salt), salt);
+    db.transaction((tx) => {
+      tx.executeSql(
+        'INSERT INTO guest_expiration (user_id, expiration_date) VALUES (?, date("now", ?))',
+        [id, `+${expiration} days`],
+        (tx, results) => {
+          console.log("Guest inserted successfully");
+        },
+        (tx, error) => {
+          console.error("Error inserting guest: ", error);
+          reject(error);
+        }
+      );
+    }, error => {
+      console.error("Error creating transaction: ", error);
+      reject(error);
+    }, () => {
+      console.log("Transaction completed");
+      resolve(pass);
+    });
+  })
+}

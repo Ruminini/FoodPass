@@ -82,4 +82,13 @@ const triggers = {
         SET last_update = CURRENT_DATE
         WHERE id = NEW.id;
     END;`,
+  // Auto update last_update on guest_expiration
+  last_update_guest_expiration: `CREATE TRIGGER IF NOT EXISTS last_update_guest_expiration
+    AFTER UPDATE ON guest_expiration
+    FOR EACH ROW
+    BEGIN
+        UPDATE guest_expiration
+        SET last_update = CURRENT_DATE
+        WHERE user_id = NEW.user_id;
+    END;`,
 };

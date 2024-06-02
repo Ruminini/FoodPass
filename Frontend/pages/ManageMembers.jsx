@@ -5,7 +5,7 @@ import Toast from 'react-native-toast-message';
 import { validateId, validateTypeUser, validatePassword, userStateValidator } from '../services/LoginValidator';
 import { validMemberRegister, validMemberDelete } from '../services/ValidMemberActions';
 
-export default function ManageMembersGuests({ goTo }) {
+export default function ManageMembers({ goTo }) {
   const [id, setId] = useState('');
   const [nameMember, setNameMember] = useState('');
   const [lastnameMember, setLastnameMember] = useState('');

@@ -129,3 +129,11 @@ export const createOrderForSupplierTable = `CREATE TABLE IF NOT EXISTS order_for
     last_update TEXT DEFAULT (DATE()), 
     state TEXT DEFAULT 'A'
   );`;
+
+export const createGuestExpirationTable = `CREATE TABLE IF NOT EXISTS guest_expiration (
+    user_id TEXT PRIMARY KEY,
+    expiration_date TEXT NOT NULL,
+    create_date TEXT DEFAULT (DATE()),
+    last_update TEXT DEFAULT (DATE())
+    --FOREIGN KEY(user_id) REFERENCES user(member_code)
+);`;
