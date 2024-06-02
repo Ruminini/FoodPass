@@ -18,6 +18,7 @@ import {
   insertUser,
   insertValidMember,
   insertFaceData,
+  insertParameters,
   getAllFood,
   insertFood,
   getFoodByID,
@@ -40,19 +41,20 @@ export default function App() {
   useEffect(() => setPage(<MainMenu goTo={goTo} />), []);
   useEffect(() => {
     initializeDatabase();
+    insertParameters();
     chargeFoodsInDatabase();
   }, []);
 
   useEffect(() => {
     dropTriggers();
     createTriggers();
-    getOrdersForSupplier(); 
+    getOrdersForSupplier();
   }, []);
 
   useEffect(() => {
     registerRestockerTask();
   }, []);
-  
+
   useEffect(() => {
     // Toma y muestra los logs de login de la aplicación
     const fetchLoginLogs = async () => {
@@ -67,7 +69,10 @@ export default function App() {
     const fetchOrderRetireLogs = async () => {
       try {
         const logs = await getOrderRetireLogs();
-        console.log("El registro de logs de los pedidos retirados es el siguiente: " + logs);
+        console.log(
+          "El registro de logs de los pedidos retirados es el siguiente: " +
+            logs
+        );
       } catch (error) {
         console.error("Error fetching order retire logs:", error);
       }
@@ -77,7 +82,6 @@ export default function App() {
   }, []);
 
   {
-
     //EJEMPLOS DE USO
 
     //Obtener alimento por id
@@ -112,11 +116,7 @@ export default function App() {
 
     //Ejemplo insertando un usuario administrador en la tabla valid_member
     useEffect(() => {
-      insertValidMember(
-        "00000000-0000",
-        "Admin",
-        "Admin"
-      );
+      insertValidMember("00000000-0000", "Admin", "Admin");
     }, []);
 
     //Ejemplo obteniendo usuario por id

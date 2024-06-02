@@ -92,7 +92,7 @@ export const createFoodTable = `CREATE TABLE IF NOT EXISTS food (
     description TEXT NOT NULL,
     price REAL DEFAULT 0,
     stock INTEGER NOT NULL,
-    minimum_amount DEFAULT 0,
+    minimum_amount INTEGER DEFAULT 0,
     create_date TEXT NOT NULL, 
     last_update TEXT NOT NULL, 
     state TEXT DEFAULT 'A'
