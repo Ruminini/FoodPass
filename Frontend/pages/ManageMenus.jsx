@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, View, TouchableOpacity, Modal } from 'react-native';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
 import Toast from 'react-native-toast-message';
 import BackButton from '../components/BackButton';
-import { validateId, validateTypeUser, validatePassword, userStateValidator } from '../services/LoginValidator';
 import { decideAction } from '../services/MenuActions';
+import AdminModal from '../components/AdminModal';
 
 export default function ProductForm({ goTo }) {
   const [category, setCategory] = useState('');
@@ -13,8 +13,6 @@ export default function ProductForm({ goTo }) {
   const [stock, setStock] = useState('');
   const [pointReOrder, setPointReOrder] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-  const [adminUser, setAdminUser] = useState('');
-  const [adminPassword, setAdminPassword] = useState('');
   const [currentAction, setCurrentAction] = useState('');
 
   const handleCategoriaSelection = (selectedCategory) => {
@@ -98,54 +96,11 @@ export default function ProductForm({ goTo }) {
   };
 
   const confirmAction = async () => {
-    // Validar credenciales del admin
-    const adminUserIsValid = await validateId(adminUser);
-    
-    if (adminUserIsValid === false) {
-      Toast.show({
-        type: 'error',
-        text1: 'Ingrese usuario correcto.',
-      });
-      return; // Salir de la función si el usuario no es válido
-    }
-
-    // Validar usuario admin
-    const adminTypeUserIsValid = await validateTypeUser(adminUser)
-    if (adminTypeUserIsValid === false){
-      Toast.show({
-        type: 'error',
-        text1: 'El usuario no es admin.',
-      });
-      return; // Salir de la función si el usuario no es admin
-    }
-
-    // Validación de la contraseña en la base de datos
-    const adminPasswordIsValid = await validatePassword(adminUser, adminPassword);
-    if (adminPasswordIsValid === false) {
-      Toast.show({
-        type: 'error',
-        text1: 'Ingrese contraseña correcta.',
-      });
-      return; // Salir de la función si la contraseña no es válida
-    }
-
-    // Validación del estado del usuario
-    const adminStateIsValid = await userStateValidator(adminUser);
-    if (adminStateIsValid === false) {
-      Toast.show({
-        type: 'error',
-        text1: 'Usuario administrador inactivo.',
-      });
-      return; // Salir de la función si el estado del usuario no es válido
-    }
-
     try {
       // Si todas las validaciones son exitosas, realizar la acción correspondiente
       console.log(`Realizar acción ${currentAction} a producto:`, name, category, type, description, stock, pointReOrder);
       const actionResult = await decideAction(currentAction, name, category, type, description, stock, pointReOrder);
       setModalVisible(false);
-      setAdminUser('');
-      setAdminPassword('');
       setCategory('');
       setType('');
       setName('');
@@ -277,45 +232,7 @@ export default function ProductForm({ goTo }) {
         </View>
       </View>
       <BackButton onPress={() => goTo('Admin')} style={styles.backButton} />
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Credenciales de Admin</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                onChangeText={setAdminUser}
-                value={adminUser}
-                placeholder="00000000-0000"
-                keyboardType="default"
-              />
-              <TextInput
-                style={styles.input}
-                onChangeText={setAdminPassword}
-                value={adminPassword}
-                placeholder="••••••••••"
-                secureTextEntry={true}
-              />
-            </View>
-            <TouchableOpacity 
-              style={[styles.button, { backgroundColor: '#6c757d' }]} 
-              onPress={confirmAction}>
-              <Text style={styles.buttonText}>Aceptar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.button, { backgroundColor: '#6c757d' }]} 
-              onPress={() => setModalVisible(false)}>
-              <Text style={styles.buttonText}>Cancelar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      <AdminModal after={confirmAction} visible={modalVisible} hide={() => setModalVisible(false)} />
     </View>
   );
 }
@@ -372,10 +289,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: '100%',
   },
-  inputContainer: {
-    width: '100%',
-    alignItems: 'center',
-  },
   buttonGroup: {
     flexDirection: 'column',
     alignItems: 'center',
@@ -406,22 +319,5 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: '80%',
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 20,
-    marginBottom: 20,
   },
 });

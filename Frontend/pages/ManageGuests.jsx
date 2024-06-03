@@ -1,15 +1,24 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, TextInput, View, TouchableOpacity, Modal } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import BackButton from "../components/BackButton";
 import Toast from "react-native-toast-message";
 import { insertGuest } from "../service_db/DBQuerys";
+import AdminModal from "../components/AdminModal";
 
 export default function ManageGuests({ goTo }) {
   const [expiration, onChangeExpiration] = useState(1);
   const [id, onChangeId] = useState();
   const [invalid, setInvalid] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const validateAndRegister = async () => {
+  const validate = () => {
     // Validación del formato del legajo
     if (!id.match(/^[0-9]{8}$/)) {
       Toast.show({
@@ -20,10 +29,12 @@ export default function ManageGuests({ goTo }) {
       setInvalid("id");
       return false;
     }
-    //TODO: Habria q validar identidad del admin con el modal de luca
+    setModalVisible(true);
+  };
 
+  const register = async () => {
     // Registrar miembro en la base de datos
-		let password
+    let password;
     try {
       password = await insertGuest(id, expiration).catch((error) => {
         Toast.show({
@@ -37,21 +48,22 @@ export default function ManageGuests({ goTo }) {
       console.error(error);
       return false;
     }
-		console.log("Invitado registrado.");
-		Alert.alert(
-			"¡Registro exitoso!",
-			"DNI: " + id + "\nContraseña: " + password,
-			[{ text: "OK", onPress: () => goTo("Admin") }]
-		);
+    console.log("Invitado registrado.");
+    Alert.alert(
+      "¡Registro exitoso!",
+      "DNI: " + id + "\nContraseña: " + password,
+      [{ text: "OK" }]
+    );
+    onChangeId("");
   };
 
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
         <Text style={[styles.title, invalid === "DNI" && { color: "red" }]}>
-          Legajo
+          DNI
         </Text>
-				{/* TODO: Falta un selector de expiración */}
+        {/* TODO: Falta un selector de expiración */}
         <TextInput
           style={styles.input}
           onChangeText={onChangeId}
@@ -60,12 +72,17 @@ export default function ManageGuests({ goTo }) {
           keyboardType="numeric"
         />
         <TouchableOpacity
-          onPress={validateAndRegister}
-          style={[styles.button, { backgroundColor: '#28a745' }]}
+          onPress={validate}
+          style={[styles.button, { backgroundColor: "#28a745" }]}
         >
           <Text style={styles.buttonText}>Registrar</Text>
         </TouchableOpacity>
       </View>
+      <AdminModal
+        visible={modalVisible}
+        hide={() => setModalVisible(false)}
+        after={register}
+      />
       <BackButton onPress={() => goTo("Admin")} />
     </View>
   );
@@ -102,13 +119,13 @@ const styles = StyleSheet.create({
   button: {
     borderRadius: 25,
     padding: 15,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 10,
-    width: '100%',
+    width: "100%",
   },
   buttonText: {
-    color: 'white',
+    color: "white",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
