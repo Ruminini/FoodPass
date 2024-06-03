@@ -15,12 +15,9 @@ export async function validFaceDescriptorsMember(descriptors) {
         const closest = await matchFaces(descriptors);
 
         // Comprueba si se encontró una coincidencia y si la distancia es aceptable
-        if (!closest || !closest.person || closest.distance > 0.65) {
+        if (!closest || !closest.person || closest.distance > 0.50) {
             // Si no se encontró una coincidencia o la distancia es demasiado alta, devuelve verdadero
             return true;
-        } else if (closest.distance < 0.50) {
-            // Si la distancia es suficientemente baja, devuelve falso
-            return false;
         } else {
             // Si la distancia está entre los umbrales aceptables, devuelve verdadero
             return false;
