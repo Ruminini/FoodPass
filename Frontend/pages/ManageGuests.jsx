@@ -13,7 +13,7 @@ import { insertGuest } from "../service_db/DBQuerys";
 import AdminModal from "../components/AdminModal";
 
 export default function ManageGuests({ goTo }) {
-  const [expiration, onChangeExpiration] = useState(1);
+  const [expiration, setExpiration] = useState(0);
   const [id, onChangeId] = useState();
   const [invalid, setInvalid] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
@@ -63,7 +63,6 @@ export default function ManageGuests({ goTo }) {
         <Text style={[styles.title, invalid === "DNI" && { color: "red" }]}>
           DNI
         </Text>
-        {/* TODO: Falta un selector de expiración */}
         <TextInput
           style={styles.input}
           onChangeText={onChangeId}
@@ -71,6 +70,19 @@ export default function ManageGuests({ goTo }) {
           placeholder="12345678"
           keyboardType="numeric"
         />
+        <View style={styles.expiration}>
+          <Text style={styles.expText}>Validez:</Text>
+          {[1, 3, 5, 7, 14, 30].map((n) => (
+            <Text
+              key={n}
+              style={[styles.expDay, expiration === n && styles.selected]}
+              onPress={() => setExpiration(n)}
+            >
+              {n}
+            </Text>
+          ))}
+          <Text style={styles.expText}>{expiration == 1 ? "dia  " : "dias"}</Text>
+        </View>
         <TouchableOpacity
           onPress={validate}
           style={[styles.button, { backgroundColor: "#28a745" }]}
@@ -127,5 +139,34 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  expiration: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "white",
+    borderRadius: 25,
+    padding: 10,
+    marginBottom: 20,
+    width: "100%",
+    elevation: 1,
+  },
+  expText: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  expDay: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginHorizontal: 5,
+    padding: 5,
+    borderRadius: 5,
+    backgroundColor: "white",
+    elevation: 2,
+    color: "#CCC",
+  },
+  selected: {
+    backgroundColor: "#CCC",
+    color: "#000",
   },
 });

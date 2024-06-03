@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import MenuButton from './MenuButton';
 import { validateId, validatePassword, userStateValidator} from '../services/LoginValidator';
 import Toast from 'react-native-toast-message';
-import { createLoginLog } from '../service_db/DBQuerys.jsx';
+import { createLoginLog, validateGuest } from '../service_db/DBQuerys.jsx';
 
 export default function OfflineLogin({ data, after }) {
     const [password, onChangePassword] = useState('');
@@ -62,8 +62,9 @@ export default function OfflineLogin({ data, after }) {
         
         try {
             const userState = await userStateValidator(guest ? id + '-9999' : id);
+            const guestState = guest ? await validateGuest(id) : true;
             
-            if(!userState){
+            if(!userState || !guestState) {
                 Toast.show({ 
                     type: 'info', 
                     text1: 'El usuario está dado de baja. Vuelva a registrarse'

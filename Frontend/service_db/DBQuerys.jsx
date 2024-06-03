@@ -529,7 +529,7 @@ export const activeValidMember = (code) => {
 export const insertUser = (member_code, type_code, hashed_pass, salt) => {
   db.transaction((tx) => {
     tx.executeSql(
-      "INSERT OR IGNORE INTO user (member_code, type_code, hashed_pass, salt, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      "INSERT OR REPLACE INTO user (member_code, type_code, hashed_pass, salt, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [
         member_code,
         type_code,
@@ -1136,7 +1136,7 @@ export const insertGuest = (dni, expiration) => {
     insertUser(id, 3, basicHash(pass,salt), salt);
     db.transaction((tx) => {
       tx.executeSql(
-        'INSERT INTO guest_expiration (user_id, expiration_date) VALUES (?, date("now", ?))',
+        'INSERT OR REPLACE INTO guest_expiration (user_id, expiration_date) VALUES (?, date("now", ?))',
         [id, `+${expiration} days`],
         (tx, results) => {
           console.log("Guest inserted successfully");
@@ -1152,6 +1152,30 @@ export const insertGuest = (dni, expiration) => {
     }, () => {
       console.log("Transaction completed");
       resolve(pass);
+    });
+  })
+}
+
+export const validateGuest = (dni) => {
+  return new Promise((resolve, reject) => {
+    const id = `${dni}-9999`;
+    db.transaction((tx) => {
+      tx.executeSql(
+        'SELECT user_id FROM guest_expiration WHERE user_id = ? AND expiration_date > CURRENT_DATE',
+        [id],
+        (tx, results) => {
+          const isValid = results.rows.length > 0;
+          console.log("Guest", id, "is valid:", isValid);
+          resolve(isValid);
+        },
+        (tx, error) => {
+          console.error("Error inserting guest: ", error);
+          reject(error);
+        }
+      );
+    }, error => {
+      console.error("Error creating transaction: ", error);
+      reject(error);
     });
   })
 }
