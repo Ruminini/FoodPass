@@ -70,6 +70,29 @@ export default function ProductForm({ goTo }) {
         return;
       }
     }
+
+    // Validar que nombre y descripción no estén vacíos
+    if (!name.trim() || !description.trim()) {
+      Toast.show({
+        type: 'info',
+        text1: 'Nombre y descripción son campos requeridos.',
+      });
+      return;
+    }
+  
+    // Limpiar los espacios adicionales
+    const cleanedName = name.replace(/\s{2,}/g, ' ').trim();
+    const cleanedDescription = description.replace(/\s{2,}/g, ' ').trim();
+
+    // Validar que nombre y descripción no contengan números ni signos de puntuación
+    if (!/^[a-zA-Z\s]+$/.test(cleanedName) || !/^[\w\s,.]+$/.test(cleanedDescription)) {
+      Toast.show({
+        type: 'info',
+        text1: 'Nombre y descripción solo pueden contener letras.',
+      });
+      return;
+    }
+
     setCurrentAction(action);
     setModalVisible(true);
   };
@@ -148,30 +171,18 @@ export default function ProductForm({ goTo }) {
     }
   }
 
-  const handleNameChange = (text) => {
-    if (/^[a-zA-Z\s]*$/.test(text) || text === '') {
-      setName(text);
-    }
-  };
-
-  const handleDescriptionChange = (text) => {
-    if (/^[a-zA-Z\s]*$/.test(text) || text === '') {
-      setDescription(text);
-    }
-  };
-
   const handleStockChange = (text) => {
-    if (/^\d+$/.test(text) || text === '') {
+    if (/^[1-9]\d*$/.test(text) || text === '') {
       setStock(text);
     }
   };
-
+  
   const handlePointReOrderChange = (text) => {
-    if (/^\d+$/.test(text) || text === '') {
+    if (/^[1-9]\d*$/.test(text) || text === '') {
       setPointReOrder(text);
     }
   };
-
+  
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -219,7 +230,7 @@ export default function ProductForm({ goTo }) {
           <Text style={styles.title}>Nombre</Text>
           <TextInput
             style={styles.input}
-            onChangeText={handleNameChange}
+            onChangeText={setName}
             value={name}
             placeholder="Milanesa con pure"
           />
@@ -228,7 +239,7 @@ export default function ProductForm({ goTo }) {
           <Text style={styles.title}>Descripción</Text>
           <TextInput
             style={styles.input}
-            onChangeText={handleDescriptionChange}
+            onChangeText={setDescription}
             value={description}
             placeholder="Milanesa de carne con pure de papa"
           />

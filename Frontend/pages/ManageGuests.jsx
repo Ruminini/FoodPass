@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, TextInput, View, Alert } from "react-native";
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, Modal } from "react-native";
 import BackButton from "../components/BackButton";
-import MenuButton from "../components/MenuButton";
 import Toast from "react-native-toast-message";
 import { insertGuest } from "../service_db/DBQuerys";
 
@@ -29,7 +28,7 @@ export default function ManageGuests({ goTo }) {
       password = await insertGuest(id, expiration).catch((error) => {
         Toast.show({
           type: "error",
-          text1: "Ocurrió un error inesperado.",
+          text1: "Error al intentar registrar el invitado",
         });
         console.log("Error al intentar registrar el invitado.");
         return false;
@@ -60,11 +59,12 @@ export default function ManageGuests({ goTo }) {
           placeholder="12345678"
           keyboardType="numeric"
         />
-        <MenuButton
-          text="Registrar"
+        <TouchableOpacity
           onPress={validateAndRegister}
-          style={{ height: 75, width: 300, alignSelf: "center" }}
-        />
+          style={[styles.button, { backgroundColor: '#28a745' }]}
+        >
+          <Text style={styles.buttonText}>Registrar</Text>
+        </TouchableOpacity>
       </View>
       <BackButton onPress={() => goTo("Admin")} />
     </View>
@@ -98,5 +98,17 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 0,
     fontSize: 20,
     marginBottom: 20,
-  }
+  },
+  button: {
+    borderRadius: 25,
+    padding: 15,
+    alignItems: 'center',
+    marginBottom: 10,
+    width: '100%',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
 });

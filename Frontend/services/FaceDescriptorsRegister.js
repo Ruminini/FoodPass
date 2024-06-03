@@ -1,6 +1,37 @@
+import { matchFaces } from '../services/FaceMatcher.js';
+
 import * as SQLite from 'expo-sqlite';
 
 const db = SQLite.openDatabase('FoodPass.db');
+
+/**
+ * Valida los descriptores faciales de un miembro.
+ * @param {Array} descriptors - Descriptores faciales del miembro a validar.
+ * @returns {Promise<boolean>} - Promesa que resuelve con un valor booleano indicando si la validación fue exitosa.
+ */
+export async function validFaceDescriptorsMember(descriptors) {
+    try {
+        // Encuentra la persona más cercana que coincide con los descriptores faciales
+        const closest = await matchFaces(descriptors);
+
+        // Comprueba si se encontró una coincidencia y si la distancia es aceptable
+        if (!closest || !closest.person || closest.distance > 0.65) {
+            // Si no se encontró una coincidencia o la distancia es demasiado alta, devuelve verdadero
+            return true;
+        } else if (closest.distance < 0.50) {
+            // Si la distancia es suficientemente baja, devuelve falso
+            return false;
+        } else {
+            // Si la distancia está entre los umbrales aceptables, devuelve verdadero
+            return false;
+        }
+    } catch (error) {
+        // Maneja cualquier error que ocurra durante el proceso de validación
+        console.error('Error al validar descriptores faciales de miembro:', error);
+        // Devuelve falso en caso de error
+        return false;
+    }
+}
 
 /**
  * Inserta o actualiza un registro en la tabla de caras (face) de la base de datos.

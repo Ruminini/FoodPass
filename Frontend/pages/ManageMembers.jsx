@@ -34,19 +34,8 @@ export default function ManageMembers({ goTo }) {
     }
   };
 
-  const handleNameChange = (text) => {
-    if (/^[a-zA-Z\s]*$/.test(text) || text === '') {
-      setNameMember(text);
-    }
-  };
-
-  const handleLastnameChange = (text) => {
-    if (/^[a-zA-Z\s]*$/.test(text) || text === '') {
-      setLastnameMember(text);
-    }
-  };
-
   const validateAndAction = async (action) => {
+    // Validar el formato del ID
     if (!/^[0-9]{8}-[0-9]{4}$/.test(id)) {
       Toast.show({
         type: 'info',
@@ -56,23 +45,39 @@ export default function ManageMembers({ goTo }) {
       setInvalid('id');
       return;
     }
-
+  
     // Legajos reservados para administradores
     if (id.endsWith('-0000')) {
       Toast.show({
         type: 'info',
         text1: 'Legajo reservado para admin.',
-        text2: 'Los legajos que terminan en -0000 son administradores.'
+        text2: 'Aquellos que terminan en -0000 son admin.'
       });
       return;
     }
+  
+    console.log(action)
 
-    if (!nameMember.trim() || !lastnameMember.trim()) {
+    // Validar que nombre y apellido no estén vacíos solo en la acción de "alta"
+    if (action === 'alta' && (!nameMember.trim() || !lastnameMember.trim())) {
       Toast.show({
         type: 'info',
         text1: 'Nombre y apellido son campos requeridos.',
       });
       return;
+    } else if (action === 'alta') {
+      // Limpiar los espacios adicionales solo en la acción de "alta"
+      const cleanedName = nameMember.replace(/\s{2,}/g, ' ').trim();
+      const cleanedLastname = lastnameMember.replace(/\s{2,}/g, ' ').trim();
+
+      // Validar que nombre y apellido no contengan números ni signos de puntuación solo en la acción de "alta"
+      if (!/^[a-zA-Z\s]+$/.test(cleanedName) || !/^[a-zA-Z\s]+$/.test(cleanedLastname)) {
+        Toast.show({
+          type: 'info',
+          text1: 'Nombre y apellido solo pueden contener letras.',
+        });
+        return;
+      }
     }
 
     setCurrentAction(action);
@@ -198,14 +203,14 @@ export default function ManageMembers({ goTo }) {
         <Text style={styles.title}>Nombre</Text>
         <TextInput
           style={styles.input}
-          onChangeText={handleNameChange}
+          onChangeText={setNameMember}
           value={nameMember}
           placeholder="Leonel"
         />
         <Text style={styles.title}>Apellido</Text>
         <TextInput
           style={styles.input}
-          onChangeText={handleLastnameChange}
+          onChangeText={setLastnameMember}
           value={lastnameMember}
           placeholder="Messi"
         />

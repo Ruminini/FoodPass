@@ -104,11 +104,23 @@ export default function Options({ goTo }) {
         try {
             const desactive = await desactiveMember(id, oldPassword);
             if (!desactive) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'No se pudo dar de baja al miembro.',
+                });
                 resetForm();
                 return false;
             }
+            Toast.show({
+                type: 'success',
+                text1: `Miembro ${id} dado de baja.`,
+            });
         } catch (error) {
             console.error(error);
+            Toast.show({
+                type: 'error',
+                text1: 'Error al dar de baja al miembro.',
+            });
             return false;
         }
     };
@@ -159,9 +171,9 @@ export default function Options({ goTo }) {
                     style={styles.menuButton}
                 />
                 <MenuButton 
-                    text="Darse de baja" 
+                    text="Dar de baja" 
                     onPress={confirmDeleteMember} 
-                    style={[styles.menuButton, styles.deleteButton]}
+                    style={styles.menuButton}
                 />
             </View>
             <BackButton onPress={() => goTo('MainMenu')} />
@@ -204,13 +216,5 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 10,
-    },
-    deleteButton: {
-        backgroundColor: '#E53935',
-        height: 50,
-        alignSelf: 'center',
-        width: 250,
-        position: 'absolute',
-        bottom: 20,
-    },
+    }
 });

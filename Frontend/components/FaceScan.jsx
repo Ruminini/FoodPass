@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, Button, Image, Alert, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, TouchableOpacity } from 'react-native';
 import { Camera, CameraType } from 'expo-camera';
 import * as ImageManipulator from 'expo-image-manipulator';
 import MenuButton from './MenuButton';
 import LandmarksSvg from './LandmarksSvg';
 import ScanAnimation from './ScanAnimation';
 import Toast from "react-native-toast-message";
-import {getFacesValidator, userStateValidator} from '../services/LoginValidator.js'
+import { userStateValidator } from '../services/LoginValidator.js'
 import { getDescriptors } from '../services/Api.js';
 import { createLoginLog } from '../service_db/DBQuerys.jsx';
 import { matchFaces } from '../services/FaceMatcher.js';
