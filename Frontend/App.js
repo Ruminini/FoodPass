@@ -1,15 +1,16 @@
-import { StyleSheet, View, StatusBar } from 'react-native';
-import { useState, useEffect } from 'react';
-import MainMenu from './pages/MainMenu';
-import ConfigMenu from './pages/ConfigMenu'
-import FoodPicker from './pages/FoodPicker';
-import Register from './pages/Register';
-import Toast from 'react-native-toast-message';
-import Login from './pages/Login';
-import Options from './pages/Options';
-import OrderPickUp from './pages/OrderPickUp';
+import { StyleSheet, View, StatusBar } from "react-native";
+import { useState, useEffect } from "react";
+import MainMenu from "./pages/MainMenu";
+import Admin from "./pages/Admin";
+import FoodPicker from "./pages/FoodPicker";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
+import Options from "./pages/Options";
+import OrderPickUp from "./pages/OrderPickUp";
+import OrderConfirm from "./pages/OrderConfirm";
+import Toast from "react-native-toast-message";
+import { initializeDatabase } from "./service_db/DBInit";
 import {
-  initializeDatabase,
   getValidMemberById,
   getValidMembers,
   getUsers,
@@ -17,57 +18,140 @@ import {
   insertUser,
   insertValidMember,
   insertFaceData,
-} from "./service_db/Database";
-// import useDatabase from "./hooks/useDatabase"; // Import the hook
+  insertParameters,
+  getAllFood,
+  insertFood,
+  getFoodByID,
+  getOrdersForSupplier,
+  updateStockFoodById,
+  markSentSupplierOrder,
+  addStockFromSupplierOrder,
+  getLoginLogs,
+  getOrderRetireLogs,
+} from "./service_db/DBQuerys";
+import { createTriggers, dropTriggers } from "./service_db/DBTriggers";
+import { basicHash } from "./utils/Hash";
+import { registerRestockerTask } from "./services/RestockerTask";
+import ManageMembers from "./pages/ManageMembers";
+import ManageMenus from "./pages/ManageMenus";
+import { chargeFoodsInDatabase } from "./service_db/DBChargeFoods";
+import ManageGuests from "./pages/ManageGuests";
 
 export default function App() {
   const [page, setPage] = useState(<View />);
   useEffect(() => setPage(<MainMenu goTo={goTo} />), []);
   useEffect(() => {
     initializeDatabase();
-    console.log("Database initialized");
+    insertParameters();
+    chargeFoodsInDatabase();
   }, []);
-  //const { fetchMember } = useDatabase();
 
-  //REGION EJEMPLOS DE USO DE LAS FUNCIONES PARA ADMINISTAR LA BASE DE DATOS
-
-  //Ejemplo insertando un usuario
   useEffect(() => {
-    insertUser("34985578-2024", "Password123", "testSalt");
+    dropTriggers();
+    createTriggers();
+    getOrdersForSupplier();
   }, []);
 
-  //Ejemplo obteniendo usuario por id
   useEffect(() => {
-    getUserById("34985578-2024").then((res) =>
-      console.log("Usuario por id:", res)
-    );
+    registerRestockerTask();
   }, []);
 
-  //Ejemplo obteniendo lista de usuarios
   useEffect(() => {
-    getUsers().then((res) => console.log("Lista de usuarios:", res));
+    // Toma y muestra los logs de login de la aplicación
+    const fetchLoginLogs = async () => {
+      try {
+        const logs = await getLoginLogs();
+        console.log("El registro de logs de logins es el siguiente: " + logs);
+      } catch (error) {
+        console.error("Error fetching login logs:", error);
+      }
+    };
+    // Toma y muestra los logs de retiro de pedidos de la aplicación
+    const fetchOrderRetireLogs = async () => {
+      try {
+        const logs = await getOrderRetireLogs();
+        console.log(
+          "El registro de logs de los pedidos retirados es el siguiente: " +
+            logs
+        );
+      } catch (error) {
+        console.error("Error fetching order retire logs:", error);
+      }
+    };
+    fetchLoginLogs();
+    fetchOrderRetireLogs();
   }, []);
 
-  //Ejemplo insertando miembro válido
-  useEffect(() => {
-    insertValidMember("87654321-1234", "NombreTest", "ApellidoTest");
-  }, []);
+  {
+    //EJEMPLOS DE USO
 
-  //Ejemplo obteniendo miembro valido por id
-  useEffect(() => {
-    getValidMemberById("34985578-2024").then((res) =>
-      console.log("Miembro valido por id:", res)
-    );
-  }, []);
+    //Obtener alimento por id
+    useEffect(() => {
+      getFoodByID(1).then((res) => console.log("Alimento elegido: ", res));
+    }, []);
 
-  //Ejemplo obteniendo lista de miembros válidos
-  useEffect(() => {
-    getValidMembers().then((res) =>
-      console.log("Lista de miembros validos:", res)
-    );
-  }, []);
+    //Listar alimentos
+    useEffect(() => {
+      getAllFood().then((res) => console.log("Lista de alimentos:", res));
+    }, []);
 
-  const descriptorExample = `{
+    //Ejemplo insertando un usuario
+    useEffect(() => {
+      insertUser(
+        "34985578-2024",
+        2,
+        basicHash("Password123", "testSalt"),
+        "testSalt"
+      );
+    }, []);
+
+    //Ejemplo insertando un usuario administrador en la tabla user
+    useEffect(() => {
+      insertUser(
+        "00000000-0000",
+        1,
+        basicHash("admin", "admin_salt"),
+        "admin_salt"
+      );
+    }, []);
+
+    //Ejemplo insertando un usuario administrador en la tabla valid_member
+    useEffect(() => {
+      insertValidMember("00000000-0000", "Admin", "Admin");
+    }, []);
+
+    //Ejemplo obteniendo usuario por id
+    useEffect(() => {
+      getUserById("34985578-2024").then((res) =>
+        console.log("Usuario por id:", res)
+      );
+    }, []);
+
+    //Ejemplo obteniendo lista de usuarios
+    useEffect(() => {
+      getUsers().then((res) => console.log("Lista de usuarios:", res));
+    }, []);
+
+    //Ejemplo insertando miembro válido
+    useEffect(() => {
+      insertValidMember("87654321-1234", "NombreTest", "ApellidoTest");
+    }, []);
+
+    //Ejemplo obteniendo miembro valido por id
+    useEffect(() => {
+      getValidMemberById("34985578-2024").then((res) =>
+        console.log("Miembro valido por id:", res)
+      );
+    }, []);
+
+    //Ejemplo obteniendo lista de miembros válidos
+    useEffect(() => {
+      getValidMembers().then((res) =>
+        console.log("Lista de miembros validos:", res)
+      );
+    }, []);
+
+    const descriptorExample = `{
         "0":-0.06022194027900696,
         "1":0.12927846610546112,
         "2":0.042801350355148315,
@@ -198,43 +282,59 @@ export default function App() {
         "127": 0.05519556626677513
     }`;
 
-  //Ejemplo insertando descriptor
-  useEffect(() => {
-    insertFaceData("34985578-2024", descriptorExample);
-  }, []);
-  //#endregion
-
-  const goTo = (option='MainMenu', data={}, before=() => {}, after=() => {}) => {
+    //Ejemplo insertando descriptor
+    useEffect(() => {
+      insertFaceData("34985578-2024", descriptorExample);
+    }, []);
+  }
+  const goTo = (
+    option = "MainMenu",
+    data = {},
+    before = () => {},
+    after = () => {}
+  ) => {
     switch (option) {
       case "FoodPicker":
         setPage(<FoodPicker data={data} goTo={goTo} />);
         break;
-      case 'Login':
-        setPage(<Login data={data} before={before} after={after} goTo={goTo}/>);
+      case "OrderConfirm":
+        setPage(<OrderConfirm data={data} before={before} after={after} />);
+        break;
+      case "Login":
+        setPage(<Login data={data} before={before} after={after} />);
         break;
       case "Register":
         setPage(<Register data={data} goTo={goTo} />);
         break;
-      case 'Options':
-        setPage(<Options goTo={goTo}/>);
+      case "Options":
+        setPage(<Options goTo={goTo} />);
         break;
-      case 'ConfigMenu':
-        setPage(<ConfigMenu goTo={goTo}/>);
+      case "Admin":
+        setPage(<Admin goTo={goTo} />);
         break;
-      case 'OrderPickUp':
+      case "ManageMenus":
+        setPage(<ManageMenus data={data} goTo={goTo} />);
+        break;
+      case "ManageMembers":
+        setPage(<ManageMembers data={data} goTo={goTo} />);
+        break;
+      case "ManageGuests":
+        setPage(<ManageGuests goTo={goTo} />);
+        break;
+      case "OrderPickUp":
         setPage(<OrderPickUp data={data} goTo={goTo} />);
         break;
-      case 'MainMenu':
+      case "MainMenu":
         setPage(<MainMenu goTo={goTo} />);
         break;
     }
   };
 
   return (
-      <View style={styles.container}>
-        {page}
-        <Toast visibilityTime={7500}/>
-      </View>
+    <View style={styles.container}>
+      {page}
+      <Toast visibilityTime={7500} />
+    </View>
   );
 }
 

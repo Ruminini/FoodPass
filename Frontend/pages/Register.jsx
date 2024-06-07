@@ -3,7 +3,7 @@ import { StyleSheet, Text, TextInput, View, Alert } from 'react-native';
 import BackButton from '../components/BackButton';
 import MenuButton from '../components/MenuButton';
 import { validateIdMember, insertMember } from '../services/MemberRegister';
-import { insertFaceDescriptorsMember } from '../services/FaceDescriptorsRegister';
+import { validFaceDescriptorsMember, insertFaceDescriptorsMember } from '../services/FaceDescriptorsRegister';
 import Toast from 'react-native-toast-message';
 
 export default function Register({ goTo, data }) {
@@ -55,8 +55,23 @@ export default function Register({ goTo, data }) {
         if (!descriptors) {
             Alert.alert('Error', 'Debe tomar una foto primero.');
             return false;
-        } else if (descriptors.length === 0) {
-            Alert.alert('Error', 'No se pudieron detectar los descriptores faciales. Por favor, tome una foto nuevamente.');
+        }
+
+        // Validar que el rostro de la persona no sea igual a otro miembro registrado
+        try {
+            const validFaceDescritpors = await validFaceDescriptorsMember(descriptors);
+            if (!validFaceDescritpors) {
+                Toast.show({ 
+                    type: 'error',
+                    text1: 'Su rostro esta registrado con otro legajo.'
+                });
+                console.log('Error al validar rostro para este legajo.');
+                return false;
+            } else {
+                console.log('Rostro valido.');
+            }
+        } catch (error) {
+            console.error(error);
             return false;
         }
         
@@ -66,7 +81,7 @@ export default function Register({ goTo, data }) {
             if (!memberInserted) {
                 Toast.show({ 
                     type: 'error',
-                    text1: 'Ocurrió un error inesperado.'
+                    text1: 'Error al intentar registrar el miembro.'
                 });
                 console.log('Error al intentar registrar el miembro.');
                 return false;
@@ -84,7 +99,7 @@ export default function Register({ goTo, data }) {
             if (!faceDescriptorsInserted) {
                 Toast.show({ 
                     type: 'error', 
-                    text1: 'Ocurrió un error inesperado.'
+                    text1: 'Error al intentar registrar descriptores.'
                 });
                 console.log('Error al intentar registrar descriptores.');
                 return false;
@@ -131,13 +146,15 @@ export default function Register({ goTo, data }) {
                     text="Tomar foto"
                     onPress={() => goTo(
                         'Login',
-                        {onlyDescriptors: true},
+                        {register: true},
                         () => goTo('Register', {id,password,descriptors}),
                         (descriptors) => goTo('Register', {id,password,descriptors})
                     )}
-                    style={{ height: 75, width: 300, alignSelf: 'center'}} />
-                <MenuButton text="Registrar" onPress={validateAndRegister} style={{ height: 75, width: 300, alignSelf: 'center'}} />
-                
+                    style={styles.menuButton} />
+                <MenuButton 
+                    text="Registrar" 
+                    onPress={validateAndRegister} 
+                    style={styles.menuButton} />
             </View>
             <BackButton onPress={() => goTo('MainMenu')} />
         </View>
@@ -177,4 +194,11 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 20,
     },
+    menuButton: {
+        height: 75,
+        marginBottom: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10
+    }
 });

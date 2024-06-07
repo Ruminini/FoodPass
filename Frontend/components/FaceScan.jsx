@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, Button, Image, Alert } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, TouchableOpacity } from 'react-native';
 import { Camera, CameraType } from 'expo-camera';
 import * as ImageManipulator from 'expo-image-manipulator';
 import MenuButton from './MenuButton';
 import LandmarksSvg from './LandmarksSvg';
 import ScanAnimation from './ScanAnimation';
 import Toast from "react-native-toast-message";
-import {getFacesValidator, userStateValidator} from '../services/LoginValidator.js'
+import { userStateValidator } from '../services/LoginValidator.js'
+import { getDescriptors } from '../services/Api.js';
+import { createLoginLog } from '../service_db/DBQuerys.jsx';
+import { matchFaces } from '../services/FaceMatcher.js';
+import Flip from '../assets/svg/flip.svg'
 
 export default function FaceScan({ data, after }) {
 	const [type, setType] = useState(CameraType.back);
@@ -15,17 +19,16 @@ export default function FaceScan({ data, after }) {
 	const [size, setSize] = useState("640x480");
 	const [landmarks, setLandmarks] = useState(null);
 	const cameraRef = useRef(null);
-	const onlyDescriptors = data.onlyDescriptors;
+	const register = data.register;
 
-	// FALTA PROBAR FUNCIONALIDAD DE LOGIN ONLINE
 	useEffect(() => {
 		if (!photo) return;
-		recognizeFaces(photo.base64).then(async (response) => {
+		getDescriptors(photo.base64).then(async (response) => {
 			let closest = null;
 			if (response && response.length > 0) {
 				setLandmarks(response);
 				const descriptors = Object.values(response[0].descriptor);
-				if (onlyDescriptors) {
+				if (register) {
 					Toast.show({
 						type: 'success',
 						text1: 'Identidad capturada correctamente.',
@@ -53,6 +56,8 @@ export default function FaceScan({ data, after }) {
 					text1: `Identidad Validada: ${closest.person}.`,
 					text2: `Distancia: ${closest.distance}`
 				})
+				// Crea un log del login
+				createLoginLog(closest.person);
 				after(closest.person);
 			} else {
 				Toast.show({
@@ -67,7 +72,7 @@ export default function FaceScan({ data, after }) {
 	
 	if (!permission) {
 		// Camera permissions are still loading
-		return <View />;
+		return <View style={{ flex: 1 }} />;
 	}
 
     if (!permission.granted) {
@@ -140,15 +145,15 @@ export default function FaceScan({ data, after }) {
 							ref={cameraRef}
 							onCameraReady={getPictureSizes}
 						/>
+						<TouchableOpacity
+							onPress={toggleCameraType}
+							style={styles.flip}>
+							<Flip fill="white" />
+						</TouchableOpacity>
 					</View>
 					<View style={styles.buttonContainer}>
 						<MenuButton
-							text="Flip Camera"
-							onPress={toggleCameraType}
-							style={styles.button}
-						/>
-						<MenuButton
-							text="Take Picture"
+							text="Validar Identidad"
 							onPress={takePicture}
 							style={styles.button}
 						/>
@@ -180,15 +185,16 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		flexDirection: "column",
-		justifyContent: "space-around",
+		justifyContent: "space-between",
 		position: "relative",
+		paddingTop: 20
 	},
 	roundedContainer: {
 		position: "relative",
 		justifyContent: "center",
 		overflow: "hidden",
 		borderRadius: 30,
-		marginHorizontal: "20%",
+		marginHorizontal: "15%",
 		alignItems: "center",
 		aspectRatio: 3 / 4,
 	},
@@ -196,75 +202,19 @@ const styles = StyleSheet.create({
 		aspectRatio: 3 / 4,
 		height: "100%",
 	},
+	flip: {
+		width: 30,
+		height: 30,
+		position: "absolute",
+		bottom: 15,
+		right: 15,
+	},
 	buttonContainer: {
 		flexDirection: "row",
 		justifyContent: "space-around",
+		marginHorizontal: "15%",
 	},
 	button: {
-		width: "40%",
 		height: 100,
 	}
 });
-
-const API_URL = 'https://foodpass.onrender.com';
-// const API_URL = 'https://quality-cicada-wrongly.ngrok-free.app';
-const recognizeFaces = async (base64Image) => {
-	if (!base64Image) throw new error('Error: Tried to recognize faces with no image');
-	try {
-		let startTime = performance.now();
-		const response = await fetch(API_URL + '/recognizeFaces', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ base64Image }),
-		});
-		// console.log(`Request time: ${performance.now()-startTime}ms`);
-		if (response.ok) {
-			const responseData = await response.json();
-			return responseData;
-		} else {
-			Toast.show({
-				type: 'error',
-				text1: 'Failed to upload image',
-				text2: `Error status: ${response.status}`
-			})
-		}
-	} catch (error) {
-		Toast.show({
-			type: 'error',
-			text1: 'Error uploading image:',
-			text2: error.message
-		})
-	}
-};
-
-function euclideanDistance(vector1, vector2) {
-    if (vector1.length !== vector2.length) {
-        throw new Error('Vectors must be of the same length');
-    }
-    let sumOfSquares = 0;
-    for (let i = 0; i < vector1.length; i++) {
-        const difference = vector1[i] - vector2[i];
-        sumOfSquares += difference * difference;
-    }
-    return Math.sqrt(sumOfSquares);
-}
-
-//Comprobación de caras de las diferentes personas dependiendo de su distancia euclideana
-async function matchFaces(face) {
-	let closestPersonId = null;
-	let closestDistance = Infinity;
-	const faces = await getFacesValidator();
-	for (const otherPerson of faces) {
-		const otherFace = otherPerson.descriptor;
-		const stringDescriptors = otherFace.match(/\-?\d+\.\d+/g);
-		if (stringDescriptors && stringDescriptors.length === 128) {
-			const floatDescriptors = stringDescriptors.map((x) => parseFloat(x));
-			const distance = euclideanDistance(face, floatDescriptors);
-			if (distance < closestDistance) {
-				closestPersonId = otherPerson.user_id;
-				closestDistance = distance;
-			}
-		}
-	}
-	return { 'person': closestPersonId, 'distance': closestDistance };
-}

@@ -4,20 +4,26 @@ import MenuButton from '../components/MenuButton'
 import MenuList from '../components/MenuList'
 import BackButton from '../components/BackButton'
 import Food from '../assets/svg/food.svg'
+import Options from '../assets/svg/options.svg'
 import Register from '../assets/svg/register.svg'
 
-export default function ConfigMenu({goTo}) {
+
+export default function Admin({goTo}) {
     return (
         <View style={styles.container}>
             <MenuList >
                 <MenuButton
-                    svg={<Food/>}
-                    text='Gestionar Menúes'
-                    onPress={() => console.log('Gestionar Menúes')} />
+                    svg={<Options/>}
+                    text='Gestionar miembros'
+                    onPress={() => goTo('ManageMembers')} />
                 <MenuButton
                     svg={<Register/>}
-                    text='Gestionar Usuarios'
-                    onPress={() => console.log('Gestionar Usuario')} />
+                    text='Agregar invitados'
+                    onPress={() => goTo('ManageGuests')} />
+                <MenuButton
+                    svg={<Food/>}
+                    text='Gestionar menús'
+                    onPress={() => goTo('ManageMenus')} />
             </MenuList>
             <BackButton onPress={() => goTo('MainMenu')}/>
         </View>

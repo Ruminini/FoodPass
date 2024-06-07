@@ -97,9 +97,8 @@ export function updatePasswordMember(id, oldPassword, newPassword) {
     });
 }
 
-
 /**
- * Desactiva un miembro en la tabla user si el legajo y la contraseña coinciden.
+ * Desactiva un miembro en las tablas user, face y valid_member si el legajo y la contraseña coinciden.
  * @param {string} id - El código del legajo del miembro.
  * @param {string} password - La contraseña del miembro.
  * @returns {Promise<boolean>} - Una promesa que indica si el miembro fue desactivado correctamente.
@@ -139,16 +138,36 @@ export function desactiveMember(id, password) {
                         return;
                     }
 
-                    // Desactivar el miembro actualizando el estado a 'I'
+                    // Desactivar el miembro actualizando el estado a 'I' en las tablas user, face y valid_member
                     tx.executeSql(
                         'UPDATE user SET state = ? WHERE member_code = ?',
                         ['I', id],
                         () => {
-                            // Si la actualización es exitosa, resolver con true
-                            resolve(true);
+                            tx.executeSql(
+                                'UPDATE face SET state = ? WHERE user_id = ?',
+                                ['I', id],
+                                () => {
+                                    tx.executeSql(
+                                        'UPDATE valid_member SET state = ? WHERE code = ?',
+                                        ['I', id],
+                                        () => {
+                                            // Si todas las actualizaciones son exitosas, resolver con true
+                                            resolve(true);
+                                        },
+                                        (_, error) => {
+                                            console.error('Error al actualizar el estado en valid_member:', error);
+                                            reject(error);
+                                        }
+                                    );
+                                },
+                                (_, error) => {
+                                    console.error('Error al actualizar el estado en face:', error);
+                                    reject(error);
+                                }
+                            );
                         },
                         (_, error) => {
-                            console.error('Error al ejecutar la actualización:', error);
+                            console.error('Error al actualizar el estado en user:', error);
                             reject(error);
                         }
                     );
