@@ -6,13 +6,10 @@ import { decideAction } from '../services/MenuActions';
 import AdminModal from '../components/AdminModal';
 
 export default function ProductForm({ data, before }) {
-  const food = data.food;
-  console.log(food)
+  const food = data.food || {};
+  const receivedFood = Object.keys(data.food).length > 0;
   const [category, setCategory] = useState(food.type_code || '');
-  // TODO: Fix food type restriction
-  const [tipo, setType] = useState([...(food.restrictions || [])]);
-  console.log(typeof tipo, tipo)
-  console.log(typeof [3].includes(3), [3])
+  const [tipo, setType] = useState(food.restrictions ? [...food.restrictions] : []);
   const [name, setName] = useState(food.name || '');
   const [description, setDescription] = useState(food.description || '');
   const [stock, setStock] = useState('' + (food.stock || ''));
@@ -25,33 +22,18 @@ export default function ProductForm({ data, before }) {
   };
 
   const handleTipoSelection = (selectedType) => {
-    setType(tipo === selectedType ? '' : selectedType);
+    newType = [...tipo];
+    index = newType.indexOf(selectedType);
+    index > -1 ? newType.splice(index, 1) : newType.push(selectedType);
+    setType(newType);
   };
 
   const validateAndAction = (action) => {
-    if (action === 'Alta'){
+    if (action === 'Alta' || action === 'Update') {
       if (category === '' || name === '' || setDescription === '' || stock === '' || pointReOrder === '') {
         Toast.show({ 
           type: 'info', 
           text1: 'Todos los campos son obligatorios.',
-        });
-        return;
-      }
-      // Convertir stock a una cadena y verificar la longitud
-      const stockString = String(stock);
-      if (stockString.length > 4) {
-        Toast.show({ 
-          type: 'info', 
-          text1: 'Cantidad de stock supera el limite (4 dígitos).',
-        });
-        return;
-      }
-    } else if (action === 'Actualización de stock') {
-      // Verificar si name o stock están vacíos
-      if (name === '' || stock === '') {
-        Toast.show({ 
-          type: 'info', 
-          text1: 'Nombre y stock son obligatorios.',
         });
         return;
       }
@@ -88,7 +70,7 @@ export default function ProductForm({ data, before }) {
     const cleanedDescription = description.replace(/\s{2,}/g, ' ').trim();
 
     // Validar que nombre y descripción no contengan números ni signos de puntuación
-    if (!/^[a-zA-Z\s]+$/.test(cleanedName) || !/^[\w\s,.]+$/.test(cleanedDescription)) {
+    if (!/^[a-zA-Z\sñÑ]+$/.test(cleanedName) || !/^[\w\s\,\.ñÑ]+$/.test(cleanedDescription)) {
       Toast.show({
         type: 'info',
         text1: 'Nombre y descripción solo pueden contener letras.',
@@ -104,7 +86,7 @@ export default function ProductForm({ data, before }) {
     try {
       // Si todas las validaciones son exitosas, realizar la acción correspondiente
       console.log(`Realizar acción ${currentAction} a producto:`, name, category, tipo, description, stock, pointReOrder);
-      const actionResult = await decideAction(currentAction, name, category, tipo, description, stock, pointReOrder);
+      const actionResult = await decideAction(currentAction, name, category, tipo, description, stock, pointReOrder, food.id);
       setModalVisible(false);
       setCategory('');
       setType('');
@@ -210,7 +192,7 @@ export default function ProductForm({ data, before }) {
             style={styles.input}
             onChangeText={handleStockChange}
             value={stock}
-            placeholder="10"
+            placeholder="50"
             keyboardType="numeric"
           />
         </View>
@@ -220,19 +202,16 @@ export default function ProductForm({ data, before }) {
             style={styles.input}
             onChangeText={handlePointReOrderChange}
             value={pointReOrder}
-            placeholder="50"
+            placeholder="10"
             keyboardType="numeric"
           />
         </View>
         <View style={styles.buttonGroup}>
-          <TouchableOpacity style={[styles.button, styles.greenButton]} onPress={() => validateAndAction('Alta')}>
-            <Text style={styles.buttonText}>Dar de alta</Text>
+          <TouchableOpacity style={[styles.button, styles.greenButton]} onPress={() => validateAndAction(receivedFood ? 'Update' : 'Alta')}>
+            <Text style={styles.buttonText}>{receivedFood ? 'Actualizar' : 'Cargar'}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.button, styles.redButton]} onPress={() => validateAndAction('Baja')}>
             <Text style={styles.buttonText}>Dar de baja</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.blueButton]} onPress={() => validateAndAction('Actualización de stock')}>
-            <Text style={styles.buttonText}>Actualizar stock</Text>
           </TouchableOpacity>
         </View>
       </View>

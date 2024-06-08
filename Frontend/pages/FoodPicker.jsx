@@ -20,7 +20,7 @@ import {
   insertMenu,
 } from "../service_db/DBQuerys.jsx"; // Importar las funciones de la DB
 
-export default function FoodPicker({ data, after, goTo }) {
+export default function FoodPicker({ data, before, after, goTo }) {
   const [filters, setFilters] = useState({
     vegetarian: false,
     vegan: false,
@@ -142,7 +142,7 @@ export default function FoodPicker({ data, after, goTo }) {
     <View style={styles.container}>
       <View style={styles.navContainer}>
         <View style={{ height: "100%", overflow: "hidden", justifyContent: "center", aspectRatio: 1 }}>
-          <BackButton onPress={() => goTo("MainMenu")} />
+          <BackButton onPress={before} />
         </View>
         <TabIcon
           text="Comida"
@@ -255,7 +255,7 @@ export default function FoodPicker({ data, after, goTo }) {
             <SelectedFoodItem
               key={index}
               title={food.name}
-              onPress={() => console.log(food.name)}
+              onPress={() => toggleSelectedFood(food)}
             />
           ))}
         </SelectedMenuList>

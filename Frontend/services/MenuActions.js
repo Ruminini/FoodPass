@@ -2,7 +2,7 @@ import { getTotalDataFoodByName,
     insertFood, 
     activeFoodByName, 
     inactiveFoodByName, 
-    updateStockFoodByName } from '../service_db/DBQuerys';
+    updateFood} from '../service_db/DBQuerys';
 
 /**
  * Decide qué acción realizar en base a la acción proporcionada.
@@ -15,14 +15,14 @@ import { getTotalDataFoodByName,
  * @param {number} pointReOrder - Punto de reorden del producto.
  * @returns {Object} Objeto con el resultado de la operación.
  */
-export async function decideAction(action, name, category, type, description, stock, pointReOrder) {
+export async function decideAction(action, name, category, type, description, stock, pointReOrder, id) {
     switch (action) {
       case 'Alta':
         return handleLoud(name, category, type, description, stock, pointReOrder);
       case 'Baja':
         return handleDown(name);
-      case 'Actualización de stock':
-        return handleUpdateStock(name, stock);
+      case 'Update':
+        return handleUpdate(id, name, category, type, description, stock, pointReOrder);
       default:
         console.log(`Acción no reconocida: ${action}`);
         return false;
@@ -90,32 +90,22 @@ async function handleDown(name) {
 }
 
 /**
- * Realiza la acción de actualizar el stock de un alimento.
- * @param {string} name - El nombre del alimento.
- * @param {number} stock - La cantidad de stock a actualizar.
- * @returns {Object} - Objeto con el resultado de la acción.
+ * Realiza la acción de actualizar un alimento.
+ * @param {number} id - Nombre del producto.
+ * @param {string} name - Nombre del producto.
+ * @param {string} category - Categoría del producto ('Comida', 'Bebida', 'Postre').
+ * @param {string} type - Tipo del producto (opcional: 'Vegano', 'Vegetariano', 'Celiaco').
+ * @param {string} description - Descripción del producto.
+ * @param {string} stock - Stock disponible del producto.
+ * @param {string} pointReOrder - Punto de reorden del producto.
+ * @returns {Object} Objeto con el resultado de la operación.
  */
-async function handleUpdateStock(name, stock) {
+async function handleUpdate(id, name, category, type, description, stock, pointReOrder) {
   try {
-    console.log('Realizando acción de actualización de stock...');
-    const food = await getTotalDataFoodByName(name);
-
-    if (food[0] !== undefined) {
-      if (food[0].state === 'I') { // Verificar si el producto ya está dado de baja
-        return { success: false, message: `${name} está dado de baja.` };
-      }
-
-      const old_stock = parseInt(food[0].stock, 10); // Convertir a entero
-      const new_stock = old_stock + parseInt(stock, 10); // Convertir a entero y sumar
-
-      // Si el producto no está dado de baja, proceder con la acción
-      await updateStockFoodByName(name, new_stock); // Actualizar el stock con el nuevo valor
-      return { success: true, message: `El stock de ${name} ha sido actualizado.` };
-    } else {
-      return { success: false, message: `No se encontró ${name}.` };
-    }
+    await updateFood(id, category, name, description, stock, pointReOrder, type);
+    return { success: true, message: `${name} ha sido actualizado.` };
   } catch (error) {
-    console.error(`Error al actualizar stock de ${name}:`, error);
-    return { success: false, message: `Error al actualizar stock de ${name}` };
+    console.error(`Error al cargar ${name}:`, error);
+    return { success: false, message: `Error al actualizar ${name}` };
   }
 }
