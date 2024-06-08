@@ -83,61 +83,32 @@ export default function ManageMembers({ goTo }) {
   const confirmAction = async () => {
     try {
       console.log(`Realizar acción ${currentAction} con el legajo:`, id);
-
+  
       if (currentAction === 'alta') {
         try {
           const validMemberRegistered = await validMemberRegister(id, nameMember, lastnameMember);
-
-          if (validMemberRegistered) {
-            Toast.show({
-              type: 'info',
-              text1: '¡Alta de miembro!',
-            });
-            resetFields();
-            return false;
-          } else {
-            Toast.show({
-              type: 'error',
-              text1: 'Error en el alta del miembro.',
-            });
-            resetFields();
-            return false;
-          }
+  
+          resetFields();
+  
+          return validMemberRegistered;
         } catch (error) {
           console.error(error);
+          resetFields();
           return false;
         }
       } else if (currentAction === 'baja') {
         try {
           const validMemberDeleted = await validMemberDelete(id);
-
-          if (validMemberDeleted) {
-            Toast.show({
-              type: 'info',
-              text1: '¡Baja de miembro!',
-            });
-            resetFields();
-            return false;
-          } else {
-            Toast.show({
-              type: 'error',
-              text1: 'Error en la baja del miembro.',
-            });
-            resetFields();
-            return false;
-          }
+  
+          resetFields();
+  
+          return validMemberDeleted;
         } catch (error) {
           console.error(error);
+          resetFields();
           return false;
         }
-      } else {
-        console.log('Acción no reconocida.');
       }
-      Toast.show({
-        type: 'success',
-        text1: '¡Acción realizada correctamente!'
-      });
-      resetFields();
     } catch (error) {
       console.error('Error en la validación del usuario:', error);
       Toast.show({
@@ -145,8 +116,10 @@ export default function ManageMembers({ goTo }) {
         text1: '¡Error de validación!',
         text2: 'Ocurrió un error al validar las credenciales del administrador.'
       });
+      resetFields();
+      return false;
     }
-  };
+  };  
 
   return (
     <View style={styles.container}>

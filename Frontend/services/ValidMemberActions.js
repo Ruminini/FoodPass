@@ -46,23 +46,40 @@ export async function validMemberRegister(id, name, last_name) {
   try {
     const existingMember = await getValidMemberById(id);
     if (existingMember.length > 0) {
+      if (existingMember[0].state === 'A') {
+        Toast.show({
+          type: 'error',
+          text1: `El miembro con ID ${id} ya está activo.`,
+        });
+        return false;
+      }
       // El miembro ya existe, lo activamos
       await activeValidMember(id);
       await activeUserMember(id);
       await activeFaceMember(id);
 
-      console.log(`El miembro con ID ${id} ya existe. Se ha activado correctamente.`);
-      fetchMemberData(id)
+      Toast.show({
+        type: 'success',
+        text1: `El miembro con ID ${id} se ha activado correctamente.`,
+      });
+      fetchMemberData(id);
       return true;
     } else {
       // El miembro no existe, lo insertamos
       await insertValidMember(id, name, last_name);
-      console.log(`Nuevo miembro registrado con ID ${id}.`);
-      fetchMemberData(id)
+      Toast.show({
+        type: 'success',
+        text1: `Nuevo miembro registrado con ID ${id}.`,
+      });
+      fetchMemberData(id);
       return true;
     }
   } catch (error) {
     console.error("Error al registrar miembro:", error);
+    Toast.show({
+      type: 'error',
+      text1: 'Error al registrar miembro. Por favor, inténtalo de nuevo.',
+    });
     return false;
   }
 }
@@ -77,21 +94,38 @@ export async function validMemberDelete(id) {
   try {
     const existingMember = await getValidMemberById(id);
     if (existingMember.length > 0) {
+      if (existingMember[0].state === 'I') {
+        Toast.show({
+          type: 'error',
+          text1: `El miembro con ID ${id} ya está inactivo.`,
+        });
+        return false;
+      }
       // El miembro existe, lo marcamos como inactivo
       await inactiveValidMember(id);
       await inactiveUserMember(id);
       await inactiveFaceMember(id);
 
-      console.log(`El miembro con ID ${id} ha sido marcado como inactivo.`);
-      fetchMemberData(id)
+      Toast.show({
+        type: 'success',
+        text1: `El miembro con ID ${id} ha sido marcado como inactivo.`,
+      });
+      fetchMemberData(id);
       return true;
     } else {
-      console.log(`El miembro con ID ${id} no existe.`);
-      fetchMemberData(id)
+      Toast.show({
+        type: 'error',
+        text1: `El miembro con ID ${id} no existe.`,
+      });
+      fetchMemberData(id);
       return false;
     }
   } catch (error) {
     console.error("Error al eliminar miembro:", error);
+    Toast.show({
+      type: 'error',
+      text1: 'Error al eliminar miembro. Por favor, inténtalo de nuevo.',
+    });
     return false;
   }
 }
