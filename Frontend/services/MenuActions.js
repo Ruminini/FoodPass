@@ -52,29 +52,8 @@ async function handleLoud(name, category, type, description, stock, pointReOrder
         return { success: true, message: `${name} se activó nuevamente.` };
       }
     } else {
-      let code_category = 0;
-      let code_type = 0;
-
-      // Asignar código de categoría según la categoría ingresada
-      if (category === 'Comida') {
-        code_category = 1;
-      } else if (category === 'Bebida') {
-        code_category = 2;
-      } else if (category === 'Postre') {
-        code_category = 3;
-      }
-
-      // Asignar código de tipo según el tipo ingresado (si se proporciona)
-      if (type === 'Vegano') {
-        code_type = 1;
-      } else if (type === 'Vegetariano') {
-        code_type = 2;
-      } else if (type === 'Celiaco') {
-        code_type = 3;
-      }
-
       // Insertar el producto en la base de datos si no existe
-      await insertFood(code_category, name, description, stock, pointReOrder, code_type);
+      await insertFood(category, name, description, stock, pointReOrder, type);
       return { success: true, message: `${name} ha sido cargado.` };
     }
   } catch (error) {

@@ -5,13 +5,18 @@ import BackButton from '../components/BackButton';
 import { decideAction } from '../services/MenuActions';
 import AdminModal from '../components/AdminModal';
 
-export default function ProductForm({ goTo }) {
-  const [category, setCategory] = useState('');
-  const [type, setType] = useState('');
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [stock, setStock] = useState('');
-  const [pointReOrder, setPointReOrder] = useState('');
+export default function ProductForm({ data, before }) {
+  const food = data.food;
+  console.log(food)
+  const [category, setCategory] = useState(food.type_code || '');
+  // TODO: Fix food type restriction
+  const [tipo, setType] = useState([...(food.restrictions || [])]);
+  console.log(typeof tipo, tipo)
+  console.log(typeof [3].includes(3), [3])
+  const [name, setName] = useState(food.name || '');
+  const [description, setDescription] = useState(food.description || '');
+  const [stock, setStock] = useState('' + (food.stock || ''));
+  const [pointReOrder, setPointReOrder] = useState('' + (food.minimum_amount || ''));
   const [modalVisible, setModalVisible] = useState(false);
   const [currentAction, setCurrentAction] = useState('');
 
@@ -20,7 +25,7 @@ export default function ProductForm({ goTo }) {
   };
 
   const handleTipoSelection = (selectedType) => {
-    setType(type === selectedType ? '' : selectedType);
+    setType(tipo === selectedType ? '' : selectedType);
   };
 
   const validateAndAction = (action) => {
@@ -98,8 +103,8 @@ export default function ProductForm({ goTo }) {
   const confirmAction = async () => {
     try {
       // Si todas las validaciones son exitosas, realizar la acción correspondiente
-      console.log(`Realizar acción ${currentAction} a producto:`, name, category, type, description, stock, pointReOrder);
-      const actionResult = await decideAction(currentAction, name, category, type, description, stock, pointReOrder);
+      console.log(`Realizar acción ${currentAction} a producto:`, name, category, tipo, description, stock, pointReOrder);
+      const actionResult = await decideAction(currentAction, name, category, tipo, description, stock, pointReOrder);
       setModalVisible(false);
       setCategory('');
       setType('');
@@ -145,18 +150,18 @@ export default function ProductForm({ goTo }) {
           <Text style={styles.label}>Categoria</Text>
           <View style={styles.radioGroup}>
             <TouchableOpacity
-              style={[styles.radio, category === 'Comida' && styles.selectedRadio]}
-              onPress={() => handleCategoriaSelection('Comida')}>
+              style={[styles.radio, category == 1 && styles.selectedRadio]}
+              onPress={() => handleCategoriaSelection(1)}>
               <Text style={styles.radioText}>Comida</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, category === 'Bebida' && styles.selectedRadio]}
-              onPress={() => handleCategoriaSelection('Bebida')}>
+              style={[styles.radio, category == 2 && styles.selectedRadio]}
+              onPress={() => handleCategoriaSelection(2)}>
               <Text style={styles.radioText}>Bebida</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, category === 'Postre' && styles.selectedRadio]}
-              onPress={() => handleCategoriaSelection('Postre')}>
+              style={[styles.radio, category == 3 && styles.selectedRadio]}
+              onPress={() => handleCategoriaSelection(3)}>
               <Text style={styles.radioText}>Postre</Text>
             </TouchableOpacity>
           </View>
@@ -165,18 +170,18 @@ export default function ProductForm({ goTo }) {
           <Text style={styles.label}>Tipo (opcional)</Text>
           <View style={styles.radioGroup}>
             <TouchableOpacity
-              style={[styles.radio, type === 'Vegano' && styles.selectedRadio]}
-              onPress={() => handleTipoSelection('Vegano')}>
+              style={[styles.radio, tipo.includes(1) && styles.selectedRadio]}
+              onPress={() => handleTipoSelection(1)}>
               <Text style={styles.radioText}>Vegano</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, type === 'Vegetariano' && styles.selectedRadio]}
-              onPress={() => handleTipoSelection('Vegetariano')}>
+              style={[styles.radio, tipo.includes(2) && styles.selectedRadio]}
+              onPress={() => handleTipoSelection(2)}>
               <Text style={styles.radioText}>Vegetariano</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, type === 'Celiaco' && styles.selectedRadio]}
-              onPress={() => handleTipoSelection('Celiaco')}>
+              style={[styles.radio, tipo.includes(3) && styles.selectedRadio]}
+              onPress={() => handleTipoSelection(3)}>
               <Text style={styles.radioText}>Celiaco</Text>
             </TouchableOpacity>
           </View>
@@ -231,7 +236,7 @@ export default function ProductForm({ goTo }) {
           </TouchableOpacity>
         </View>
       </View>
-      <BackButton onPress={() => goTo('Admin')} style={styles.backButton} />
+      <BackButton onPress={before} style={styles.backButton} />
       <AdminModal after={confirmAction} visible={modalVisible} hide={() => setModalVisible(false)} />
     </View>
   );

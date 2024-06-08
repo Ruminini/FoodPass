@@ -290,12 +290,12 @@ export default function App() {
   const goTo = (
     option = "MainMenu",
     data = {},
-    before = () => {},
+    before = () => {goTo("MainMenu")},
     after = () => {}
   ) => {
     switch (option) {
       case "FoodPicker":
-        setPage(<FoodPicker data={data} goTo={goTo} />);
+        setPage(<FoodPicker data={data} before={before} after={after} goTo={goTo} />);
         break;
       case "OrderConfirm":
         setPage(<OrderConfirm data={data} before={before} after={after} />);
@@ -313,7 +313,7 @@ export default function App() {
         setPage(<Admin goTo={goTo} />);
         break;
       case "ManageMenus":
-        setPage(<ManageMenus data={data} goTo={goTo} />);
+        setPage(<ManageMenus data={data} before={before} goTo={goTo} />);
         break;
       case "ManageMembers":
         setPage(<ManageMembers data={data} goTo={goTo} />);

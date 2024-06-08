@@ -9,6 +9,14 @@ import Register from '../assets/svg/register.svg'
 
 
 export default function Admin({goTo}) {
+    const goToManageMenus = () => {
+        goTo(
+            'FoodPicker',
+            {adminMode: true},
+            () => {goTo('Admin')},
+            (food) => {goTo('ManageMenus', {food}, goToManageMenus)}
+        );
+    }
     return (
         <View style={styles.container}>
             <MenuList >
@@ -23,7 +31,7 @@ export default function Admin({goTo}) {
                 <MenuButton
                     svg={<Food/>}
                     text='Gestionar menús'
-                    onPress={() => goTo('ManageMenus')} />
+                    onPress={goToManageMenus} />
             </MenuList>
             <BackButton onPress={() => goTo('MainMenu')}/>
         </View>
