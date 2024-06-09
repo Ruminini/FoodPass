@@ -1,11 +1,9 @@
 import {
   getAllDescriptors,
   getUserById,
-  getTypeUserById,
-  getPasswordById,
-  getSaltById,
+  getTypeUserById
 } from "../service_db/DBQuerys.jsx";
-import { basicHash, compareHash } from "../utils/Hash.js";
+import { compareHash } from "../utils/Hash.js";
 
 // Este método devuelve true si se todas las caras de la base de datos,
 // en caso contrario devuelve falso.

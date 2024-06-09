@@ -5,8 +5,6 @@ import FaceScan from '../components/FaceScan';
 import OfflineLogin from '../components/OfflineLogin';
 import BackButton from '../components/BackButton';
 import Toast from 'react-native-toast-message';
-import MenuButton from '../components/MenuButton';
-import Guest from '../assets/svg/guest.svg'
 
 export default function Login({ data, before, after }) {
 	const [internet, setInternet] = useState(true);

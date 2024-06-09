@@ -1,4 +1,4 @@
-import { getAllFood, getFoodIdByName, getRelationOfFood, insertFood, insertRestriction } from "./DBQuerys";
+import { getRelationOfFood, insertFood } from "./DBQuerys";
 
 export const chargeFoodsInDatabase = async () => {
 

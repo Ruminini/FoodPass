@@ -1,4 +1,4 @@
-import { TouchableOpacity, StyleSheet, Text, View } from 'react-native'
+import { TouchableOpacity, StyleSheet } from 'react-native'
 import React from 'react'
 import Settings from '../assets/svg/setting.svg'
 

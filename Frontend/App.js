@@ -20,12 +20,8 @@ import {
   insertFaceData,
   insertParameters,
   getAllFood,
-  insertFood,
   getFoodByID,
   getOrdersForSupplier,
-  updateStockFoodById,
-  markSentSupplierOrder,
-  addStockFromSupplierOrder,
   getLoginLogs,
   getOrderRetireLogs,
 } from "./service_db/DBQuerys";

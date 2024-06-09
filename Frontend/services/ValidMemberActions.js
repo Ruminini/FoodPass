@@ -10,6 +10,8 @@ import { getValidMemberById,
   inactiveFaceMember
 } from '../service_db/DBQuerys';
 
+import Toast from 'react-native-toast-message';
+
 /**
  * Obtiene información relevante de un miembro dado su ID.
  * 
