@@ -7,7 +7,8 @@ import { getValidMemberById,
   activeUserMember,
   inactiveUserMember,
   activeFaceMember,
-  inactiveFaceMember
+  inactiveFaceMember,
+  updateValidMember
 } from '../service_db/DBQuerys';
 
 import Toast from 'react-native-toast-message';
@@ -59,6 +60,7 @@ export async function validMemberRegister(id, name, last_name) {
       await activeValidMember(id);
       await activeUserMember(id);
       await activeFaceMember(id);
+      await updateValidMember(id, name, last_name);
 
       Toast.show({
         type: 'success',

@@ -525,6 +525,26 @@ export const activeValidMember = (code) => {
   });
 };
 
+//Función para actualizar nombre y apellido de miembro/invitado en la tabla valid_member
+export const updateValidMember = (code, name, lastname) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE valid_member SET name = ?, last_name = ? WHERE code = ?",
+      [
+        name,
+        lastname,
+        code
+      ],
+      (tx, results) => {
+        console.log("Miembro actualizado correctamente", code);
+      },
+      (tx, error) => {
+        console.error("Error al actualizar datos de miembro:", error);
+      }
+    );
+  });
+};
+
 //Insertar usuario en tabla user. Se utilizará para nuevos registros.
 export const insertUser = (member_code, type_code, hashed_pass, salt) => {
   db.transaction((tx) => {
