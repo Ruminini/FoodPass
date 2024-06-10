@@ -136,6 +136,29 @@ export const getUsers = () => {
   });
 };
 
+//Obtener listado de todos los invitados
+export const getGuests = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `SELECT *
+        FROM user
+        INNER JOIN guest_expiration exp
+          ON exp.user_id = user.member_code
+        WHERE type_code = 3`,
+        [],
+        (tx, results) => {
+          const users = results.rows._array;
+          resolve(users);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
 //Obtener un listado de todos los descriptores de la tabla face
 export const getAllDescriptors = () => {
   return new Promise((resolve, reject) => {

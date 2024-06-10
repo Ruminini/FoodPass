@@ -36,6 +36,7 @@ import ManageMembers from "./pages/ManageMembers";
 import ManageMenus from "./pages/ManageMenus";
 import { chargeFoodsInDatabase } from "./service_db/DBChargeFoods";
 import ManageGuests from "./pages/ManageGuests";
+import UserList from "./pages/UserList";
 
 export default function App() {
   const [page, setPage] = useState(<View />);
@@ -135,6 +136,9 @@ export default function App() {
     //Ejemplo insertando miembro válido
     useEffect(() => {
       insertValidMember("87654321-1234", "NombreTest", "ApellidoTest");
+      insertValidMember("11111111-1111", "NombreA", "ApellidoA");
+      insertValidMember("22222222-2222", "NombreB", "ApellidoB");
+      insertValidMember("33333333-3333", "NombreC", "ApellidoC");
     }, []);
 
     //Ejemplo obteniendo miembro valido por id
@@ -312,14 +316,17 @@ export default function App() {
       case "Admin":
         setPage(<Admin goTo={goTo} />);
         break;
+      case "UserList":
+        setPage(<UserList data={data} goTo={goTo} />);
+        break;
       case "ManageMenus":
         setPage(<ManageMenus data={data} before={before} goTo={goTo} />);
         break;
       case "ManageMembers":
-        setPage(<ManageMembers data={data} goTo={goTo} />);
+        setPage(<ManageMembers data={data} before={before} goTo={goTo} />);
         break;
       case "ManageGuests":
-        setPage(<ManageGuests goTo={goTo} />);
+        setPage(<ManageGuests data={data} before={before} goTo={goTo} />);
         break;
       case "OrderPickUp":
         setPage(<OrderPickUp data={data} goTo={goTo} />);

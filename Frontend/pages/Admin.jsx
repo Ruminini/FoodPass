@@ -8,7 +8,7 @@ import Options from '../assets/svg/options.svg'
 import Register from '../assets/svg/register.svg'
 
 
-export default function Admin({goTo}) {
+export default function Admin({ goTo }) {
     const goToManageMenus = () => {
         goTo(
             'FoodPicker',
@@ -23,11 +23,11 @@ export default function Admin({goTo}) {
                 <MenuButton
                     svg={<Options/>}
                     text='Gestionar miembros'
-                    onPress={() => goTo('ManageMembers')} />
+                    onPress={() => goTo('UserList')} />
                 <MenuButton
                     svg={<Register/>}
                     text='Agregar invitados'
-                    onPress={() => goTo('ManageGuests')} />
+                    onPress={() => {goTo('UserList', {guests: true}); console.log("hola")}} />
                 <MenuButton
                     svg={<Food/>}
                     text='Gestionar menús'

@@ -12,9 +12,10 @@ import Toast from "react-native-toast-message";
 import { insertGuest } from "../service_db/DBQuerys";
 import AdminModal from "../components/AdminModal";
 
-export default function ManageGuests({ goTo }) {
-  const [expiration, setExpiration] = useState(0);
-  const [id, onChangeId] = useState();
+export default function ManageGuests({ before, data }) {
+  console.log(data)
+  const [expiration, setExpiration] = useState(1);
+  const [id, onChangeId] = useState(data?.user?.member_code || "");
   const [invalid, setInvalid] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -95,7 +96,7 @@ export default function ManageGuests({ goTo }) {
         hide={() => setModalVisible(false)}
         after={register}
       />
-      <BackButton onPress={() => goTo("Admin")} />
+      <BackButton onPress={before} />
     </View>
   );
 }
