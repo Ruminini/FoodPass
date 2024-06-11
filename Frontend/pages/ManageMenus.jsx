@@ -7,7 +7,7 @@ import AdminModal from '../components/AdminModal';
 
 export default function ProductForm({ goTo }) {
   const [category, setCategory] = useState('');
-  const [type, setType] = useState('');
+  const [selectedTypes, setSelectedTypes] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [stock, setStock] = useState('');
@@ -20,7 +20,14 @@ export default function ProductForm({ goTo }) {
   };
 
   const handleTipoSelection = (selectedType) => {
-    setType(type === selectedType ? '' : selectedType);
+    // Verificar si el tipo ya está seleccionado
+    if (selectedTypes.includes(selectedType)) {
+      // Si está seleccionado, quitarlo de la lista de tipos seleccionados
+      setSelectedTypes(selectedTypes.filter(type => type !== selectedType));
+    } else {
+      // Si no está seleccionado, añadirlo a la lista de tipos seleccionados
+      setSelectedTypes([...selectedTypes, selectedType]);
+    }
   };
 
   const validateAndAction = (action) => {
@@ -69,26 +76,36 @@ export default function ProductForm({ goTo }) {
       }
     }
 
-    // Validar que nombre y descripción no estén vacíos
-    if (!name.trim() || !description.trim()) {
-      Toast.show({
-        type: 'info',
-        text1: 'Nombre y descripción son campos requeridos.',
-      });
-      return;
-    }
-  
-    // Limpiar los espacios adicionales
-    const cleanedName = name.replace(/\s{2,}/g, ' ').trim();
-    const cleanedDescription = description.replace(/\s{2,}/g, ' ').trim();
-
-    // Validar que nombre y descripción no contengan números ni signos de puntuación
-    if (!/^[a-zA-Z\s]+$/.test(cleanedName) || !/^[\w\s,.]+$/.test(cleanedDescription)) {
-      Toast.show({
-        type: 'info',
-        text1: 'Nombre y descripción solo pueden contener letras.',
-      });
-      return;
+    if (action === 'Alta') {
+      // Validar que nombre y descripción no estén vacíos
+      if (!name.trim() || !description.trim()) {
+        Toast.show({
+          type: 'info',
+          text1: 'Nombre y descripción son campos requeridos.',
+        });
+        return;
+      }
+    
+      // Limpiar los espacios adicionales
+      const cleanedName = name.replace(/\s{2,}/g, ' ').trim();
+      const cleanedDescription = description.replace(/\s{2,}/g, ' ').trim();
+    
+      // Validar que nombre y descripción cumplan con los criterios
+      if (!/^[a-zA-Z\s]+$/.test(cleanedName)) {
+        Toast.show({
+          type: 'info',
+          text1: 'El nombre no puede contener números.',
+        });
+        return;
+      }
+    
+      if (!/^[a-zA-Z\s.,!?¿¡]+$/.test(cleanedDescription)) {
+        Toast.show({
+          type: 'info',
+          text1: 'La descripción no puede contener números.',
+        });
+        return;
+      }
     }
 
     setCurrentAction(action);
@@ -98,11 +115,11 @@ export default function ProductForm({ goTo }) {
   const confirmAction = async () => {
     try {
       // Si todas las validaciones son exitosas, realizar la acción correspondiente
-      console.log(`Realizar acción ${currentAction} a producto:`, name, category, type, description, stock, pointReOrder);
-      const actionResult = await decideAction(currentAction, name, category, type, description, stock, pointReOrder);
+      console.log(`Realizar acción ${currentAction} a producto:`, name, category, selectedTypes, description, stock, pointReOrder);
+      const actionResult = await decideAction(currentAction, name, category, selectedTypes, description, stock, pointReOrder);
       setModalVisible(false);
       setCategory('');
-      setType('');
+      setSelectedTypes('');
       setName('');
       setDescription('');
       setStock('');
@@ -165,19 +182,19 @@ export default function ProductForm({ goTo }) {
           <Text style={styles.label}>Tipo (opcional)</Text>
           <View style={styles.radioGroup}>
             <TouchableOpacity
-              style={[styles.radio, type === 'Vegano' && styles.selectedRadio]}
+              style={[styles.radio, selectedTypes.includes('Vegano') && styles.selectedRadio]}
               onPress={() => handleTipoSelection('Vegano')}>
-              <Text style={styles.radioText}>Vegano</Text>
+              <Text style={[styles.radioText, selectedTypes.includes('Vegano') && styles.selectedRadioText]}>Vegano</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, type === 'Vegetariano' && styles.selectedRadio]}
+              style={[styles.radio, selectedTypes.includes('Vegetariano') && styles.selectedRadio]}
               onPress={() => handleTipoSelection('Vegetariano')}>
-              <Text style={styles.radioText}>Vegetariano</Text>
+              <Text style={[styles.radioText, selectedTypes.includes('Vegetariano') && styles.selectedRadioText]}>Vegetariano</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, type === 'Celiaco' && styles.selectedRadio]}
+              style={[styles.radio, selectedTypes.includes('Celiaco') && styles.selectedRadio]}
               onPress={() => handleTipoSelection('Celiaco')}>
-              <Text style={styles.radioText}>Celiaco</Text>
+              <Text style={[styles.radioText, selectedTypes.includes('Celiaco') && styles.selectedRadioText]}>Celiaco</Text>
             </TouchableOpacity>
           </View>
         </View>
