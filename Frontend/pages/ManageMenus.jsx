@@ -156,19 +156,19 @@ export default function ProductForm({ data, before }) {
           <Text style={styles.label}>Tipo (opcional)</Text>
           <View style={styles.radioGroup}>
             <TouchableOpacity
-              style={[styles.radio, tipo.includes(1) && styles.selectedRadio]}
+              style={[styles.radio, selectedTypes.includes(1) && styles.selectedRadio]}
               onPress={() => handleTypeSelection(1)}>
-              <Text style={[styles.radioText, selectedTypes.includes(1) && styles.selectedRadioText]}>Vegano</Text>
+              <Text style={styles.radioText}>Vegano</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, tipo.includes(2) && styles.selectedRadio]}
+              style={[styles.radio, selectedTypes.includes(2) && styles.selectedRadio]}
               onPress={() => handleTypeSelection(2)}>
-              <Text style={[styles.radioText, selectedTypes.includes(2) && styles.selectedRadioText]}>Vegetariano</Text>
+              <Text style={styles.radioText}>Vegetariano</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, tipo.includes(3) && styles.selectedRadio]}
+              style={[styles.radio, selectedTypes.includes(3) && styles.selectedRadio]}
               onPress={() => handleTypeSelection(3)}>
-              <Text style={[styles.radioText, selectedTypes.includes(3) && styles.selectedRadioText]}>Celiaco</Text>
+              <Text style={styles.radioText}>Celiaco</Text>
             </TouchableOpacity>
           </View>
         </View>
