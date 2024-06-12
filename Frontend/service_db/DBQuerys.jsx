@@ -136,6 +136,29 @@ export const getUsers = () => {
   });
 };
 
+//Obtener listado de todos los invitados
+export const getGuests = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `SELECT *
+        FROM user
+        INNER JOIN guest_expiration exp
+          ON exp.user_id = user.member_code
+        WHERE type_code = 3`,
+        [],
+        (tx, results) => {
+          const users = results.rows._array;
+          resolve(users);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
 //Obtener un listado de todos los descriptores de la tabla face
 export const getAllDescriptors = () => {
   return new Promise((resolve, reject) => {
@@ -640,7 +663,7 @@ export const insertFood = (
   description,
   stock,
   minimum_amount,
-  code_restriction
+  code_restrictions
 ) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
@@ -665,18 +688,18 @@ export const insertFood = (
             [name],
             (tx, results) => {
               const food_id = results.rows._array[0].id;
-
-              if (code_restriction) {
-                //Insertar la restricción correspondiente
-                insertRestriction(food_id, code_restriction)
-                  .then(() => {
-                    console.log("Alimento y restricción insertados correctamente: ", name);
-                    resolve();
-                  })
-                  .catch((error) => {
-                    console.error("Error al insertar la restricción: ", error);
-                    reject(error);
-                  });
+              if (code_restrictions) {
+                for (let i = 0; i < code_restrictions.length; i++) {
+                  insertRestriction(food_id, code_restrictions[i])
+                    .then(() => {
+                      console.log("Alimento y restricción insertados correctamente: ", name);
+                      resolve();
+                    })
+                    .catch((error) => {
+                      console.error("Error al insertar la restricción: ", error);
+                      reject(error);
+                    });
+                }
               } else {
                 console.log("Alimento insertado sin restricción: ", name);
                 resolve();
@@ -696,6 +719,82 @@ export const insertFood = (
     });
   });
 };
+
+//Insertar alimentos y su restricción
+export const updateFood = (
+  id,
+  type_code,
+  name,
+  description,
+  stock,
+  minimum_amount,
+  code_restrictions
+) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      // Insertar el alimento en la tabla food
+      tx.executeSql(
+        "UPDATE food SET type_code = ?, name = ?, description = ?, price = ?, stock = ?, minimum_amount = ?, last_update = ?, state = ? WHERE id = ?;",
+        [
+          type_code,
+          name,
+          description,
+          0,
+          stock,
+          minimum_amount,
+          new Date().toString(),
+          "A",
+          id
+        ],
+        (tx, results) => {
+          removeRestrictions(id)
+            .then(() => {
+              if (code_restrictions) {
+                for (let i = 0; i < code_restrictions.length; i++) {
+                  insertRestriction(id, code_restrictions[i])
+                    .then(() => {
+                      console.log("Alimento y restricción insertados correctamente: ", name);
+                      resolve();
+                    })
+                    .catch((error) => {
+                      console.error("Error al insertar la restricción: ", error);
+                      reject(error);
+                    });
+                }
+              } else {
+                console.log("Alimento insertado sin restricción: ", name);
+                resolve();
+              }
+            })
+          resolve();
+        },
+        (tx, error) => {
+          console.error("Error al insertar el alimento: ", name, error);
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+export const removeRestrictions = (food_id) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "DELETE FROM relation_restriction_food WHERE id_food = ?",
+        [food_id],
+        (tx, results) => {
+          resolve();
+        },
+        (tx, error) => {
+          console.error("Error al remover las restricciones del alimento: ", error);
+          reject(error);
+        }
+      );
+    });
+  });
+}
+
 
 //Insertar alimentos y sus restricciones
 export const insertFoodWithVariousRestrictions = (

@@ -3,7 +3,7 @@ import { getTotalDataFoodByName,
     insertFoodWithVariousRestrictions,
     activeFoodByName, 
     inactiveFoodByName, 
-    updateStockFoodByName } from '../service_db/DBQuerys';
+    updateFood} from '../service_db/DBQuerys';
 
 /**
  * Decide qué acción realizar en base a la acción proporcionada.
@@ -16,14 +16,14 @@ import { getTotalDataFoodByName,
  * @param {number} pointReOrder - Punto de reorden del producto.
  * @returns {Object} Objeto con el resultado de la operación.
  */
-export async function decideAction(action, name, category, types, description, stock, pointReOrder) {
+export async function decideAction(action, name, category, types, description, stock, pointReOrder, id) {
     switch (action) {
       case 'Alta':
         return handleLoud(name, category, types, description, stock, pointReOrder);
       case 'Baja':
         return handleDown(name);
-      case 'Actualización de stock':
-        return handleUpdateStock(name, stock);
+      case 'Update':
+        return handleUpdate(id, name, category, types, description, stock, pointReOrder);
       default:
         console.log(`Acción no reconocida: ${action}`);
         return false;
@@ -43,44 +43,13 @@ export async function decideAction(action, name, category, types, description, s
 async function handleLoud(name, category, types, description, stock, pointReOrder) {
   try {
     console.log('Realizando acción de alta...');
-    
-    let code_category = 0;
-    let code_restrictions = [];
-
-    // Asignar código de categoría según la categoría ingresada
-    if (category === 'Comida') {
-      code_category = 1;
-    } else if (category === 'Bebida') {
-      code_category = 2;
-    } else if (category === 'Postre') {
-      code_category = 3;
-    }
-
-    if (types && Array.isArray(types)) {
-      // Obtener los códigos de restricciones
-      types.forEach(type => {
-        if (type === 'Vegano') {
-          code_restrictions.push(1);
-        } else if (type === 'Vegetariano') {
-          code_restrictions.push(2);
-        } else if (type === 'Celiaco') {
-          code_restrictions.push(3);
-        }
-      });
-    }
-
     const food = await getTotalDataFoodByName(name);
 
     if (food[0] !== undefined) {
-      if (food[0].state === 'A') {
-        return { success: false, message: `${name} ya está cargado.` };
-      } else if (food[0].state === 'I') {
-        await activeFoodByName(name); 
-        await updateFoodWithVariousRestrictions(code_category, name, description, stock, pointReOrder, code_restrictions);
-        return { success: true, message: `${name} se activó nuevamente.` };
-      }
+      return { success: false, message: `${name} ya hay un producto con ese nombre.` };
     } else {
-      await insertFoodWithVariousRestrictions(code_category, name, description, stock, pointReOrder, code_restrictions);
+      // Insertar el producto en la base de datos si no existe
+      await insertFood(category, name, description, stock, pointReOrder, types);
       return { success: true, message: `${name} ha sido cargado.` };
     }
   } catch (error) {
@@ -116,31 +85,26 @@ async function handleDown(name) {
 }
 
 /**
- * Realiza la acción de actualizar el stock de un alimento.
- * @param {string} name - El nombre del alimento.
- * @param {number} stock - La cantidad de stock a actualizar.
- * @returns {Object} - Objeto con el resultado de la acción.
+ * Realiza la acción de actualizar un alimento.
+ * @param {number} id - Nombre del producto.
+ * @param {string} name - Nombre del producto.
+ * @param {string} category - Categoría del producto ('Comida', 'Bebida', 'Postre').
+ * @param {string[]} types - Tipo del producto (opcional: 'Vegano', 'Vegetariano', 'Celiaco').
+ * @param {string} description - Descripción del producto.
+ * @param {string} stock - Stock disponible del producto.
+ * @param {string} pointReOrder - Punto de reorden del producto.
+ * @returns {Object} Objeto con el resultado de la operación.
  */
-async function handleUpdateStock(name, stock) {
+async function handleUpdate(id, name, category, types, description, stock, pointReOrder) {
   try {
-    console.log('Realizando acción de actualización de stock...');
     const food = await getTotalDataFoodByName(name);
-
-    if (food[0] !== undefined) {
-      if (food[0].state === 'I') {
-        return { success: false, message: `${name} está dado de baja.` };
-      }
-
-      const old_stock = parseInt(food[0].stock, 10);
-      const new_stock = old_stock + parseInt(stock, 10);
-
-      await updateStockFoodByName(name, new_stock);
-      return { success: true, message: `El stock de ${name} ha sido actualizado.` };
-    } else {
-      return { success: false, message: `No se encontró ${name}.` };
+    if (food[0] !== undefined && food[0].id != id) {
+      return { success: false, message: `${name} ya hay un alimento con ese nombre.` };
     }
+    await updateFood(id, category, name, description, stock, pointReOrder, types);
+    return { success: true, message: `${name} ha sido actualizado.` };
   } catch (error) {
-    console.error(`Error al actualizar stock de ${name}:`, error);
-    return { success: false, message: `Error al actualizar stock de ${name}` };
+    console.error(`Error al cargar ${name}:`, error);
+    return { success: false, message: `Error al actualizar ${name}` };
   }
 }

@@ -10,6 +10,7 @@ import Dessert from "../assets/svg/dessert.svg";
 import Vegetarian from "../assets/svg/vegetarian.svg";
 import Vegan from "../assets/svg/vegan.svg";
 import Celiac from "../assets/svg/celiac.svg";
+import Add from "../assets/svg/add.svg";
 import SelectedMenuList from "../components/SelectedMenuList";
 import SelectedFoodItem from "../components/SelectedFoodItem";
 import Toast from "react-native-toast-message";
@@ -19,7 +20,7 @@ import {
   insertMenu,
 } from "../service_db/DBQuerys.jsx"; // Importar las funciones de la DB
 
-export default function FoodPicker({ data, goTo }) {
+export default function FoodPicker({ data, before, after, goTo }) {
   const [filters, setFilters] = useState({
     vegetarian: false,
     vegan: false,
@@ -28,6 +29,7 @@ export default function FoodPicker({ data, goTo }) {
   });
   const [selectedFoods, setSelectedFoods] = useState(data.foods || []);
   const [foods, setFoods] = useState([]);
+  const adminMode = data.adminMode;
 
   useEffect(() => {
     // Cargar alimentos con stock y activos desde la base de datos
@@ -70,6 +72,10 @@ export default function FoodPicker({ data, goTo }) {
   const totalPrice = selectedFoods.reduce((acc, food) => acc + food.price, 0);
   // Guarda las comidas seleccionadas y cambia el color del front
   function toggleSelectedFood(food) {
+    if (adminMode) {
+      after(food)
+      return
+    }
     if (selectedFoods.includes(food)) {
       setSelectedFoods(
         selectedFoods.filter((selectedFood) => selectedFood.id !== food.id)
@@ -135,8 +141,8 @@ export default function FoodPicker({ data, goTo }) {
   return (
     <View style={styles.container}>
       <View style={styles.navContainer}>
-        <View style={{ height: "100%", overflow: "hidden", aspectRatio: 1 }}>
-          <BackButton onPress={() => goTo("MainMenu")} />
+        <View style={{ height: "100%", overflow: "hidden", justifyContent: "center", aspectRatio: 1 }}>
+          <BackButton onPress={before} />
         </View>
         <TabIcon
           text="Comida"
@@ -174,8 +180,15 @@ export default function FoodPicker({ data, goTo }) {
           }
           selected={filters.type === "postre"}
         />
-        <View style={{ height: "100%", overflow: "hidden", aspectRatio: 1 }}>
-          <BackButton
+        <View style={{ height: "100%", overflow: "hidden", justifyContent: "center", aspectRatio: 1 }}>
+          { adminMode ?
+            <TabIcon
+              svg={<Add fill="#007bff" />}
+              onPress={() => {after({})}}
+              style={ {padding: 10} }
+              selected={filters.type === "admin"}
+            /> :
+            <BackButton
             style={{ transform: [{ rotate: "180deg" }] }}
             onPress={() => {
               if (selectedFoods.length === 0) {
@@ -187,7 +200,7 @@ export default function FoodPicker({ data, goTo }) {
               }
               goToConfirm();
             }}
-          />
+          />}
         </View>
       </View>
       <MenuList alignTop={true}>
@@ -242,7 +255,7 @@ export default function FoodPicker({ data, goTo }) {
             <SelectedFoodItem
               key={index}
               title={food.name}
-              onPress={() => console.log(food.name)}
+              onPress={() => toggleSelectedFood(food)}
             />
           ))}
         </SelectedMenuList>

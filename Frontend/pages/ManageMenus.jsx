@@ -5,21 +5,20 @@ import BackButton from '../components/BackButton';
 import { decideAction } from '../services/MenuActions';
 import AdminModal from '../components/AdminModal';
 
-export default function ProductForm({ goTo }) {
-  const [category, setCategory] = useState('');
-  const [selectedTypes, setSelectedTypes] = useState([]);
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [stock, setStock] = useState('');
-  const [pointReOrder, setPointReOrder] = useState('');
+export default function ProductForm({ data, before }) {
+  const food = data.food || {};
+  const receivedFood = Object.keys(data.food).length > 0;
+  const [category, setCategory] = useState(food.type_code || '1');
+  const [selectedTypes, setSelectedTypes] = useState(food.restrictions ? [...food.restrictions] : []);
+  const [name, setName] = useState(food.name || '');
+  const [description, setDescription] = useState(food.description || '');
+  const [stock, setStock] = useState('' + (food.stock || ''));
+  const [pointReOrder, setPointReOrder] = useState('' + (food.minimum_amount || ''));
   const [modalVisible, setModalVisible] = useState(false);
   const [currentAction, setCurrentAction] = useState('');
 
-  const handleCategoriaSelection = (selectedCategory) => {
-    setCategory(category === selectedCategory ? '' : selectedCategory);
-  };
 
-  const handleTipoSelection = (selectedType) => {
+  const handleTypeSelection = (selectedType) => {
     // Verificar si el tipo ya está seleccionado
     if (selectedTypes.includes(selectedType)) {
       // Si está seleccionado, quitarlo de la lista de tipos seleccionados
@@ -31,29 +30,11 @@ export default function ProductForm({ goTo }) {
   };
 
   const validateAndAction = (action) => {
-    if (action === 'Alta'){
+    if (action === 'Alta' || action === 'Update') {
       if (category === '' || name === '' || setDescription === '' || stock === '' || pointReOrder === '') {
         Toast.show({ 
           type: 'info', 
           text1: 'Todos los campos son obligatorios.',
-        });
-        return;
-      }
-      // Convertir stock a una cadena y verificar la longitud
-      const stockString = String(stock);
-      if (stockString.length > 4) {
-        Toast.show({ 
-          type: 'info', 
-          text1: 'Cantidad de stock supera el limite (4 dígitos).',
-        });
-        return;
-      }
-    } else if (action === 'Actualización de stock') {
-      // Verificar si name o stock están vacíos
-      if (name === '' || stock === '') {
-        Toast.show({ 
-          type: 'info', 
-          text1: 'Nombre y stock son obligatorios.',
         });
         return;
       }
@@ -76,36 +57,34 @@ export default function ProductForm({ goTo }) {
       }
     }
 
-    if (action === 'Alta') {
-      // Validar que nombre y descripción no estén vacíos
-      if (!name.trim() || !description.trim()) {
-        Toast.show({
-          type: 'info',
-          text1: 'Nombre y descripción son campos requeridos.',
-        });
-        return;
-      }
-    
-      // Limpiar los espacios adicionales
-      const cleanedName = name.replace(/\s{2,}/g, ' ').trim();
-      const cleanedDescription = description.replace(/\s{2,}/g, ' ').trim();
-    
-      // Validar que nombre y descripción cumplan con los criterios
-      if (!/^[a-zA-Z\s]+$/.test(cleanedName)) {
-        Toast.show({
-          type: 'info',
-          text1: 'El nombre no puede contener números.',
-        });
-        return;
-      }
-    
-      if (!/^[a-zA-Z\s.,!?¿¡]+$/.test(cleanedDescription)) {
-        Toast.show({
-          type: 'info',
-          text1: 'La descripción no puede contener números.',
-        });
-        return;
-      }
+    // Validar que nombre y descripción no estén vacíos
+    if (!name.trim() || !description.trim()) {
+      Toast.show({
+        type: 'info',
+        text1: 'Nombre y descripción son campos requeridos.',
+      });
+      return;
+    }
+  
+    // Limpiar los espacios adicionales
+    const cleanedName = name.replace(/\s{2,}/g, ' ').trim();
+    const cleanedDescription = description.replace(/\s{2,}/g, ' ').trim();
+  
+    // Validar que nombre y descripción cumplan con los criterios
+    if (!/^[a-zA-Z\sñÑ]+$/.test(cleanedName)) {
+      Toast.show({
+        type: 'info',
+        text1: 'El nombre no puede contener números.',
+      });
+      return;
+    }
+  
+    if (!/^[a-zA-Z\s.,!?¿¡ñÑ]+$/.test(cleanedDescription)) {
+      Toast.show({
+        type: 'info',
+        text1: 'La descripción no puede contener números.',
+      });
+      return;
     }
 
     setCurrentAction(action);
@@ -115,21 +94,16 @@ export default function ProductForm({ goTo }) {
   const confirmAction = async () => {
     try {
       // Si todas las validaciones son exitosas, realizar la acción correspondiente
-      console.log(`Realizar acción ${currentAction} a producto:`, name, category, selectedTypes, description, stock, pointReOrder);
-      const actionResult = await decideAction(currentAction, name, category, selectedTypes, description, stock, pointReOrder);
+      console.log(`Realizar acción ${currentAction} a producto:`, name, category, selectedTypes, description, stock, pointReOrder, food.id);
+      const actionResult = await decideAction(currentAction, name, category, selectedTypes, description, stock, pointReOrder, food.id);
       setModalVisible(false);
-      setCategory('');
-      setSelectedTypes('');
-      setName('');
-      setDescription('');
-      setStock('');
-      setPointReOrder('');
     
       if (actionResult.success) {
         Toast.show({
             type: 'info',
             text1: actionResult.message,
         });
+        before();
       } else {
           // Hubo un error al realizar la acción
           Toast.show({
@@ -162,18 +136,18 @@ export default function ProductForm({ goTo }) {
           <Text style={styles.label}>Categoria</Text>
           <View style={styles.radioGroup}>
             <TouchableOpacity
-              style={[styles.radio, category === 'Comida' && styles.selectedRadio]}
-              onPress={() => handleCategoriaSelection('Comida')}>
+              style={[styles.radio, category == 1 && styles.selectedRadio]}
+              onPress={() => setCategory(1)}>
               <Text style={styles.radioText}>Comida</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, category === 'Bebida' && styles.selectedRadio]}
-              onPress={() => handleCategoriaSelection('Bebida')}>
+              style={[styles.radio, category == 2 && styles.selectedRadio]}
+              onPress={() => setCategory(2)}>
               <Text style={styles.radioText}>Bebida</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, category === 'Postre' && styles.selectedRadio]}
-              onPress={() => handleCategoriaSelection('Postre')}>
+              style={[styles.radio, category == 3 && styles.selectedRadio]}
+              onPress={() => setCategory(3)}>
               <Text style={styles.radioText}>Postre</Text>
             </TouchableOpacity>
           </View>
@@ -182,19 +156,19 @@ export default function ProductForm({ goTo }) {
           <Text style={styles.label}>Tipo (opcional)</Text>
           <View style={styles.radioGroup}>
             <TouchableOpacity
-              style={[styles.radio, selectedTypes.includes('Vegano') && styles.selectedRadio]}
-              onPress={() => handleTipoSelection('Vegano')}>
-              <Text style={[styles.radioText, selectedTypes.includes('Vegano') && styles.selectedRadioText]}>Vegano</Text>
+              style={[styles.radio, tipo.includes(1) && styles.selectedRadio]}
+              onPress={() => handleTypeSelection(1)}>
+              <Text style={[styles.radioText, selectedTypes.includes(1) && styles.selectedRadioText]}>Vegano</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, selectedTypes.includes('Vegetariano') && styles.selectedRadio]}
-              onPress={() => handleTipoSelection('Vegetariano')}>
-              <Text style={[styles.radioText, selectedTypes.includes('Vegetariano') && styles.selectedRadioText]}>Vegetariano</Text>
+              style={[styles.radio, tipo.includes(2) && styles.selectedRadio]}
+              onPress={() => handleTypeSelection(2)}>
+              <Text style={[styles.radioText, selectedTypes.includes(2) && styles.selectedRadioText]}>Vegetariano</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, selectedTypes.includes('Celiaco') && styles.selectedRadio]}
-              onPress={() => handleTipoSelection('Celiaco')}>
-              <Text style={[styles.radioText, selectedTypes.includes('Celiaco') && styles.selectedRadioText]}>Celiaco</Text>
+              style={[styles.radio, tipo.includes(3) && styles.selectedRadio]}
+              onPress={() => handleTypeSelection(3)}>
+              <Text style={[styles.radioText, selectedTypes.includes(3) && styles.selectedRadioText]}>Celiaco</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -222,7 +196,7 @@ export default function ProductForm({ goTo }) {
             style={styles.input}
             onChangeText={handleStockChange}
             value={stock}
-            placeholder="10"
+            placeholder="50"
             keyboardType="numeric"
           />
         </View>
@@ -232,23 +206,20 @@ export default function ProductForm({ goTo }) {
             style={styles.input}
             onChangeText={handlePointReOrderChange}
             value={pointReOrder}
-            placeholder="50"
+            placeholder="10"
             keyboardType="numeric"
           />
         </View>
         <View style={styles.buttonGroup}>
-          <TouchableOpacity style={[styles.button, styles.greenButton]} onPress={() => validateAndAction('Alta')}>
-            <Text style={styles.buttonText}>Dar de alta</Text>
+          <TouchableOpacity style={[styles.button, styles.greenButton]} onPress={() => validateAndAction(receivedFood ? 'Update' : 'Alta')}>
+            <Text style={styles.buttonText}>{receivedFood ? 'Actualizar' : 'Cargar'}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.button, styles.redButton]} onPress={() => validateAndAction('Baja')}>
             <Text style={styles.buttonText}>Dar de baja</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.blueButton]} onPress={() => validateAndAction('Actualización de stock')}>
-            <Text style={styles.buttonText}>Actualizar stock</Text>
-          </TouchableOpacity>
         </View>
       </View>
-      <BackButton onPress={() => goTo('Admin')} style={styles.backButton} />
+      <BackButton onPress={before} style={styles.backButton} />
       <AdminModal after={confirmAction} visible={modalVisible} hide={() => setModalVisible(false)} />
     </View>
   );

@@ -5,20 +5,17 @@ import Toast from 'react-native-toast-message';
 import { validMemberRegister, validMemberDelete } from '../services/ValidMemberActions';
 import AdminModal from '../components/AdminModal';
 
-export default function ManageMembers({ goTo }) {
-  const [id, setId] = useState('');
-  const [nameMember, setNameMember] = useState('');
-  const [lastnameMember, setLastnameMember] = useState('');
+export default function ManageMembers({ before, data }) {
+  const [id, setId] = useState(data?.user?.code || '');
+  const [nameMember, setNameMember] = useState(data?.user?.name || '');
+  const [lastnameMember, setLastnameMember] = useState(data?.user?.last_name || '');
   const [invalid, setInvalid] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [currentAction, setCurrentAction] = useState('');
 
   const resetFields = () => {
-    setId('');
-    setNameMember('');
-    setLastnameMember('');
-    setCurrentAction('');
     setModalVisible(false);
+    before();
   };
 
   const handleIdChange = (text) => {
@@ -158,7 +155,7 @@ export default function ManageMembers({ goTo }) {
         </TouchableOpacity>
       </View>
       <AdminModal after={confirmAction} visible={modalVisible} hide={() => setModalVisible(false)} />
-      <BackButton onPress={() => goTo('Admin')} style={styles.backButton} />
+      <BackButton onPress={before} style={styles.backButton} />
     </View>
   );
 }
