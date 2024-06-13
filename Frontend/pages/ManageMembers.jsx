@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
 import BackButton from '../components/BackButton';
 import Toast from 'react-native-toast-message';
-import { validMemberRegister, validMemberDelete } from '../services/ValidMemberActions';
+import { validMemberRegister, validMemberDelete, validMemberUpdate } from '../services/ValidMemberActions';
 import AdminModal from '../components/AdminModal';
 
 export default function ManageMembers({ before, data }) {
@@ -48,17 +48,16 @@ export default function ManageMembers({ before, data }) {
       });
       return;
     }
-  
-    console.log(action)
 
-    // Validar que nombre y apellido no estén vacíos solo en la acción de "alta"
-    if (action === 'alta' && (!nameMember.trim() || !lastnameMember.trim())) {
+    // Validar que nombre y apellido no estén vacíos solo en las acciones de 'alta' y 'actualizacion'
+    if (action === 'alta' && (!nameMember.trim() || !lastnameMember.trim()) || action === 'actualizar' && (!nameMember.trim() || !lastnameMember.trim())) {
       Toast.show({
         type: 'info',
         text1: 'Nombre y apellido son campos requeridos.',
       });
       return;
-    } else if (action === 'alta') {
+    } else if (action === 'alta' || action === 'actualizar') {
+
       // Limpiar los espacios adicionales solo en la acción de "alta"
       const cleanedName = nameMember.replace(/\s{2,}/g, ' ').trim();
       const cleanedLastname = lastnameMember.replace(/\s{2,}/g, ' ').trim();
@@ -80,7 +79,7 @@ export default function ManageMembers({ before, data }) {
   const confirmAction = async () => {
     try {
       console.log(`Realizar acción ${currentAction} con el legajo:`, id);
-  
+
       if (currentAction === 'alta') {
         try {
           const validMemberRegistered = await validMemberRegister(id, nameMember, lastnameMember);
@@ -105,6 +104,19 @@ export default function ManageMembers({ before, data }) {
           resetFields();
           return false;
         }
+      } else if (currentAction === 'actualizar') {
+        try {
+          const validMemberUpdated = await validMemberUpdate(id, nameMember, lastnameMember);
+
+          console.log(validMemberUpdated)
+          resetFields();
+
+          return validMemberUpdated;
+        } catch (error) {
+          console.error(error);
+          resetFields();
+          return false;
+        }
       }
     } catch (error) {
       console.error('Error en la validación del usuario:', error);
@@ -119,44 +131,49 @@ export default function ManageMembers({ before, data }) {
   };  
 
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <Text style={[styles.title, invalid === 'id' && { color: 'red' }]}>Legajo</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={handleIdChange}
-          value={id}
-          placeholder="12345678-4321"
-          keyboardType="numeric"
-        />
-        <Text style={styles.title}>Nombre</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={setNameMember}
-          value={nameMember}
-          placeholder="Leonel"
-        />
-        <Text style={styles.title}>Apellido</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={setLastnameMember}
-          value={lastnameMember}
-          placeholder="Messi"
-        />
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: '#28a745' }]}
-          onPress={() => validateAndAction('alta')}>
-          <Text style={styles.buttonText}>Dar de alta</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: '#dc3545' }]}
-          onPress={() => validateAndAction('baja')}>
-          <Text style={styles.buttonText}>Dar de baja</Text>
-        </TouchableOpacity>
-      </View>
-      <AdminModal after={confirmAction} visible={modalVisible} hide={() => setModalVisible(false)} />
-      <BackButton onPress={before} style={styles.backButton} />
+  <View style={styles.container}>
+    <View style={styles.content}>
+      <Text style={[styles.title, invalid === 'id' && { color: 'red' }]}>Legajo</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={handleIdChange}
+        value={id}
+        placeholder="12345678-4321"
+        keyboardType="numeric"
+      />
+      <Text style={styles.title}>Nombre</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={setNameMember}
+        value={nameMember}
+        placeholder="Leonel"
+      />
+      <Text style={styles.title}>Apellido</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={setLastnameMember}
+        value={lastnameMember}
+        placeholder="Messi"
+      />
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: '#28a745' }]}
+        onPress={() => validateAndAction('alta')}>
+        <Text style={styles.buttonText}>Dar de alta</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: '#dc3545' }]}
+        onPress={() => validateAndAction('baja')}>
+        <Text style={styles.buttonText}>Dar de baja</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: '#007bff' }]}
+        onPress={() => validateAndAction('actualizar')}>
+        <Text style={styles.buttonText}>Actualizar datos</Text>
+      </TouchableOpacity>
     </View>
+    <AdminModal after={confirmAction} visible={modalVisible} hide={() => setModalVisible(false)} />
+    <BackButton onPress={before} style={styles.backButton} />
+  </View>
   );
 }
 

@@ -27,7 +27,7 @@ export default function Admin({ goTo }) {
                 <MenuButton
                     svg={<Register/>}
                     text='Agregar invitados'
-                    onPress={() => {goTo('UserList', {guests: true}); console.log("hola")}} />
+                    onPress={() => {goTo('UserList', {guests: true})}} />
                 <MenuButton
                     svg={<Food/>}
                     text='Gestionar menús'

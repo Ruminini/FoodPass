@@ -133,3 +133,42 @@ export async function validMemberDelete(id) {
     return false;
   }
 }
+
+/**
+ * Actualiza los datos de un miembro existente en la base de datos.
+ * 
+ * @param {string} id - El ID del miembro que se va a actualizar.
+ * @param {string} name - El nuevo nombre del miembro.
+ * @param {string} last_name - El nuevo apellido del miembro.
+ * @returns {Promise<boolean>} - Retorna true si la actualización fue exitosa, de lo contrario retorna false.
+ */
+export async function validMemberUpdate(id, name, last_name) {
+  try {
+    const existingMember = await getValidMemberById(id);
+    if (existingMember.length > 0) {
+      // El miembro ya existe, lo actualizamos
+      await updateValidMember(id, name, last_name);
+
+      Toast.show({
+        type: 'success',
+        text1: `El miembro con ID ${id} ha sido actualizado.`,
+      });
+      fetchMemberData(id);
+      return true;
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: `El miembro con ID ${id} no existe.`,
+      });
+      fetchMemberData(id);
+      return false;
+    }
+  } catch (error) {
+    console.error("Error al actualizar datos del miembro:", error);
+    Toast.show({
+      type: 'error',
+      text1: 'Error al actualizar datos del miembro. Por favor, inténtalo de nuevo.',
+    });
+    return false;
+  }
+}
