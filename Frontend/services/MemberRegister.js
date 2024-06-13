@@ -1,4 +1,10 @@
+import {
+    activeValidMember,
+} from "../service_db/DBQuerys.jsx";
+
 import { generateSalt, basicHash } from '../utils/Hash';
+
+
 
 import * as SQLite from 'expo-sqlite';
 
@@ -138,8 +144,13 @@ export async function insertMember(id, password) {
                                         "A",
                                         id,
                                     ],
-                                    () => {
-                                        resolve(true); // El estado se actualizó y la contraseña se cambió con éxito
+                                    async () => {
+                                        resolve(true);
+                                        try {
+                                            await activeValidMember(id);
+                                        } catch (error) {
+                                            console.error('Error al activar el miembro:', error);
+                                        }
                                     },
                                     (_, error) => {
                                         console.error('Error al actualizar el estado y la contraseña:', error);
