@@ -9,7 +9,7 @@ export default function OfflineLogin({ data, after }) {
     const [password, onChangePassword] = useState('');
     const [id, onChangeId] = useState('');
     const [invalid, setInvalid] = useState('');
-    const guest = data.guest;
+    const guest = data?.guest;
 
     const validateAndLogIn = async () => {
         // Validación del formato del legajo
