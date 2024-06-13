@@ -4,8 +4,6 @@ import {
 
 import { generateSalt, basicHash } from '../utils/Hash';
 
-
-
 import * as SQLite from 'expo-sqlite';
 
 const db = SQLite.openDatabase('FoodPass.db');
