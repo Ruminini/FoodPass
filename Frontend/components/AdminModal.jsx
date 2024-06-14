@@ -86,7 +86,7 @@ export default function AdminModal({ hide, after, visible }) {
               onChangeText={setAdminUser}
               value={adminUser}
               placeholder="00000000-0000"
-              keyboardType="default"
+              keyboardType="numeric"
             />
             <TextInput
               style={styles.input}

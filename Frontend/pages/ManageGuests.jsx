@@ -11,11 +11,12 @@ import BackButton from "../components/BackButton";
 import Toast from "react-native-toast-message";
 import { insertGuest } from "../service_db/DBQuerys";
 import AdminModal from "../components/AdminModal";
+import { sendGuestEmail } from "../services/Api";
 
 export default function ManageGuests({ before, data }) {
-  console.log(data)
   const [expiration, setExpiration] = useState(1);
   const [id, onChangeId] = useState(data?.user?.member_code.slice(0, 8) || "");
+  const [mail, onChangeMail] = useState(data?.user?.mail || "");
   const [invalid, setInvalid] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -30,31 +31,47 @@ export default function ManageGuests({ before, data }) {
       setInvalid("id");
       return false;
     }
+    // Mail no obligatorio
+    if (mail && !mail.match(/^[\w-]+([\w\.-])*[\w-]@([\w-]+\.)*[\w-]{2,4}$/gm)) {
+      Toast.show({
+        type: "info",
+        text1: "Formato de Mail incorrecto.",
+      });
+      setInvalid("mail");
+      return false;
+    }
     setModalVisible(true);
   };
 
   const register = async () => {
     // Registrar miembro en la base de datos
     let password;
-    try {
-      password = await insertGuest(id, expiration).catch((error) => {
-        Toast.show({
-          type: "error",
-          text1: "Error al intentar registrar el invitado",
-        });
-        console.log("Error al intentar registrar el invitado.");
-        return false;
+    password = await insertGuest(id, expiration).catch((error) => {
+      Toast.show({
+        type: "error",
+        text1: "Error al intentar registrar el invitado",
       });
-    } catch (error) {
-      console.error(error);
+      console.log("Error al intentar registrar el invitado.",error);
       return false;
-    }
+    });
     console.log("Invitado registrado.");
     Alert.alert(
       "¡Registro exitoso!",
       "DNI: " + id + "\nContraseña: " + password,
       [{ text: "OK" }]
     );
+    if (await sendGuestEmail(mail, id, password)){
+      Toast.show({
+        type: "success",
+        text1: "Mail enviado correctamente.",
+      });
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Error al enviar el mail",
+        text2: "Deberas notificarle manualmente.",
+      });
+    }
     onChangeId("");
   };
 
@@ -71,6 +88,16 @@ export default function ManageGuests({ before, data }) {
           placeholder="12345678"
           keyboardType="numeric"
         />
+        <Text style={[styles.title, invalid === "mail" && { color: "red" }]}>
+          Correo
+        </Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={onChangeMail}
+          value={mail}
+          placeholder="nombre@mail.com"
+          keyboardType="email-address"
+        />
         <View style={styles.expiration}>
           <Text style={styles.expText}>Validez:</Text>
           {[1, 3, 5, 7, 14, 30].map((n) => (
@@ -82,7 +109,9 @@ export default function ManageGuests({ before, data }) {
               {n}
             </Text>
           ))}
-          <Text style={styles.expText}>{expiration == 1 ? "dia  " : "dias"}</Text>
+          <Text style={styles.expText}>
+            {expiration == 1 ? "dia  " : "dias"}
+          </Text>
         </View>
         <TouchableOpacity
           onPress={validate}
