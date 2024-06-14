@@ -146,20 +146,7 @@ export function desactiveMember(id, password) {
                             tx.executeSql(
                                 'UPDATE face SET state = ? WHERE user_id = ?',
                                 ['I', id],
-                                () => {
-                                    tx.executeSql(
-                                        'UPDATE valid_member SET state = ? WHERE code = ?',
-                                        ['I', id],
-                                        () => {
-                                            // Si todas las actualizaciones son exitosas, resolver con true
-                                            resolve(true);
-                                        },
-                                        (_, error) => {
-                                            console.error('Error al actualizar el estado en valid_member:', error);
-                                            reject(error);
-                                        }
-                                    );
-                                },
+                                () => {},
                                 (_, error) => {
                                     console.error('Error al actualizar el estado en face:', error);
                                     reject(error);

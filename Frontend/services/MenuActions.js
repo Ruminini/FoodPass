@@ -1,7 +1,4 @@
 import { getTotalDataFoodByName, 
-    updateFoodWithVariousRestrictions,
-    insertFoodWithVariousRestrictions,
-    activeFoodByName, 
     inactiveFoodByName,
     insertFood, 
     updateFood} from '../service_db/DBQuerys';

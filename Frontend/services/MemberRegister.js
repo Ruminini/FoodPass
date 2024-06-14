@@ -142,14 +142,6 @@ export async function insertMember(id, password) {
                                         "A",
                                         id,
                                     ],
-                                    async () => {
-                                        resolve(true);
-                                        try {
-                                            await activeValidMember(id);
-                                        } catch (error) {
-                                            console.error('Error al activar el miembro:', error);
-                                        }
-                                    },
                                     (_, error) => {
                                         console.error('Error al actualizar el estado y la contraseña:', error);
                                         reject(error);
