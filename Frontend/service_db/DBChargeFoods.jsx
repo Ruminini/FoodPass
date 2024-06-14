@@ -10,23 +10,22 @@ export const chargeFoodsInDatabase = async () => {
         "Pollo al horno gratinado con finas hierbas", // Descripción del alimento
         150, // Stock del alimento
         50, // Punto de reorden
-        0 // Restricción. 0 = ninguna, 1 = vegano, 2 = vegetariano, 3 = celíaco
-    );  
+        // Restricción. Nada = ninguna, 1 = vegano, 2 = vegetariano, 3 = celíaco
+    );
     insertFood(
         1, 
         "Milanesa de carne con fritas", 
         "Milanesa de carne frita con papas fritas",
         150,
         50,
-        0
-    );
+    ); 
     insertFood(
         1, 
         "Tacos", 
         "Tacos veganos de garbanzos y soja.",
         150,
         50,
-        1
+        [1, 2]
     );
     insertFood(
         1, 
@@ -34,7 +33,7 @@ export const chargeFoodsInDatabase = async () => {
         "Canelones vegetarianos de espinaca y ricota con salsa de tomate",
         150,
         50,
-        2
+        [2]
     );
     insertFood(
         1, 
@@ -42,7 +41,7 @@ export const chargeFoodsInDatabase = async () => {
         "Guiso de lentejas con cebolla, ajo y pimentón suave",
         150,
         50,
-        3
+        [1, 2, 3]
     );
     // Dos bebidas sin restricción, una vegana, una vegetariana y una celíaca
 
@@ -51,7 +50,8 @@ export const chargeFoodsInDatabase = async () => {
         "Gaseosa sabor cola", 
         "Fresca gaseosa sabor cola de 500 ml",
         150,
-        50
+        50,
+        [1, 2, 3]
     );
     insertFood(
         2, 
@@ -59,7 +59,7 @@ export const chargeFoodsInDatabase = async () => {
         "Café que puede pedirse con leche o sin",
         150,
         50,
-        0
+        [1, 2, 3]
     );
     insertFood(
         2, 
@@ -67,7 +67,7 @@ export const chargeFoodsInDatabase = async () => {
         "Jugo dulce con azucares naturales y bajos carbohidratos.",
         50,
         50,
-        1
+        [1]
     );
     insertFood(
         2, 
@@ -75,7 +75,7 @@ export const chargeFoodsInDatabase = async () => {
         "Café con leche y chocolate, especial para días fríos.",
         150,
         50,
-        2
+        [2]
     );
     insertFood(
         2, 
@@ -83,7 +83,7 @@ export const chargeFoodsInDatabase = async () => {
         "Jugo de naranja sin azúcares agregados.",
         150,
         50,
-        3
+        [1,2,3]
     );
 
     // Dos postres sin restricción, uno vegano, uno vegetariano y uno celíaco
@@ -93,7 +93,8 @@ export const chargeFoodsInDatabase = async () => {
         "Budín de pan", 
         "Budín de pan al horno con dulce de leche",
         150,
-        50
+        50,
+        [2]
     );
     insertFood(
         3, 
@@ -101,7 +102,7 @@ export const chargeFoodsInDatabase = async () => {
         "Helado del mejor gusto posible y textura exquisita",
         150,
         50,
-        0
+        [2]
     );
     insertFood(
         3, 
@@ -109,7 +110,7 @@ export const chargeFoodsInDatabase = async () => {
         "Magdalenas de limón sin gluten, sin huevo y sin leche",
         150,
         50,
-        1
+        [1,2]
     );
     insertFood(
         3, 
@@ -117,7 +118,7 @@ export const chargeFoodsInDatabase = async () => {
         "Panqueques con dulce de leche.",
         150,
         50,
-        2
+        [2]
     );
     insertFood(
         3, 
@@ -125,7 +126,7 @@ export const chargeFoodsInDatabase = async () => {
         "Alfajores de arroz suaves y ricos",
         150,
         50,
-        3
+        [1,2,3]
     );
     // Llama a la función para nostrar las relaciones
     handleRelations();
