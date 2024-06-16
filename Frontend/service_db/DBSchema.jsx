@@ -95,7 +95,8 @@ export const createFoodTable = `CREATE TABLE IF NOT EXISTS food (
     minimum_amount INTEGER DEFAULT 0,
     create_date TEXT NOT NULL, 
     last_update TEXT NOT NULL, 
-    state TEXT DEFAULT 'A'
+    state TEXT DEFAULT 'A',
+    image_path TEXT
     --FOREIGN KEY(type_code) REFERENCES type_food(code)
   );`;
 
