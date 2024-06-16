@@ -7,7 +7,7 @@ import AdminModal from '../components/AdminModal';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 
-export default async function ProductForm({ data, before }) {
+export default function ProductForm({ data, before }) {
   const food = data.food || {};
   const receivedFood = Object.keys(data.food).length > 0;
   const [category, setCategory] = useState(food.type_code || '1');
@@ -18,8 +18,8 @@ export default async function ProductForm({ data, before }) {
   const [pointReOrder, setPointReOrder] = useState('' + (food.minimum_amount || ''));
   const [modalVisible, setModalVisible] = useState(false);
   const [currentAction, setCurrentAction] = useState('');
-  const [imageUri, setImageUri] = useState(food.image_path ? await FileSystem.getInfoAsync(food.image_path) : null); // Setear la URI de la imagen si ya está guardada
-  
+  const [imageUri, setImageUri] = useState(food.image_path ? `${FileSystem.documentDirectory}${food.image_path}` : null); // Setear la URI de la imagen si ya está guardada
+
   const handleTypeSelection = (selectedType) => {
     // Verificar si el tipo ya está seleccionado
     if (selectedTypes.includes(selectedType)) {
