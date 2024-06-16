@@ -7,7 +7,7 @@ import AdminModal from '../components/AdminModal';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 
-export default function ProductForm({ data, before }) {
+export default async function ProductForm({ data, before }) {
   const food = data.food || {};
   const receivedFood = Object.keys(data.food).length > 0;
   const [category, setCategory] = useState(food.type_code || '1');
@@ -18,63 +18,8 @@ export default function ProductForm({ data, before }) {
   const [pointReOrder, setPointReOrder] = useState('' + (food.minimum_amount || ''));
   const [modalVisible, setModalVisible] = useState(false);
   const [currentAction, setCurrentAction] = useState('');
-  const [imageUri, setImageUri] = useState(food.image_path ? `${FileSystem.documentDirectory}${food.image_path}` : null); // Setear la URI de la imagen si ya está guardada
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permiso necesario', 'Debes permitir el acceso a la galería para seleccionar imágenes.');
-      }
-    })();
-  }, []);
-
-  // Función para manejar la selección de imágenes
-  const pickImage = async () => {
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.ALL,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-
-      if (!result.cancelled) {
-        setImageUri(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.error('Error al seleccionar imagen:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Hubo un error al seleccionar la imagen.',
-      });
-    }
-  };
-
-  const saveImage = async () => {
-    if (!imageUri) {
-      Alert.alert('Error', 'Primero selecciona una imagen.');
-      return;
-    }
-
-    try {
-      const fileName = imageUri.split('/').pop();
-      const destinationPath = `${FileSystem.documentDirectory}${fileName}`;
-      await FileSystem.copyAsync({
-        from: imageUri,
-        to: destinationPath,
-      });
-      setImageUri(destinationPath); // Actualizar la URI con la ruta guardada
-      Toast.show({
-        type: 'success',
-        text1: 'Imagen guardada correctamente.',
-      });
-    } catch (error) {
-      console.error('Error al guardar la imagen:', error);
-      Alert.alert('Error', 'No se pudo guardar la imagen.');
-    }
-  };
-
+  const [imageUri, setImageUri] = useState(food.image_path ? await FileSystem.getInfoAsync(food.image_path) : null); // Setear la URI de la imagen si ya está guardada
+  
   const handleTypeSelection = (selectedType) => {
     // Verificar si el tipo ya está seleccionado
     if (selectedTypes.includes(selectedType)) {
@@ -185,6 +130,62 @@ export default function ProductForm({ data, before }) {
   const handlePointReOrderChange = (text) => {
     if (/^[1-9]\d*$/.test(text) || text === '') {
       setPointReOrder(text);
+    }
+  };
+
+  // Función para manejar la selección de imágenes
+  const pickImage = async () => {
+    //Pide los permisos para abrir y modificar la librería
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permiso necesario', 'Debes permitir el acceso a la galería para seleccionar imágenes.');
+      return;
+    }
+    //Si fueron concedidos entonces abre la librería y permite al usuario seleccionar una imagen (No es 100% necesario) 
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0,
+      });
+
+      if (!result.canceled) {
+        setImageUri(result.assets[0].uri);
+      } else if(result.canceled){
+        return;
+      }
+    } catch (error) {
+      console.error('Error al seleccionar imagen:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Hubo un error al seleccionar la imagen.',
+      });
+    }
+  };
+
+  //Una vez que se confirma el alta de la comida o su modificación se guarda la imagen
+  const saveImage = async () => {
+    if (!imageUri) {
+      Alert.alert('Error', 'Primero selecciona una imagen.');
+      return;
+    }
+
+    try {
+      const fileName = imageUri.split('/').pop();
+      const destinationPath = `${FileSystem.documentDirectory}${fileName}`;
+      await FileSystem.copyAsync({
+        from: imageUri,
+        to: destinationPath,
+      });
+      setImageUri(destinationPath); // Actualizar la URI con la ruta guardada
+      Toast.show({
+        type: 'success',
+        text1: 'Imagen guardada correctamente.',
+      });
+    } catch (error) {
+      console.error('Error al guardar la imagen:', error);
+      Alert.alert('Error', 'No se pudo guardar la imagen.');
     }
   };
   

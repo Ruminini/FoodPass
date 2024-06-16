@@ -9,7 +9,7 @@ const foods = [
         description: "Pollo al horno gratinado con finas hierbas",
         stock: 150,
         pointReOrder: 50,
-        restrictions: [],
+        restrictions: [], // vacío ninguna, 1 vegano, 2 vegetariano, 3 celíaco
         imageUri: require("../assets/foods/Pollo_al_horno.jpg"),
     },
     {
@@ -140,6 +140,7 @@ const foods = [
     },
 ];
 
+//Carga las primeras 15 comidas y sus respectivas imágenes
 export const chargeFoodsInDatabase = async () => {
     try {
         for (const food of foods) {
@@ -164,7 +165,7 @@ export const chargeFoodsInDatabase = async () => {
     }
 };
 
-
+//Guarda las imágenes en el FileSystem del dispositivo
 const copyImageToFilesystem = async (imageUri, imageName) => {
     const imagePath = FileSystem.documentDirectory + imageName;
     try {
@@ -179,6 +180,7 @@ const copyImageToFilesystem = async (imageUri, imageName) => {
         return null;
     }
 };
+
 // Función para mostrar las relaciones que se crearon
 export const handleRelations = async () => {
     try {

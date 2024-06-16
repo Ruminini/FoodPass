@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 
 export default function SelectedFoodItem({ title, description, selected=false, onPress, imgPath, style }) {
+    // Si el usuario llega a cargar una comida sin imagen entonces le pone el logo de FoodPass
     if(imgPath === null){
         imgPath = require("../assets/icon.png")
         return (
