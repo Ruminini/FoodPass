@@ -9,18 +9,30 @@ import {
 } from "react-native";
 import BackButton from "../components/BackButton";
 import Toast from "react-native-toast-message";
-import { insertGuest } from "../service_db/DBQuerys";
+import {
+  activeUserMember,
+  getUserById,
+  inactiveUserMember,
+  insertGuest,
+} from "../service_db/DBQuerys";
 import AdminModal from "../components/AdminModal";
 import { sendGuestEmail } from "../services/Api";
 
 export default function ManageGuests({ before, data }) {
+  const user = data?.user;
+  const updating = user?.member_code ? true : false;
   const [expiration, setExpiration] = useState(1);
-  const [id, onChangeId] = useState(data?.user?.member_code.slice(0, 8) || "");
-  const [mail, onChangeMail] = useState(data?.user?.mail || "");
+  const [id, onChangeId] = useState(user?.member_code.slice(0, 8) || "");
+  const [mail, onChangeMail] = useState(user?.mail || "");
   const [invalid, setInvalid] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [after, setAfter] = useState("");
 
-  const validate = () => {
+  const handleAfter = () => {
+    after == "register" ? register() : setActive();
+  };
+
+  const validate = async () => {
     // Validación del formato del legajo
     if (!id.match(/^[0-9]{8}$/)) {
       Toast.show({
@@ -32,7 +44,10 @@ export default function ManageGuests({ before, data }) {
       return false;
     }
     // Mail no obligatorio
-    if (mail && !mail.match(/^[\w-]+([\w\.-])*[\w-]@([\w-]+\.)*[\w-]{2,4}$/gm)) {
+    if (
+      mail &&
+      !mail.match(/^[\w-]+([\w\.-])*[\w-]@([\w-]+\.)*[\w-]{2,4}$/gm)
+    ) {
       Toast.show({
         type: "info",
         text1: "Formato de Mail incorrecto.",
@@ -40,18 +55,25 @@ export default function ManageGuests({ before, data }) {
       setInvalid("mail");
       return false;
     }
+    const registered = await getUserById(`${id}-9999`);
+    if (registered.length > 0) {
+      Toast.show({
+        type: "error",
+        text1: "DNI ya registrado",
+      });
+      return false;
+    }
+    setAfter("register");
     setModalVisible(true);
   };
 
   const register = async () => {
-    // Registrar miembro en la base de datos
-    let password;
-    password = await insertGuest(id, expiration).catch((error) => {
+    let password = await insertGuest(id, expiration).catch((error) => {
       Toast.show({
         type: "error",
         text1: "Error al intentar registrar el invitado",
       });
-      console.log("Error al intentar registrar el invitado.",error);
+      console.log("Error al intentar registrar el invitado.", error);
       return false;
     });
     console.log("Invitado registrado.");
@@ -60,7 +82,7 @@ export default function ManageGuests({ before, data }) {
       "DNI: " + id + "\nContraseña: " + password,
       [{ text: "OK" }]
     );
-    if (await sendGuestEmail(mail, id, password)){
+    if (mail != "" && (await sendGuestEmail(mail, id, password))) {
       Toast.show({
         type: "success",
         text1: "Mail enviado correctamente.",
@@ -68,11 +90,24 @@ export default function ManageGuests({ before, data }) {
     } else {
       Toast.show({
         type: "error",
-        text1: "Error al enviar el mail",
+        text1: "El invitado no ha sido notificado",
         text2: "Deberas notificarle manualmente.",
       });
     }
-    onChangeId("");
+    before();
+  };
+
+  const handleUpdateState = () => {
+    setAfter("updateState");
+    setModalVisible(true);
+  };
+
+  const setActive = () => {
+    console.log("setting active");
+    user.state == "A"
+      ? inactiveUserMember(`${id}-9999`)
+      : activeUserMember(`${id}-9999`);
+    before();
   };
 
   return (
@@ -87,6 +122,7 @@ export default function ManageGuests({ before, data }) {
           value={id}
           placeholder="12345678"
           keyboardType="numeric"
+          readOnly={updating}
         />
         <Text style={[styles.title, invalid === "mail" && { color: "red" }]}>
           Correo
@@ -115,15 +151,30 @@ export default function ManageGuests({ before, data }) {
         </View>
         <TouchableOpacity
           onPress={validate}
-          style={[styles.button, { backgroundColor: "#28a745" }]}
+          style={[styles.button, { backgroundColor: "#007bff" }]}
         >
-          <Text style={styles.buttonText}>Registrar</Text>
+          <Text style={styles.buttonText}>
+            {updating ? "Actualizar" : "Registrar"}
+          </Text>
         </TouchableOpacity>
+        {updating && (
+          <TouchableOpacity
+            style={[
+              styles.button,
+              { backgroundColor: user.state == "A" ? "#dc3545" : "#28a745" },
+            ]}
+            onPress={handleUpdateState}
+          >
+            <Text style={styles.buttonText}>
+              {user.state == "A" ? "Dar de baja" : "Dar de alta"}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
       <AdminModal
         visible={modalVisible}
         hide={() => setModalVisible(false)}
-        after={register}
+        after={handleAfter}
       />
       <BackButton onPress={before} />
     </View>
