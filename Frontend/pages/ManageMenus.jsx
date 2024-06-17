@@ -71,7 +71,7 @@ export default function ProductForm({ data, before }) {
     const cleanedDescription = description.replace(/\s{2,}/g, ' ').trim();
   
     // Validar que nombre y descripción cumplan con los criterios
-    if (!/^[a-zA-Z\sñÑ]+$/.test(cleanedName)) {
+    if (!/^[\p{Script=Latin}\s]+$/u.test(cleanedName)) {
       Toast.show({
         type: 'info',
         text1: 'El nombre no puede contener números.',
@@ -79,7 +79,7 @@ export default function ProductForm({ data, before }) {
       return;
     }
   
-    if (!/^[a-zA-Z\s.,!?¿¡ñÑ]+$/.test(cleanedDescription)) {
+    if (!/^[\p{Script=Latin}\s.,!?¿¡]+$/u.test(cleanedDescription)) {
       Toast.show({
         type: 'info',
         text1: 'La descripción no puede contener números.',

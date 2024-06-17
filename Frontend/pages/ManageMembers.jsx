@@ -63,7 +63,7 @@ export default function ManageMembers({ before, data }) {
       const cleanedLastname = lastnameMember.replace(/\s{2,}/g, ' ').trim();
 
       // Validar que nombre y apellido no contengan números ni signos de puntuación solo en la acción de "alta"
-      if (!/^[a-zA-Z\s]+$/.test(cleanedName) || !/^[a-zA-Z\s]+$/.test(cleanedLastname)) {
+      if (!/^[\p{Script=Latin}\s]+$/u.test(cleanedName) || !/^[\p{Script=Latin}\s]+$/u.test(cleanedLastname)) {
         Toast.show({
           type: 'info',
           text1: 'Nombre y apellido solo pueden contener letras.',
