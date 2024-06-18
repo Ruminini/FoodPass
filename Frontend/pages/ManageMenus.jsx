@@ -18,7 +18,7 @@ export default function ProductForm({ data, before }) {
   const [pointReOrder, setPointReOrder] = useState('' + (food.minimum_amount || ''));
   const [modalVisible, setModalVisible] = useState(false);
   const [currentAction, setCurrentAction] = useState('');
-  const [imageUri, setImageUri] = useState(food.image_path ? `${FileSystem.documentDirectory}${food.image_path}` : null); // Setear la URI de la imagen si ya está guardada
+  const [imageUri, setImageUri] = useState(food.image_path ? `${food.image_path}` : null); // Setear la URI de la imagen si ya está guardada
 
   const handleTypeSelection = (selectedType) => {
     // Verificar si el tipo ya está seleccionado
@@ -30,7 +30,9 @@ export default function ProductForm({ data, before }) {
       setSelectedTypes([...selectedTypes, selectedType]);
     }
   };
-
+  useEffect(() => {
+    console.log(imageUri)
+  })
   const validateAndAction = (action) => {
     if (action === 'Alta' || action === 'Update') {
       if (category === '' || name === '' || description === '' || stock === '' || pointReOrder === '') {
@@ -97,7 +99,6 @@ export default function ProductForm({ data, before }) {
     try {
       // Si todas las validaciones son exitosas, realizar la acción correspondiente
       console.log(`Realizar acción ${currentAction} a producto:`, name, category, selectedTypes, description, stock, pointReOrder, food.id);
-      // Aquí deberías llamar a la función para decidir la acción y pasar la URI de la imagen guardada
       const actionResult = await decideAction(currentAction, name, category, selectedTypes, description, stock, pointReOrder, food.id, imageUri);
       setModalVisible(false);
     
@@ -164,16 +165,19 @@ export default function ProductForm({ data, before }) {
     }
   };
 
-  //Una vez que se confirma el alta de la comida o su modificación se guarda la imagen
+  //Una vez que se confirma el alta de la comida o su modificación se guarda la imagen en la cache
   const saveImage = async () => {
+    //Si no tiene una imagen, el sistema la reemplaza por el ícono de Foodpass automaticamente
     if (!imageUri) {
-      Alert.alert('Error', 'Primero selecciona una imagen.');
       return;
     }
-
     try {
       const fileName = imageUri.split('/').pop();
       const destinationPath = `${FileSystem.documentDirectory}${fileName}`;
+      //Si la foto guardada es la misma que la del nueva entonces no la guarda 
+      if(destinationPath == imageUri){
+        return;
+      }
       await FileSystem.copyAsync({
         from: imageUri,
         to: destinationPath,

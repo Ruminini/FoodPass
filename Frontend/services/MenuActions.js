@@ -47,7 +47,7 @@ async function handleLoud(name, category, types, description, stock, pointReOrde
       return { success: false, message: `${name} ya hay un producto con ese nombre.` };
     } else {
       // Insertar el producto en la base de datos si no existe
-      await insertFood(category, name, description, stock, pointReOrder, types, imageUri);
+      insertFood(category, name, description, stock, pointReOrder, types, imageUri);
       return { success: true, message: `${name} ha sido cargado.` };
     }
   } catch (error) {
