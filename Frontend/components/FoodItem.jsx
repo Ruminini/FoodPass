@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 
 export default function FoodItem({ title, description, stock, selected=false, onPress, imgPath, style }) {
-    if(imgPath === null){
+    if(imgPath === null || undefined){
         imgPath = require("../assets/icon.png")
         return (
             <View style={[styles.container, style]}>

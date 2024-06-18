@@ -1,5 +1,5 @@
-import React, { useEffect, useState }  from 'react';
-import { View, Text, StyleSheet, TouchableOpacity  } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import BackButton from '../components/BackButton';
 import { createOrderRetireLog, getOrderFoodsByUserId, pickupOrder } from '../service_db/DBQuerys';
 import MenuList from '../components/MenuList';
@@ -18,61 +18,64 @@ export default function OrderPickUp({ data, goTo }) {
             () => goTo('MainMenu'),
             (id) => goTo('OrderPickUp', {legajo: id})
         ), 50);
-        return <View/>;
+        return <View />;
     }
 
-    useEffect(() => {
-        // Cargar imágenes para los alimentos seleccionados
-        const loadImages = async () => {
-            const images = {};
-            await Promise.all(foods.map(async (food) => {
-                const uri = await getImageUri(food.image_path);
-                images[food.id] = uri;
-            }));
-            setFoodImages(images);
-            };
-
-            loadImages();
-        }, [foods]);
-
-        const getImageUri = async (fileName) => {
-            try {
-                const uri = `${fileName}`;
-                const fileInfo = await FileSystem.getInfoAsync(uri);
-                if (fileInfo.exists) {
-                return uri;
-                } else {
-                return null;
-                }
-            } catch (error) {
-                console.error('Error al obtener la imagen:', error);
-                return null;
-            }
-    };
-
     const legajo = data.legajo;
+
     useEffect(() => {
         console.log('OrderPickUp: ' + legajo);
         getOrderFoodsByUserId(legajo)
-            .then(setOrder)
+            .then((orderData) => {
+                //Toma la info de la orden y la setea
+                setOrder(orderData);
+                //Con la info de la orden va a cargar las imágenes de cada alimento
+                loadImages(orderData);
+            })
             .catch((reason) => {
                 reason == "No orders" &&
-                Toast.show({ type: 'error', text1: 'No tienes ordenes para retirar', text2: 'Prueba realizar un pedido' })
+                Toast.show({ type: 'error', text1: 'No tienes ordenes para retirar', text2: 'Prueba realizar un pedido' });
                 goTo('MainMenu');
             });
-    }, []);
-    //Lógica para mostrar el pedido y poder retirarlo
+    }, [legajo]);
+
+    const loadImages = async (foods) => {
+        console.log(foods)
+        const images = {};
+        await Promise.all(foods.map(async (food) => {
+            console.log(food)
+            const uri = await getImageUri(food.image_path);
+            images[food.id] = uri;
+        }));
+        setFoodImages(images);
+    };
+
+    const getImageUri = async (fileName) => {
+        try {
+            const uri = `${fileName}`;
+            const fileInfo = await FileSystem.getInfoAsync(uri);
+            if (fileInfo.exists) {
+                return uri;
+            } else {
+                return null;
+            }
+        } catch (error) {
+            console.error('Error al obtener la imagen:', error);
+            return null;
+        }
+    };
+
     return (
-        <View style={{flex: 1}}>
+        <View style={{ flex: 1 }}>
             <View style={styles.container}>
                 <Text style={styles.text}>Hola {legajo},{'\n'} este es tu pedido:</Text>
                 <MenuList alignTop={true}>
                     {order && order.map((food, index) => (
                         <FoodItem
-                        key={index}
-                        title={food.name}
-                        description={food.description} 
-                        imgPath={foodImages[food.id]}
+                            key={index}
+                            title={food.name}
+                            description={food.description}
+                            imgPath={foodImages[food.id]} // Pasar la URI de la imagen aquí
                         />                       
                     ))}
                 </MenuList>

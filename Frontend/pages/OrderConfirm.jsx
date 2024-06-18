@@ -30,9 +30,9 @@ export default function OrderConfirm({ data, before, after }) {
                 const uri = `${fileName}`;
                 const fileInfo = await FileSystem.getInfoAsync(uri);
                 if (fileInfo.exists) {
-                return uri;
+                    return uri;
                 } else {
-                return null;
+                    return null;
                 }
             } catch (error) {
                 console.error('Error al obtener la imagen:', error);
