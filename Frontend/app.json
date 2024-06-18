@@ -24,7 +24,9 @@
       },
       "permissions": [
         "RECEIVE_BOOT_COMPLETED",
-        "android.permission.CAMERA"
+        "android.permission.CAMERA",
+        "READ_EXTERNAL_STORAGE", 
+        "WRITE_EXTERNAL_STORAGE"
       ],
       "package": "com.FoodTech.FoodPass"
     },

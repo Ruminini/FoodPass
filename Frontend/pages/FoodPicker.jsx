@@ -14,6 +14,7 @@ import Add from "../assets/svg/add.svg";
 import SelectedMenuList from "../components/SelectedMenuList";
 import SelectedFoodItem from "../components/SelectedFoodItem";
 import Toast from "react-native-toast-message";
+import * as FileSystem from 'expo-file-system';
 import {
   getAllFoodWithStockAndActive,
   getRelationOfFood,
@@ -29,6 +30,7 @@ export default function FoodPicker({ data, before, after, goTo }) {
   });
   const [selectedFoods, setSelectedFoods] = useState(data.foods || []);
   const [foods, setFoods] = useState([]);
+  const [foodImages, setFoodImages] = useState({});
   const adminMode = data.adminMode;
 
   useEffect(() => {
@@ -67,6 +69,35 @@ export default function FoodPicker({ data, before, after, goTo }) {
 
     loadFoods();
   }, [data.foods]);
+
+  useEffect(() => {
+    // Cargar imágenes para los alimentos seleccionados
+    const loadImages = async () => {
+      const images = {};
+      await Promise.all(foods.map(async (food) => {
+        const uri = await getImageUri(food.image_path);
+        images[food.id] = uri;
+      }));
+      setFoodImages(images);
+    };
+
+    loadImages();
+  }, [foods]);
+
+  const getImageUri = async (fileName) => {
+    try {
+      const uri = `${fileName}`;
+      const fileInfo = await FileSystem.getInfoAsync(uri);
+      if (fileInfo.exists) {
+        return uri;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Error al obtener la imagen:', error);
+      return null;
+    }
+  };
 
   const foodList = foods.filter((food) => matchesFilters(food, filters));
   const totalPrice = selectedFoods.reduce((acc, food) => acc + food.price, 0);
@@ -244,6 +275,7 @@ export default function FoodPicker({ data, before, after, goTo }) {
             key={index}
             title={food.name}
             description={food.description}
+            imgPath={foodImages[food.id]}
             // stock = {food.stock} Si se quiere mostrar el stock con la comida
             onPress={() => toggleSelectedFood(food)}
           />
@@ -255,6 +287,7 @@ export default function FoodPicker({ data, before, after, goTo }) {
             <SelectedFoodItem
               key={index}
               title={food.name}
+              imgPath={foodImages[food.id]}
               onPress={() => toggleSelectedFood(food)}
             />
           ))}

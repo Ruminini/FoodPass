@@ -1,11 +1,25 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 
-export default function FoodItem({ title, description, stock, selected=false, onPress, imgPath=require('../assets/icon.png'), style }) {
+export default function FoodItem({ title, description, stock, selected=false, onPress, imgPath, style }) {
+    if(imgPath === null){
+        imgPath = require("../assets/icon.png")
+        return (
+            <View style={[styles.container, style]}>
+                <TouchableOpacity style={styles.image_holder} onPress={onPress}>
+                    <Image source={imgPath} style={styles.image} />
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.background,  selected && styles.selectedStyle]} onPress={onPress}>
+                    <Text style={styles.title}>{title}</Text>
+                    {description && <Text style={styles.description}>{description} {stock}</Text>}
+                </TouchableOpacity>
+            </View>
+        )
+    }
     return (
         <View style={[styles.container, style]}>
             <TouchableOpacity style={styles.image_holder} onPress={onPress}>
-                <Image source={imgPath} style={styles.image} />
+                <Image source={{uri: imgPath}} style={styles.image} />
             </TouchableOpacity>
             <TouchableOpacity style={[styles.background,  selected && styles.selectedStyle]} onPress={onPress}>
                 <Text style={styles.title}>{title}</Text>

@@ -5,9 +5,12 @@ import { createOrderRetireLog, getOrderFoodsByUserId, pickupOrder } from '../ser
 import MenuList from '../components/MenuList';
 import FoodItem from '../components/FoodItem';
 import Toast from 'react-native-toast-message';
+import * as FileSystem from 'expo-file-system';
 
 export default function OrderPickUp({ data, goTo }) {
     const [order, setOrder] = useState(null);
+    const [foodImages, setFoodImages] = useState({});
+    
     if (!data || !data.legajo) {
         setTimeout(() => goTo(
             'Login',
@@ -17,6 +20,36 @@ export default function OrderPickUp({ data, goTo }) {
         ), 50);
         return <View/>;
     }
+
+    useEffect(() => {
+        // Cargar imágenes para los alimentos seleccionados
+        const loadImages = async () => {
+            const images = {};
+            await Promise.all(foods.map(async (food) => {
+                const uri = await getImageUri(food.image_path);
+                images[food.id] = uri;
+            }));
+            setFoodImages(images);
+            };
+
+            loadImages();
+        }, [foods]);
+
+        const getImageUri = async (fileName) => {
+            try {
+                const uri = `${fileName}`;
+                const fileInfo = await FileSystem.getInfoAsync(uri);
+                if (fileInfo.exists) {
+                return uri;
+                } else {
+                return null;
+                }
+            } catch (error) {
+                console.error('Error al obtener la imagen:', error);
+                return null;
+            }
+    };
+
     const legajo = data.legajo;
     useEffect(() => {
         console.log('OrderPickUp: ' + legajo);
@@ -38,7 +71,9 @@ export default function OrderPickUp({ data, goTo }) {
                         <FoodItem
                         key={index}
                         title={food.name}
-                        description={food.description} />
+                        description={food.description} 
+                        imgPath={foodImages[food.id]}
+                        />                       
                     ))}
                 </MenuList>
                 <TouchableOpacity

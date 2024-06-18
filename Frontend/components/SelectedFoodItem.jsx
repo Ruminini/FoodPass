@@ -1,14 +1,30 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 
-export default function SelectedFoodItem({ title, description, selected=false, onPress, imgPath=require('../assets/icon.png'), style }) {
+export default function SelectedFoodItem({ title, description, selected=false, onPress, imgPath, style }) {
+    // Si el usuario llega a cargar una comida sin imagen entonces le pone el logo de FoodPass
+    if(imgPath === null){
+        imgPath = require("../assets/icon.png")
+        return (
+            <View style={[styles.container, style]}>
+                <TouchableOpacity style={styles.image_holder} onPress={onPress}>
+                    <Image source={imgPath} style={styles.image} />
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.background,  selected && styles.selectedStyle]} onPress={onPress}>
+                    <Text style={styles.title}>{title}</Text>
+                    {description && <Text style={styles.description}>{description} {stock}</Text>}
+                </TouchableOpacity>
+            </View>
+        )
+    }
     return (
         <View style={[styles.container, style]}>
             <TouchableOpacity style={styles.image_holder} onPress={onPress}>
-                <Image source={imgPath} style={styles.image} />
+                <Image source={{uri: imgPath}} style={styles.image} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.background} onPress={onPress}>
+            <TouchableOpacity style={[styles.background,  selected && styles.selectedStyle]} onPress={onPress}>
                 <Text style={styles.title}>{title}</Text>
+                {description && <Text style={styles.description}>{description} {stock}</Text>}
             </TouchableOpacity>
         </View>
     )

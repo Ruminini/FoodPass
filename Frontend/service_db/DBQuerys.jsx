@@ -663,13 +663,14 @@ export const insertFood = (
   description,
   stock,
   minimum_amount,
-  code_restrictions
+  code_restrictions,
+  image_path
 ) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
-      //Insertar el alimento en la tabla food
+      // Insertar el alimento en la tabla food
       tx.executeSql(
-        "INSERT OR IGNORE INTO food (type_code, name, description, price, stock, minimum_amount, create_date, last_update, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT OR IGNORE INTO food (type_code, name, description, price, stock, minimum_amount, create_date, last_update, state, image_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
           type_code,
           name,
@@ -680,9 +681,10 @@ export const insertFood = (
           new Date().toString(),
           new Date().toString(),
           "A",
+          image_path
         ],
         (tx, results) => {
-          //Obtener el ID del alimento recién insertado
+          // Obtener el ID del alimento recién insertado
           tx.executeSql(
             "SELECT id FROM food WHERE name = ?",
             [name],
@@ -692,7 +694,7 @@ export const insertFood = (
                 for (let i = 0; i < code_restrictions.length; i++) {
                   insertRestriction(food_id, code_restrictions[i])
                     .then(() => {
-                      console.log("Alimento y restricción insertados correctamente: ", name);
+                      console.log("Alimento y restricción insertados correctamente: " + name + "además se almacenó con imagen de path: " + image_path);
                       resolve();
                     })
                     .catch((error) => {
@@ -720,6 +722,7 @@ export const insertFood = (
   });
 };
 
+
 //Insertar alimentos y su restricción
 export const updateFood = (
   id,
@@ -728,13 +731,14 @@ export const updateFood = (
   description,
   stock,
   minimum_amount,
-  code_restrictions
+  code_restrictions,
+  image_path
 ) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       // Insertar el alimento en la tabla food
       tx.executeSql(
-        "UPDATE food SET type_code = ?, name = ?, description = ?, price = ?, stock = ?, minimum_amount = ?, last_update = ?, state = ? WHERE id = ?;",
+        "UPDATE food SET type_code = ?, name = ?, description = ?, price = ?, stock = ?, minimum_amount = ?, last_update = ?, state = ?, image_path = ? WHERE id = ?;",
         [
           type_code,
           name,
@@ -744,6 +748,7 @@ export const updateFood = (
           minimum_amount,
           new Date().toString(),
           "A",
+          image_path,
           id
         ],
         (tx, results) => {

@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity,ScrollView, Alert, Image } from 'react-native';
 import Toast from 'react-native-toast-message';
 import BackButton from '../components/BackButton';
 import { decideAction } from '../services/MenuActions';
 import AdminModal from '../components/AdminModal';
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 
 export default function ProductForm({ data, before }) {
   const food = data.food || {};
@@ -16,7 +18,7 @@ export default function ProductForm({ data, before }) {
   const [pointReOrder, setPointReOrder] = useState('' + (food.minimum_amount || ''));
   const [modalVisible, setModalVisible] = useState(false);
   const [currentAction, setCurrentAction] = useState('');
-
+  const [imageUri, setImageUri] = useState(food.image_path ? `${food.image_path}` : null); // Setear la URI de la imagen si ya está guardada
 
   const handleTypeSelection = (selectedType) => {
     // Verificar si el tipo ya está seleccionado
@@ -28,10 +30,12 @@ export default function ProductForm({ data, before }) {
       setSelectedTypes([...selectedTypes, selectedType]);
     }
   };
-
+  useEffect(() => {
+    console.log(imageUri)
+  })
   const validateAndAction = (action) => {
     if (action === 'Alta' || action === 'Update') {
-      if (category === '' || name === '' || setDescription === '' || stock === '' || pointReOrder === '') {
+      if (category === '' || name === '' || description === '' || stock === '' || pointReOrder === '') {
         Toast.show({ 
           type: 'info', 
           text1: 'Todos los campos son obligatorios.',
@@ -43,7 +47,7 @@ export default function ProductForm({ data, before }) {
       if (stockString.length > 4) {
         Toast.show({ 
           type: 'info', 
-          text1: 'Cantidad de stock supera el limite (4 dígitos).',
+          text1: 'Cantidad de stock supera el límite (4 dígitos).',
         });
         return;
       }
@@ -95,10 +99,11 @@ export default function ProductForm({ data, before }) {
     try {
       // Si todas las validaciones son exitosas, realizar la acción correspondiente
       console.log(`Realizar acción ${currentAction} a producto:`, name, category, selectedTypes, description, stock, pointReOrder, food.id);
-      const actionResult = await decideAction(currentAction, name, category, selectedTypes, description, stock, pointReOrder, food.id);
+      const actionResult = await decideAction(currentAction, name, category, selectedTypes, description, stock, pointReOrder, food.id, imageUri);
       setModalVisible(false);
     
       if (actionResult.success) {
+        await saveImage()
         Toast.show({
             type: 'info',
             text1: actionResult.message,
@@ -128,26 +133,85 @@ export default function ProductForm({ data, before }) {
       setPointReOrder(text);
     }
   };
+
+  // Función para manejar la selección de imágenes
+  const pickImage = async () => {
+    //Pide los permisos para abrir y modificar la librería
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permiso necesario', 'Debes permitir el acceso a la galería para seleccionar imágenes.');
+      return;
+    }
+    //Si fueron concedidos entonces abre la librería y permite al usuario seleccionar una imagen (No es 100% necesario) 
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0,
+      });
+
+      if (!result.canceled) {
+        setImageUri(result.assets[0].uri);
+      } else if(result.canceled){
+        return;
+      }
+    } catch (error) {
+      console.error('Error al seleccionar imagen:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Hubo un error al seleccionar la imagen.',
+      });
+    }
+  };
+
+  //Una vez que se confirma el alta de la comida o su modificación se guarda la imagen en la cache
+  const saveImage = async () => {
+    //Si no tiene una imagen, el sistema la reemplaza por el ícono de Foodpass automaticamente
+    if (!imageUri) {
+      return;
+    }
+    try {
+      const fileName = imageUri.split('/').pop();
+      const destinationPath = `${FileSystem.documentDirectory}${fileName}`;
+      //Si la foto guardada es la misma que la del nueva entonces no la guarda 
+      if(destinationPath == imageUri){
+        return;
+      }
+      await FileSystem.copyAsync({
+        from: imageUri,
+        to: destinationPath,
+      });
+      setImageUri(destinationPath); // Actualizar la URI con la ruta guardada
+      Toast.show({
+        type: 'success',
+        text1: 'Imagen guardada correctamente.',
+      });
+    } catch (error) {
+      console.error('Error al guardar la imagen:', error);
+      Alert.alert('Error', 'No se pudo guardar la imagen.');
+    }
+  };
   
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.content}>
         <View style={styles.field}>
-          <Text style={styles.label}>Categoria</Text>
+          <Text style={styles.label}>Categoría</Text>
           <View style={styles.radioGroup}>
             <TouchableOpacity
-              style={[styles.radio, category == 1 && styles.selectedRadio]}
-              onPress={() => setCategory(1)}>
+              style={[styles.radio, category == '1' && styles.selectedRadio]}
+              onPress={() => setCategory('1')}>
               <Text style={styles.radioText}>Comida</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, category == 2 && styles.selectedRadio]}
-              onPress={() => setCategory(2)}>
+              style={[styles.radio, category == '2' && styles.selectedRadio]}
+              onPress={() => setCategory('2')}>
               <Text style={styles.radioText}>Bebida</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.radio, category == 3 && styles.selectedRadio]}
-              onPress={() => setCategory(3)}>
+              style={[styles.radio, category == '3' && styles.selectedRadio]}
+              onPress={() => setCategory('3')}>
               <Text style={styles.radioText}>Postre</Text>
             </TouchableOpacity>
           </View>
@@ -178,7 +242,7 @@ export default function ProductForm({ data, before }) {
             style={styles.input}
             onChangeText={setName}
             value={name}
-            placeholder="Milanesa con pure"
+            placeholder="Milanesa con puré"
           />
         </View>
         <View style={styles.field}>
@@ -187,7 +251,7 @@ export default function ProductForm({ data, before }) {
             style={styles.input}
             onChangeText={setDescription}
             value={description}
-            placeholder="Milanesa de carne con pure de papa"
+            placeholder="Milanesa de carne con puré de papa"
           />
         </View>
         <View style={styles.field}>
@@ -217,15 +281,27 @@ export default function ProductForm({ data, before }) {
           <TouchableOpacity style={[styles.button, styles.redButton]} onPress={() => validateAndAction('Baja')}>
             <Text style={styles.buttonText}>Dar de baja</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={pickImage}>
+            <Text style={styles.buttonText}>Seleccionar Imagen</Text>
+          </TouchableOpacity>
+          {imageUri && (
+            <Image source={{ uri: imageUri }} style={{ width: 200, height: 200, marginBottom: 10 }} />
+          )}
         </View>
       </View>
       <BackButton onPress={before} style={styles.backButton} />
       <AdminModal after={confirmAction} visible={modalVisible} hide={() => setModalVisible(false)} />
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 25,
+  },
   container: {
     flex: 1,
     backgroundColor: '#EEE',

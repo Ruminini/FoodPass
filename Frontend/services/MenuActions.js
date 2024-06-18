@@ -14,14 +14,14 @@ import { getTotalDataFoodByName,
  * @param {number} pointReOrder - Punto de reorden del producto.
  * @returns {Object} Objeto con el resultado de la operación.
  */
-export async function decideAction(action, name, category, types, description, stock, pointReOrder, id) {
+export async function decideAction(action, name, category, types, description, stock, pointReOrder, id, imageUri) {
     switch (action) {
       case 'Alta':
-        return handleLoud(name, category, types, description, stock, pointReOrder);
+        return handleLoud(name, category, types, description, stock, pointReOrder, imageUri);
       case 'Baja':
         return handleDown(name);
       case 'Update':
-        return handleUpdate(id, name, category, types, description, stock, pointReOrder);
+        return handleUpdate(id, name, category, types, description, stock, pointReOrder, imageUri);
       default:
         console.log(`Acción no reconocida: ${action}`);
         return false;
@@ -38,7 +38,7 @@ export async function decideAction(action, name, category, types, description, s
  * @param {number} pointReOrder - Punto de reorden del producto.
  * @returns {Object} Objeto con el resultado de la operación.
  */
-async function handleLoud(name, category, types, description, stock, pointReOrder) {
+async function handleLoud(name, category, types, description, stock, pointReOrder, imageUri) {
   try {
     console.log('Realizando acción de alta...');
     const food = await getTotalDataFoodByName(name);
@@ -47,7 +47,7 @@ async function handleLoud(name, category, types, description, stock, pointReOrde
       return { success: false, message: `${name} ya hay un producto con ese nombre.` };
     } else {
       // Insertar el producto en la base de datos si no existe
-      await insertFood(category, name, description, stock, pointReOrder, types);
+      insertFood(category, name, description, stock, pointReOrder, types, imageUri);
       return { success: true, message: `${name} ha sido cargado.` };
     }
   } catch (error) {
@@ -93,13 +93,13 @@ async function handleDown(name) {
  * @param {string} pointReOrder - Punto de reorden del producto.
  * @returns {Object} Objeto con el resultado de la operación.
  */
-async function handleUpdate(id, name, category, types, description, stock, pointReOrder) {
+async function handleUpdate(id, name, category, types, description, stock, pointReOrder, imageUri) {
   try {
     const food = await getTotalDataFoodByName(name);
     if (food[0] !== undefined && food[0].id != id) {
       return { success: false, message: `${name} ya hay un alimento con ese nombre.` };
     }
-    await updateFood(id, category, name, description, stock, pointReOrder, types);
+    await updateFood(id, category, name, description, stock, pointReOrder, types, imageUri);
     return { success: true, message: `${name} ha sido actualizado.` };
   } catch (error) {
     console.error(`Error al cargar ${name}:`, error);
