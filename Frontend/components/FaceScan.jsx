@@ -13,7 +13,7 @@ import { matchFaces } from '../services/FaceMatcher.js';
 import Flip from '../assets/svg/flip.svg'
 
 export default function FaceScan({ data, after }) {
-	const [type, setType] = useState(CameraType.back);
+	const [type, setType] = useState(CameraType.front);
 	const [permission, requestPermission] = Camera.useCameraPermissions();
 	const [photo, setPhoto] = useState(null);
 	const [size, setSize] = useState("640x480");

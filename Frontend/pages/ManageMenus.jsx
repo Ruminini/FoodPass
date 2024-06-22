@@ -6,6 +6,7 @@ import { decideAction } from '../services/MenuActions';
 import AdminModal from '../components/AdminModal';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 export default function ProductForm({ data, before }) {
   const food = data.food || {};
@@ -99,11 +100,11 @@ export default function ProductForm({ data, before }) {
     try {
       // Si todas las validaciones son exitosas, realizar la acción correspondiente
       console.log(`Realizar acción ${currentAction} a producto:`, name, category, selectedTypes, description, stock, pointReOrder, food.id);
-      const actionResult = await decideAction(currentAction, name, category, selectedTypes, description, stock, pointReOrder, food.id, imageUri);
+      const imgUri = await saveImage()
+      const actionResult = await decideAction(currentAction, name, category, selectedTypes, description, stock, pointReOrder, food.id, imgUri);
       setModalVisible(false);
     
       if (actionResult.success) {
-        await saveImage()
         Toast.show({
             type: 'info',
             text1: actionResult.message,
@@ -147,12 +148,13 @@ export default function ProductForm({ data, before }) {
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0,
+        aspect: [1, 1]
       });
 
       if (!result.canceled) {
-        setImageUri(result.assets[0].uri);
+        let image = result.assets[0]
+        image = await resizeImage(image);
+        setImageUri(image.uri);
       } else if(result.canceled){
         return;
       }
@@ -164,6 +166,18 @@ export default function ProductForm({ data, before }) {
       });
     }
   };
+  
+	async function resizeImage(img) {
+    console.log(JSON.stringify(img))
+		if (img.height <= 512) return img;
+		const resizedPhoto = await ImageManipulator.manipulateAsync(
+			img.uri,
+			[{ resize: { width: 512, height: 512 } }],
+			{ compress: 0.15 }
+		);
+    console.log(JSON.stringify(resizedPhoto))
+		return resizedPhoto;
+	}
 
   //Una vez que se confirma el alta de la comida o su modificación se guarda la imagen en la cache
   const saveImage = async () => {
@@ -176,17 +190,18 @@ export default function ProductForm({ data, before }) {
       const destinationPath = `${FileSystem.documentDirectory}${fileName}`;
       //Si la foto guardada es la misma que la del nueva entonces no la guarda 
       if(destinationPath == imageUri){
-        return;
+        return imageUri;
       }
       await FileSystem.copyAsync({
         from: imageUri,
         to: destinationPath,
       });
-      setImageUri(destinationPath); // Actualizar la URI con la ruta guardada
+      FileSystem.deleteAsync(imageUri);
       Toast.show({
         type: 'success',
         text1: 'Imagen guardada correctamente.',
       });
+      return destinationPath;
     } catch (error) {
       console.error('Error al guardar la imagen:', error);
       Alert.alert('Error', 'No se pudo guardar la imagen.');
