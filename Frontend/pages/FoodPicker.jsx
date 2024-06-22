@@ -221,6 +221,7 @@ export default function FoodPicker({ data, before, after, goTo }) {
             /> :
             <BackButton
             style={{ transform: [{ rotate: "180deg" }] }}
+            ignoreBack={true}
             onPress={() => {
               if (selectedFoods.length === 0) {
                 Toast.show({
