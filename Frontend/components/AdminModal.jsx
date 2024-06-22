@@ -14,6 +14,7 @@ import {
   validatePassword,
   userStateValidator,
 } from "../services/LoginValidator";
+import { createLoginLog } from "../service_db/DBQuerys";
 
 export default function AdminModal({ hide, after, visible }) {
   const [adminUser, setAdminUser] = useState("");
@@ -67,6 +68,7 @@ export default function AdminModal({ hide, after, visible }) {
     }
 
     resetFields();
+    createLoginLog(adminUser);
     after();
   };
 

@@ -1310,6 +1310,24 @@ export const getLoginLogs = () => {
   });
 };
 
+//Funcion para obtener miembro valido mediante el id
+export const getLoginLogsArr = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM logs_login",
+        [],
+        (tx, results) => {
+          resolve(results.rows._array);
+        },
+        (tx, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
 //Crea un log del login con el id del usuario y el año, mes, día y hora
 export const createOrderRetireLog = (member_code) => {
   return new Promise((resolve, reject) => {

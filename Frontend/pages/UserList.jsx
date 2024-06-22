@@ -51,7 +51,7 @@ export default function UserList({ data, goTo }) {
           placeholder="Buscar..."
         />
       <MenuList>
-        {filteredUsers.length === 0 ? <Text>No hay usuarios</Text> : filteredUsers.map((user, index) => (
+        {filteredUsers.length === 0 ? <Text style={{ textAlign: "center" }}>No hay usuarios</Text> : filteredUsers.map((user, index) => (
           data.guests ?
           <UserItem key={index} name={user.member_code.slice(0, 8)} id={"Valido hasta: "+user.expiration_date} inactive={user.state != "A"} onPress={() => goTo("ManageGuests", {user}, () => goTo("UserList", data))} /> :
           <UserItem key={index} name={user.name + " " + user.last_name} id={user.code} onPress={() => goTo("ManageMembers", {user}, () => {goTo("UserList")})} inactive={user.state != "A"}/>

@@ -6,6 +6,7 @@ import BackButton from '../components/BackButton'
 import Food from '../assets/svg/food.svg'
 import Options from '../assets/svg/options.svg'
 import Register from '../assets/svg/register.svg'
+import Guest from '../assets/svg/guest.svg'
 
 
 export default function Admin({ goTo }) {
@@ -32,6 +33,10 @@ export default function Admin({ goTo }) {
                     svg={<Food/>}
                     text='Gestionar menús'
                     onPress={goToManageMenus} />
+                <MenuButton
+                    svg={<Guest/>}
+                    text='Logs de sesiones'
+                    onPress={() => goTo('Logs')} />
             </MenuList>
             <BackButton onPress={() => goTo('MainMenu')}/>
         </View>
