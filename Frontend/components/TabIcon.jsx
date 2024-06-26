@@ -5,8 +5,8 @@ export default function TabIcon({ text, onPress, selected=false, svg, style }) {
     
     return (
         <TouchableOpacity style={[styles.container, style]} onPress={onPress}>
-            <View style={styles.icon}>
-                <View style={{ aspectRatio: 1 }}>
+            <View style={[styles.icon, { aspectRatio: 1, alignItems: 'center', justifyContent: 'center' }]}>
+                <View style={{ aspectRatio: 1} }>
                     {svg}
                 </View>
             </View>

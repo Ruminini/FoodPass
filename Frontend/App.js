@@ -37,6 +37,7 @@ import Logs from "./pages/Logs";
 
 export default function App() {
   const [page, setPage] = useState(<View />);
+  StatusBar.setHidden(true);
 
   useEffect(() => {
     initializeDatabase();
@@ -128,6 +129,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#EEE",
     width: "100%",
     position: "relative",
-    paddingTop: StatusBar.currentHeight,
+    // paddingTop: StatusBar.currentHeight,
   },
 });

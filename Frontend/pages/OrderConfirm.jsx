@@ -73,11 +73,11 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
     },
     title: {
-        height: 60,
+        height: '10%',
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'white',
-        elevation: 10,
+        elevation: 5,
     },
     text: {
         fontSize: 40,

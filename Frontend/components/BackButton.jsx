@@ -1,6 +1,8 @@
-import { TouchableOpacity, StyleSheet, Alert, BackHandler } from "react-native";
+import { TouchableOpacity, StyleSheet, Alert, BackHandler, Dimensions } from "react-native";
 import React, { useEffect } from "react";
 import ArrowLeft from "../assets/svg/arrow-left.svg";
+
+const size = Dimensions.get('window').height / 15;
 
 export default function BackButton({ onPress, style, ignoreBack = false }) {
   useEffect(() => {
@@ -19,7 +21,7 @@ export default function BackButton({ onPress, style, ignoreBack = false }) {
   }, []);
   return (
     <TouchableOpacity onPress={onPress} style={[styles.button, style]}>
-      <ArrowLeft width={50} height={50} />
+      <ArrowLeft width={size} height={size} />
     </TouchableOpacity>
   );
 }
@@ -27,7 +29,7 @@ export default function BackButton({ onPress, style, ignoreBack = false }) {
 const styles = StyleSheet.create({
   button: {
     marginHorizontal: 10,
-    marginVertical: 5,
+    marginVertical: 15,
     position: "absolute",
   },
 });

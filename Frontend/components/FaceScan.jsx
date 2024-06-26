@@ -11,6 +11,7 @@ import { getDescriptors } from '../services/Api.js';
 import { createLoginLog } from '../service_db/DBQuerys.jsx';
 import { matchFaces } from '../services/FaceMatcher.js';
 import Flip from '../assets/svg/flip.svg'
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 export default function FaceScan({ data, after }) {
 	const [type, setType] = useState(CameraType.front);
@@ -77,9 +78,9 @@ export default function FaceScan({ data, after }) {
 
     if (!permission.granted) {
         return (
-            <View style={styles.container}>
-                <Text style={{ textAlign: 'center' }}>We need your permission to show the camera</Text>
-                <Button onPress={requestPermission} title="Grant Permission" />
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', width: '80%', alignSelf: 'center'}]}>
+                <Text style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 20 }}>Necesitamos permiso para usar la camara</Text>
+				<MenuButton text="Dar  permiso" style={{ height: 50 }} onPress={requestPermission}/>
             </View>
         );
     }

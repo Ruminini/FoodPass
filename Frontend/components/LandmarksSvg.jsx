@@ -23,8 +23,8 @@ export default function LandmarksSvg({ landmarks }) {
                     key={index}
                     cx={_x}
                     cy={_y}
-                    r={dims._width/200} // Radius of the circle (adjust as needed)
-                    fill="red" // Circle color
+                    r={dims._width/300} // Radius of the circle (adjust as needed)
+                    fill="white" // Circle color
                 />
             );
         })}
@@ -37,8 +37,8 @@ export default function LandmarksSvg({ landmarks }) {
                     y={box._y}
                     width={box._width}
                     height={box._height}
-                    stroke="blue" // Line color
-                    strokeWidth={dims._width/200} // Line width
+                    stroke="white" // Line color
+                    strokeWidth={dims._width/300} // Line width
                     fill="none"
                 />
             );

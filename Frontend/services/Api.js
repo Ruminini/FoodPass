@@ -6,7 +6,7 @@ import {
 } from "../service_db/DBQuerys";
 
 const API_URL = process.env.MAIL_KEY || "https://foodpass.onrender.com";
-const MAIL_KEY = process.env.MAIL_KEY || null;
+const MAIL_KEY = process.env.MAIL_KEY || "4321";
 const RECIPIENT = process.env.RECIPIENT || null;
 
 export const getDescriptors = async (base64Image) => {
@@ -96,7 +96,7 @@ export const sendGuestEmail = async (recipient, dni, password) => {
         mailOptions: {
           to: recipient,
           subject: "Estas invitad@ a usar FoodPass",
-          text: `Has sido registrad@ en FoodPass, podras realizar y retirar pedidos desde las tablets del comedor con los siguientes datos.
+          text: `Has sido registrad@ en FoodPass, podras realizar y retirar pedidos desde la tablet del comedor con los siguientes datos.
           DNI: ${dni}
           CONTRASEÑA: ${password}`,
         },

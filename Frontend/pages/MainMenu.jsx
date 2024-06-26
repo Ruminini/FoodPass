@@ -44,7 +44,9 @@ export default function MainMenu({goTo}) {
             <SettingsButton onPress={() => {
                 showAdminToast();
                 goTo('Admin');
-            }}/>
+            }}
+            style={{marginVertical: 15, marginHorizontal: 10}}
+            />
         </View>
     )
 }

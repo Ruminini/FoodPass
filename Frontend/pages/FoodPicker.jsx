@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Dimensions } from "react-native";
 import MenuList from "../components/MenuList";
 import FoodItem from "../components/FoodItem";
 import TabIcon from "../components/TabIcon";
@@ -20,6 +20,7 @@ import {
   getRelationOfFood,
   insertMenu,
 } from "../service_db/DBQuerys.jsx"; // Importar las funciones de la DB
+const size = Dimensions.get('window').height / 20;
 
 export default function FoodPicker({ data, before, after, goTo }) {
   const [filters, setFilters] = useState({
@@ -211,16 +212,15 @@ export default function FoodPicker({ data, before, after, goTo }) {
           }
           selected={filters.type === "postre"}
         />
-        <View style={{ height: "100%", overflow: "hidden", justifyContent: "center", aspectRatio: 1 }}>
+        <View style={{ height: "100%", overflow: "hidden", justifyContent: "center", aspectRatio: 1, marginRight: 5 }}>
           { adminMode ?
             <TabIcon
-              svg={<Add fill="#007bff" />}
+              svg={<Add fill="#007bff" width={size} height={size} />}
               onPress={() => {after({})}}
-              style={ {padding: 10} }
               selected={filters.type === "admin"}
             /> :
             <BackButton
-            style={{ transform: [{ rotate: "180deg" }] }}
+            style={{ transform: [{ rotate: "180deg" }], marginRight: 5 }}
             ignoreBack={true}
             onPress={() => {
               if (selectedFoods.length === 0) {
